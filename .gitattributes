@@ -1,0 +1,11 @@
+# 由 Git 自动识别文本与二进制, 文本文件统一以 LF 存储和检出
+* text=auto eol=lf
+
+# PNG 图片按二进制处理, 不做换行转换, 文本 diff 与合并
+*.png binary
+
+# ICO 图标按二进制处理, 不做换行转换, 文本 diff 与合并
+*.ico binary
+
+# ICNS 图标按二进制处理, 不做换行转换, 文本 diff 与合并
+*.icns binary

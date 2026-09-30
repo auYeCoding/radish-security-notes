@@ -1,0 +1,23 @@
+# 顶层配置, 编辑器不再向上级目录查找其它 .editorconfig
+root = true
+
+# 以下规则适用于所有文件
+[*]
+
+# 文件编码使用 UTF-8, 不带 BOM
+charset = utf-8
+
+# 缩进使用空格, 不使用 Tab
+indent_style = space
+
+# 缩进宽度为 2 个空格, 与现有代码及 Prettier 默认风格一致
+indent_size = 2
+
+# 换行符统一为 LF
+end_of_line = lf
+
+# 文件末尾保留一个换行
+insert_final_newline = true
+
+# 保存时删除行尾空白
+trim_trailing_whitespace = true
