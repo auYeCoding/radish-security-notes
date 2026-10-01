@@ -1,0 +1,62 @@
+/*
+ * 第 1 层 token: 原始值. 只有本文件允许出现颜色, 尺寸与时长字面量.
+ * 取值依据见 docs/设计语言.md. 组件与页面不得引用本层, 只能引用语义层与组件层.
+ * --base-surface-light 与 --base-surface-dark 必须写成十六进制字面量,
+ * 主进程在建窗时读取它们作为窗口背景色, 解析逻辑见 src/main/theme/window-background.ts.
+ */
+:root {
+  --base-surface-light: #ffffff;
+  --base-surface-dark: #0f172a;
+  --white: #ffffff;
+
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-450: #8495ad;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-925: #0b1224;
+  --slate-950: #020617;
+
+  --navy-50: #eff6ff;
+  --navy-100: #dae9fe;
+  --navy-200: #b5d4fd;
+  --navy-300: #96b7e3;
+  --navy-400: #7594bf;
+  --navy-500: #587398;
+  --navy-600: #3f5776;
+  --navy-700: #1e3a5f;
+  --navy-800: #1d2f46;
+  --navy-900: #112034;
+  --navy-950: #061222;
+
+  --emerald-500: #10b981;
+  --emerald-700: #047857;
+
+  --red-400: #f87171;
+  --red-600: #dc2626;
+
+  --space-unit: 0.25rem;
+
+  --radius-6: 0.375rem;
+  --radius-8: 0.5rem;
+
+  --font-stack-sans:
+    "Inter Variable", "Noto Sans SC Variable", "Segoe UI", "Microsoft YaHei UI",
+    system-ui, sans-serif;
+  --font-stack-mono: "Cascadia Mono", Consolas, "Courier New", monospace;
+
+  --duration-none: 0ms;
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --duration-fast-exit: 84ms;
+  --duration-base-exit: 140ms;
+  --duration-slow-exit: 224ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}

@@ -1,0 +1,39 @@
+{
+  "app": {
+    "title": "Security Notes"
+  },
+  "search": {
+    "placeholder": "Search entries",
+    "label": "Search"
+  },
+  "folderPane": {
+    "foldersHeading": "Folders",
+    "tagsHeading": "Tags",
+    "emptyFolders": "No folders yet",
+    "emptyTags": "No tags yet"
+  },
+  "entryListPane": {
+    "heading": "Entries",
+    "count": "{count, plural, one {# entry} other {# entries}}",
+    "empty": "No entries yet"
+  },
+  "entryDetailPane": {
+    "empty": "Select an entry to see its details"
+  },
+  "settings": {
+    "open": "Settings"
+  },
+  "preferences": {
+    "theme": {
+      "label": "Theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "language": {
+      "label": "Language",
+      "zh": "简体中文",
+      "en": "English"
+    }
+  }
+}

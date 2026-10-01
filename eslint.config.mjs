@@ -6,6 +6,7 @@ import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginReactRefresh from "eslint-plugin-react-refresh";
 import eslintPluginJsdoc from "eslint-plugin-jsdoc";
 import { documentationRules } from "./tools/eslint/documentation-rules.mjs";
+import { frontendConstraintConfigs } from "./tools/eslint/frontend-constraints.mjs";
 import { noCommentsInFunctionBody } from "./tools/eslint/no-comments-in-function-body.mjs";
 
 /**
@@ -105,5 +106,6 @@ export default defineConfig(
     plugins: { local: LOCAL_PLUGIN },
     rules: { "local/no-comments-in-function-body": "error" },
   },
+  ...frontendConstraintConfigs,
   eslintConfigPrettier,
 );

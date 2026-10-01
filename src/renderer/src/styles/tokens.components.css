@@ -1,0 +1,11 @@
+/*
+ * 第 3 层 token: 组件. 只引用第 2 层, 为具体组件与布局提供尺寸.
+ * 只放当前三栏主界面用到的项, 新组件需要时再加.
+ */
+:root {
+  --control-height: calc(var(--space-base) * 8);
+  --sidebar-width: calc(var(--space-base) * 56);
+  --list-pane-width: calc(var(--space-base) * 80);
+  --topbar-height: calc(var(--space-base) * 14);
+  --list-row-height: calc(var(--space-base) * 15);
+}

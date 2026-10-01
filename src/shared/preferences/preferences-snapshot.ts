@@ -1,0 +1,20 @@
+import type { SupportedLanguage } from "./language";
+import type { ThemeSource } from "./theme-source";
+
+/**
+ * 主进程交给渲染进程的偏好快照.
+ */
+export interface PreferencesSnapshot {
+  /**
+   * 用户选择的主题来源.
+   */
+  readonly themeSource: ThemeSource;
+  /**
+   * 当前界面语言.
+   */
+  readonly language: SupportedLanguage;
+  /**
+   * 是否启用开发用的伪本地化.
+   */
+  readonly isPseudoLocalizationEnabled: boolean;
+}

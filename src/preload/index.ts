@@ -1,10 +1,15 @@
-import { contextBridge } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
+import type { RendererApi } from "@shared/ipc/renderer-api";
+import { contextBridge, ipcRenderer } from "electron";
+
+import { createPreferencesBridge } from "./create-preferences-bridge";
 
 /**
  * 暴露给渲染进程的自定义 API 集合.
  */
-const api = {};
+const api: RendererApi = {
+  preferences: createPreferencesBridge(ipcRenderer),
+};
 
 if (process.contextIsolated) {
   try {

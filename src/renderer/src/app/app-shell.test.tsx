@@ -1,0 +1,84 @@
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it } from "vitest";
+
+import { createPreferencesTestEnvironment } from "@renderer/testing/preferences-test-environment";
+
+import { AppShell } from "./app-shell";
+
+/**
+ * 在偏好环境里渲染三栏主界面.
+ */
+async function renderShell(): Promise<void> {
+  const { Providers } = await createPreferencesTestEnvironment();
+  render(<AppShell />, { wrapper: Providers });
+}
+
+/**
+ * 判断第二个节点在文档里是否位于第一个节点之后.
+ * @param first 第一个节点.
+ * @param second 第二个节点.
+ * @returns 第二个节点在第一个之后时为 true.
+ */
+function isFollowing(first: Node, second: Node): boolean {
+  return Boolean(
+    first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING,
+  );
+}
+
+describe("AppShell 布局", () => {
+  it("显示三栏空壳: 标签与文件夹, 条目列表, 条目详情, 搜索入口与设置按钮", async () => {
+    await renderShell();
+
+    expect(screen.getByText("安全笔记")).toBeDefined();
+    expect(screen.getByRole("heading", { name: "标签" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "文件夹" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "条目" })).toBeDefined();
+    expect(screen.getByText("共 0 个条目")).toBeDefined();
+    expect(screen.getByText("选择一个条目查看详情")).toBeDefined();
+    expect(screen.getByRole("searchbox", { name: "搜索" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "设置" })).toBeDefined();
+  });
+
+  it("侧栏里标签在文件夹之上, 且没有主题与语言切换控件", async () => {
+    await renderShell();
+
+    const sidebar = within(screen.getByRole("complementary"));
+    const tags = sidebar.getByRole("heading", { name: "标签" });
+    const folders = sidebar.getByRole("heading", { name: "文件夹" });
+    expect(isFollowing(tags, folders)).toBe(true);
+    expect(sidebar.queryByRole("group", { name: "主题" })).toBeNull();
+    expect(sidebar.queryByRole("group", { name: "语言" })).toBeNull();
+  });
+
+  it("顶栏里搜索栏在左, 主题与语言切换控件在右", async () => {
+    await renderShell();
+
+    const topbar = within(screen.getByRole("banner"));
+    const searchbox = topbar.getByRole("searchbox", { name: "搜索" });
+    const themeGroup = topbar.getByRole("group", { name: "主题" });
+    const languageGroup = topbar.getByRole("group", { name: "语言" });
+    expect(isFollowing(searchbox, themeGroup)).toBe(true);
+    expect(isFollowing(themeGroup, languageGroup)).toBe(true);
+  });
+});
+
+describe("AppShell 语言切换", () => {
+  it("切换语言后全部窗格的文案随之切换", async () => {
+    await renderShell();
+
+    await userEvent
+      .setup()
+      .click(screen.getByRole("button", { name: "English" }));
+
+    expect(await screen.findByRole("heading", { name: "Tags" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Folders" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Entries" })).toBeDefined();
+    expect(screen.getByText("0 entries")).toBeDefined();
+    expect(
+      screen.getByText("Select an entry to see its details"),
+    ).toBeDefined();
+    expect(screen.getByRole("searchbox", { name: "Search" })).toBeDefined();
+    expect(screen.getByRole("button", { name: "Settings" })).toBeDefined();
+  });
+});

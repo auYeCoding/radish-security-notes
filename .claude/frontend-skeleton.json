@@ -1,0 +1,37 @@
+{
+  "version": "1",
+  "frontendRoot": "src/renderer/src",
+  "alias": {
+    "@renderer": "src/renderer/src",
+    "@shared": "src/shared"
+  },
+  "zones": {
+    "app": "src/renderer/src/app",
+    "features": "src/renderer/src/features",
+    "components": "src/renderer/src/components",
+    "lib": "src/renderer/src/lib",
+    "stores": "src/renderer/src/stores",
+    "i18n": "src/renderer/src/i18n",
+    "theme": "src/renderer/src/theme",
+    "styles": "src/renderer/src/styles",
+    "testing": "src/renderer/src/testing",
+    "shared": "src/shared"
+  },
+  "offLimits": ["src/main", "src/preload"],
+  "stack": {
+    "framework": "react",
+    "runtime": "electron-renderer",
+    "uiLib": "shadcn/ui (Base UI, base-nova)",
+    "styling": "tailwind",
+    "i18nLib": "i18next + react-i18next + i18next-icu",
+    "themeStrategy": "nativeTheme + html.dark class",
+    "storybook": false
+  },
+  "tokenLayers": {
+    "primitivesFile": "src/renderer/src/styles/tokens.primitives.css",
+    "semanticFile": "src/renderer/src/styles/tokens.semantic.css",
+    "componentsFile": "src/renderer/src/styles/tokens.components.css"
+  },
+  "packageManager": "npm",
+  "devCommand": "npm run dev"
+}

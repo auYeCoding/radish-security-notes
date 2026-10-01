@@ -1,0 +1,82 @@
+/*
+ * 第 2 层 token: 语义. 只引用第 1 层, 明暗两套靠换指向实现.
+ * 变量名对接 Shadcn 的约定, 另有 brand (安全绿) 与 sidebar 两组本项目的语义.
+ * 组件与页面只允许引用本层与第 3 层.
+ */
+:root {
+  --background: var(--base-surface-light);
+  --foreground: var(--slate-900);
+  --card: var(--base-surface-light);
+  --card-foreground: var(--slate-900);
+  --popover: var(--base-surface-light);
+  --popover-foreground: var(--slate-900);
+  --primary: var(--navy-700);
+  --primary-foreground: var(--white);
+  --secondary: var(--slate-100);
+  --secondary-foreground: var(--slate-900);
+  --muted: var(--slate-100);
+  --muted-foreground: var(--slate-600);
+  --accent: var(--slate-100);
+  --accent-foreground: var(--slate-900);
+  --brand: var(--emerald-700);
+  --brand-foreground: var(--white);
+  --destructive: var(--red-600);
+  --border: var(--slate-200);
+  --input: var(--slate-450);
+  --ring: var(--navy-700);
+  --sidebar: var(--slate-50);
+  --sidebar-foreground: var(--slate-900);
+  --sidebar-border: var(--slate-200);
+
+  --radius: var(--radius-6);
+  --radius-container: var(--radius-8);
+  --space-base: var(--space-unit);
+
+  --font-family-sans: var(--font-stack-sans);
+  --font-family-mono: var(--font-stack-mono);
+
+  --motion-fast: var(--duration-fast);
+  --motion-base: var(--duration-base);
+  --motion-slow: var(--duration-slow);
+  --motion-fast-exit: var(--duration-fast-exit);
+  --motion-base-exit: var(--duration-base-exit);
+  --motion-slow-exit: var(--duration-slow-exit);
+  --motion-ease: var(--ease-standard);
+}
+
+.dark {
+  --background: var(--base-surface-dark);
+  --foreground: var(--slate-50);
+  --card: var(--slate-900);
+  --card-foreground: var(--slate-50);
+  --popover: var(--slate-800);
+  --popover-foreground: var(--slate-50);
+  --primary: var(--navy-300);
+  --primary-foreground: var(--navy-900);
+  --secondary: var(--slate-800);
+  --secondary-foreground: var(--slate-50);
+  --muted: var(--slate-800);
+  --muted-foreground: var(--slate-400);
+  --accent: var(--slate-800);
+  --accent-foreground: var(--slate-50);
+  --brand: var(--emerald-500);
+  --brand-foreground: var(--slate-950);
+  --destructive: var(--red-400);
+  --border: var(--slate-700);
+  --input: var(--slate-500);
+  --ring: var(--navy-300);
+  --sidebar: var(--slate-925);
+  --sidebar-foreground: var(--slate-50);
+  --sidebar-border: var(--slate-800);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: var(--duration-none);
+    --motion-base: var(--duration-none);
+    --motion-slow: var(--duration-none);
+    --motion-fast-exit: var(--duration-none);
+    --motion-base-exit: var(--duration-none);
+    --motion-slow-exit: var(--duration-none);
+  }
+}

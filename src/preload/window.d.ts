@@ -1,4 +1,5 @@
-import { ElectronAPI } from "@electron-toolkit/preload";
+import type { ElectronAPI } from "@electron-toolkit/preload";
+import type { RendererApi } from "@shared/ipc/renderer-api";
 
 declare global {
   /**
@@ -12,6 +13,6 @@ declare global {
     /**
      * preload 脚本暴露的自定义 API.
      */
-    api: unknown;
+    api: RendererApi;
   }
 }
