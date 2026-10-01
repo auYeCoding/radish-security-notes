@@ -1,0 +1,32 @@
+import type { VaultOperationResult } from "./vault-operation-result";
+import type { VaultStatus } from "./vault-status";
+
+/**
+ * preload 暴露给渲染进程的保险库接口, 渲染进程只经它设置主密码与解锁.
+ */
+export interface VaultBridge {
+  /**
+   * 读取保险库当前的启动状态.
+   * @returns 启动状态.
+   */
+  getStatus: () => Promise<VaultStatus>;
+  /**
+   * 首次设置主密码, 主进程创建加密数据库并解锁.
+   * @param masterPassword 用户设置的主密码.
+   * @returns 设置结果.
+   */
+  setupWithMasterPassword: (
+    masterPassword: string,
+  ) => Promise<VaultOperationResult>;
+  /**
+   * 首次启动时跳过主密码, 主进程用系统保护数据密钥, 创建加密数据库并解锁.
+   * @returns 设置结果.
+   */
+  setupWithoutMasterPassword: () => Promise<VaultOperationResult>;
+  /**
+   * 用主密码解锁已设置主密码的保险库.
+   * @param masterPassword 用户输入的主密码.
+   * @returns 解锁结果.
+   */
+  unlock: (masterPassword: string) => Promise<VaultOperationResult>;
+}

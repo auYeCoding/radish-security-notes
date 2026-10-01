@@ -35,5 +35,51 @@
       "zh": "简体中文",
       "en": "English"
     }
+  },
+  "vault": {
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password"
+    },
+    "onboarding": {
+      "title": "Set a master password",
+      "description": "The master password unlocks your data each time you open the app.",
+      "passwordLabel": "Master password",
+      "confirmationLabel": "Confirm master password",
+      "passwordHint": "At least {minLength} characters",
+      "forgetNotice": "The master password is not stored. If you forget it, it cannot be recovered and your data cannot be opened.",
+      "acknowledgeLabel": "I understand",
+      "submit": "Set master password",
+      "submitting": "Setting up...",
+      "skip": "Skip",
+      "error": {
+        "tooShort": "The master password needs at least {minLength} characters.",
+        "mismatch": "The two passwords do not match.",
+        "notAcknowledged": "Confirm that you understand first.",
+        "systemUnavailable": "The system cannot protect the data key, so you cannot skip. Set a master password.",
+        "unexpected": "The operation failed. Close the app and try again."
+      }
+    },
+    "skipConfirm": {
+      "title": "Skip the master password?",
+      "description": "Your data stays encrypted, but anyone who can sign in to this Windows account can open the app.",
+      "cancel": "Cancel",
+      "confirm": "Skip"
+    },
+    "unlock": {
+      "title": "Unlock",
+      "description": "Enter your master password to open your data.",
+      "passwordLabel": "Master password",
+      "submit": "Unlock",
+      "submitting": "Unlocking...",
+      "error": {
+        "wrongPassword": "The master password is incorrect. Try again.",
+        "unexpected": "Unlock failed. Close the app and try again."
+      }
+    },
+    "failure": {
+      "title": "Unable to open your data",
+      "description": "A data file is missing or damaged, or the system cannot open the protected key. Close the app and try again. Do not delete the vault folder in the data directory."
+    }
   }
 }

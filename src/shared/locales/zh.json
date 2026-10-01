@@ -35,5 +35,51 @@
       "zh": "简体中文",
       "en": "English"
     }
+  },
+  "vault": {
+    "password": {
+      "show": "显示密码",
+      "hide": "隐藏密码"
+    },
+    "onboarding": {
+      "title": "设置主密码",
+      "description": "主密码用于在每次打开应用时解锁数据.",
+      "passwordLabel": "主密码",
+      "confirmationLabel": "确认主密码",
+      "passwordHint": "至少 {minLength} 个字符",
+      "forgetNotice": "主密码不会保存, 忘记后无法找回, 数据将无法打开.",
+      "acknowledgeLabel": "我已了解",
+      "submit": "设置主密码",
+      "submitting": "正在设置...",
+      "skip": "跳过",
+      "error": {
+        "tooShort": "主密码至少需要 {minLength} 个字符.",
+        "mismatch": "两次输入的主密码不一致.",
+        "notAcknowledged": "请先确认已了解主密码无法找回.",
+        "systemUnavailable": "系统无法保护数据密钥, 无法跳过. 请设置主密码.",
+        "unexpected": "操作失败. 请关闭应用后重试."
+      }
+    },
+    "skipConfirm": {
+      "title": "跳过主密码?",
+      "description": "数据仍加密保存, 但能登录此 Windows 账户的人可直接打开应用.",
+      "cancel": "取消",
+      "confirm": "跳过"
+    },
+    "unlock": {
+      "title": "解锁",
+      "description": "输入主密码以打开数据.",
+      "passwordLabel": "主密码",
+      "submit": "解锁",
+      "submitting": "正在解锁...",
+      "error": {
+        "wrongPassword": "主密码不正确, 请重新输入.",
+        "unexpected": "解锁失败. 请关闭应用后重试."
+      }
+    },
+    "failure": {
+      "title": "无法打开数据",
+      "description": "数据文件缺失或已损坏, 或系统无法解开受保护的密钥. 请关闭应用后重试, 不要删除数据目录中的 vault 文件夹."
+    }
   }
 }

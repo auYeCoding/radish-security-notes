@@ -7,3 +7,4 @@ tsconfig.*.json
 .navigator
 .claude
 coverage
+resources/migrations

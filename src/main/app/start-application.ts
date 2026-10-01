@@ -3,6 +3,7 @@ import { BrowserWindow, app, ipcMain } from "electron";
 
 import icon from "../../../resources/icon.png?asset";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
+import { registerVaultIpc } from "../ipc/vault-ipc";
 import { resolveWindowBackground } from "../theme/window-background";
 import { createMainWindow } from "../window/create-main-window";
 import { applyWindowBackground, applyWindowTitle } from "../window/window-sync";
@@ -10,6 +11,7 @@ import {
   createPreferencesRuntime,
   type PreferencesRuntime,
 } from "./preferences-runtime";
+import { createVaultRuntime } from "./vault-runtime";
 
 /**
  * 应用的用户模型标识, Windows 用它归并任务栏与通知.
@@ -50,7 +52,8 @@ function openMainWindow(runtime: PreferencesRuntime): void {
 }
 
 /**
- * 启动应用: 先应用主题并建好 i18n, 再注册 IPC, 最后创建主窗口. 在 app ready 之后调用.
+ * 启动应用: 先应用主题并建好 i18n, 判定保险库状态, 再注册 IPC, 最后创建主窗口.
+ * 在 app ready 之后调用.
  * @returns 启动完成后兑现.
  */
 export async function startApplication(): Promise<void> {
@@ -59,7 +62,10 @@ export async function startApplication(): Promise<void> {
     optimizer.watchWindowShortcuts(window);
   });
   const runtime = await createPreferencesRuntime();
+  const vault = await createVaultRuntime();
   registerPreferencesIpc(ipcMain, runtime.service);
+  registerVaultIpc(ipcMain, vault.service);
+  app.on("will-quit", () => vault.service.close());
   keepWindowsInSync(runtime);
   openMainWindow(runtime);
   app.on("activate", () => {
