@@ -3,7 +3,7 @@
  * @returns 应用的根节点.
  */
 function App(): React.JSX.Element {
-  return <></>
+  return <></>;
 }
 
-export default App
+export default App;

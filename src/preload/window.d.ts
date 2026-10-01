@@ -1,4 +1,4 @@
-import { ElectronAPI } from '@electron-toolkit/preload'
+import { ElectronAPI } from "@electron-toolkit/preload";
 
 declare global {
   /**
@@ -8,10 +8,10 @@ declare global {
     /**
      * Electron 提供的 IPC 与进程信息 API.
      */
-    electron: ElectronAPI
+    electron: ElectronAPI;
     /**
      * preload 脚本暴露的自定义 API.
      */
-    api: unknown
+    api: unknown;
   }
 }
