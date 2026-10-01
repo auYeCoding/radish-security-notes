@@ -4,6 +4,9 @@ import eslintConfigPrettier from "@electron-toolkit/eslint-config-prettier";
 import eslintPluginReact from "eslint-plugin-react";
 import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginReactRefresh from "eslint-plugin-react-refresh";
+import eslintPluginJsdoc from "eslint-plugin-jsdoc";
+import { documentationRules } from "./tools/eslint/documentation-rules.mjs";
+import { noCommentsInFunctionBody } from "./tools/eslint/no-comments-in-function-body.mjs";
 
 /**
  * 单个函数允许的最大行数, 不计空行与注释.
@@ -32,8 +35,22 @@ const IGNORED_PATHS = [
 ];
 
 /**
+ * 纯 JavaScript 文件. 它们无法标注返回类型, 所以不要求显式返回类型.
+ */
+const JAVASCRIPT_FILES = ["**/*.{js,mjs,cjs}"];
+
+/**
+ * 项目自写规则的插件, 规则以 `local/` 为前缀引用.
+ */
+const LOCAL_PLUGIN = {
+  rules: {
+    "no-comments-in-function-body": noCommentsInFunctionBody,
+  },
+};
+
+/**
  * ESLint 扁平配置, 组合 TypeScript, React, React Hooks 与 Prettier 规则,
- * 并限制函数长度, 圈复杂度与文件长度.
+ * 限制函数长度, 圈复杂度与文件长度, 并要求声明有文档注释且函数体内无注释.
  */
 export default defineConfig(
   { ignores: IGNORED_PATHS },
@@ -74,6 +91,19 @@ export default defineConfig(
         { max: MAX_LINES_PER_FILE, skipBlankLines: true, skipComments: true },
       ],
     },
+  },
+  {
+    files: ["**/*.{ts,tsx}"],
+    plugins: { jsdoc: eslintPluginJsdoc },
+    rules: documentationRules,
+  },
+  {
+    files: JAVASCRIPT_FILES,
+    rules: { "@typescript-eslint/explicit-function-return-type": "off" },
+  },
+  {
+    plugins: { local: LOCAL_PLUGIN },
+    rules: { "local/no-comments-in-function-body": "error" },
   },
   eslintConfigPrettier,
 );

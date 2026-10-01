@@ -3,16 +3,17 @@ productName: radish-security-notes
 directories:
   buildResources: build
 files:
-  - "!**/.vscode/*"
-  - "!src/*"
-  - "!electron.vite.config.{js,ts,mjs,cjs}"
-  - "!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}"
-  - "!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
-  - "!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}"
+  - out/**
+  - resources/**
 asarUnpack:
   - resources/**
 win:
   executableName: radish-security-notes
+  # 平台专属的 files 只有排除项时会重新加入 "**/*", 所以重复写出白名单.
+  files:
+    - out/**
+    - resources/**
+    - "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/{darwin-arm64,darwin-x64,linux-arm64,linux-x64,linuxmusl-arm64,linuxmusl-x64,win32-arm64}.node"
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}

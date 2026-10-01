@@ -14,6 +14,12 @@ An Electron application with React and TypeScript
 $ npm install
 ```
 
+Electron 42 起, `npm install` 不再下载 Electron 二进制. 安装依赖后, 运行开发或构建命令之前, 先下载二进制:
+
+```bash
+$ npx install-electron
+```
+
 ### Development
 
 ```bash
