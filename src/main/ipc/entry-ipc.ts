@@ -1,11 +1,11 @@
 import {
   isEntryCopyField,
   type EntryCopyField,
-  type NewEntryInput,
 } from "@shared/entries/entry-types";
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 
 import type { EntryService } from "../entries/entry-service";
+import { requireNewEntryInput } from "./new-entry-input-guard";
 import type { IpcMainPort } from "./preferences-ipc";
 
 /**
@@ -35,27 +35,16 @@ function requireCopyField(field: unknown): EntryCopyField {
 }
 
 /**
- * 校验渲染进程传来的新建输入是三个字符串字段组成的对象. 名称是否为空, 是否超长由服务判定,
- * 这里只保证类型.
- * @param input 渲染进程传来的值.
- * @returns 校验通过的新建输入.
- * @throws Error 当参数不是三个字符串字段组成的对象时.
+ * 校验渲染进程传来的自定义字段编号是字符串.
+ * @param id 渲染进程传来的值.
+ * @returns 校验通过的自定义字段编号.
+ * @throws Error 当参数不是字符串时.
  */
-function requireNewEntryInput(input: unknown): NewEntryInput {
-  if (typeof input !== "object" || input === null) {
-    throw new Error("无效的条目内容");
+function requireCustomFieldIdentifier(id: unknown): string {
+  if (typeof id !== "string") {
+    throw new Error("无效的字段编号");
   }
-  const name: unknown = Reflect.get(input, "name");
-  const account: unknown = Reflect.get(input, "account");
-  const password: unknown = Reflect.get(input, "password");
-  if (
-    typeof name !== "string" ||
-    typeof account !== "string" ||
-    typeof password !== "string"
-  ) {
-    throw new Error("无效的条目内容");
-  }
-  return { name, account, password };
+  return id;
 }
 
 /**
@@ -76,5 +65,13 @@ export function registerEntryIpc(
   );
   ipcMain.handle(IPC_CHANNELS.entriesCopyField, (_event, id, field) =>
     service.copyField(requireEntryIdentifier(id), requireCopyField(field)),
+  );
+  ipcMain.handle(
+    IPC_CHANNELS.entriesCopyCustomField,
+    (_event, id, customFieldId) =>
+      service.copyCustomField(
+        requireEntryIdentifier(id),
+        requireCustomFieldIdentifier(customFieldId),
+      ),
   );
 }

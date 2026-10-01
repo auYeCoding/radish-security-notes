@@ -1,3 +1,4 @@
+import { CUSTOM_FIELD_ERROR_CODES } from "@shared/entries/custom-field-schema";
 import type { EntryFailureReason } from "@shared/entries/entry-result";
 import {
   ENTRY_ACCOUNT_MAX_LENGTH,
@@ -9,7 +10,7 @@ import type { TFunction } from "i18next";
 
 /**
  * 把新建表单的校验错误代码换成当前语言的文案.
- * @param code 校验消息, 由 `newEntrySchema` 产生.
+ * @param code 校验消息, 由 `newEntrySchema` 与自定义字段的校验方案产生.
  * @param translate 翻译函数.
  * @returns 文案, 不认识的代码返回 undefined.
  */
@@ -32,6 +33,8 @@ export function describeNewEntryError(
       return translate("entryCreate.error.passwordTooLong", {
         maxLength: ENTRY_PASSWORD_MAX_LENGTH,
       });
+    case CUSTOM_FIELD_ERROR_CODES.labelRequired:
+      return translate("entryCreate.error.customFieldLabelRequired");
     default:
       return undefined;
   }

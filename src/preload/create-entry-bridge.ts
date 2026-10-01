@@ -35,5 +35,13 @@ export function createEntryBridge(ipcRenderer: IpcRendererPort): EntryBridge {
       );
       return result as EntryResult<undefined>;
     },
+    copyCustomField: async (id, customFieldId) => {
+      const result = await ipcRenderer.invoke(
+        IPC_CHANNELS.entriesCopyCustomField,
+        id,
+        customFieldId,
+      );
+      return result as EntryResult<undefined>;
+    },
   };
 }

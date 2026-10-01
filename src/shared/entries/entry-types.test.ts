@@ -4,13 +4,16 @@ import { entryFailed, entrySucceeded } from "./entry-result";
 import { ENTRY_COPY_FIELDS, isEntryCopyField } from "./entry-types";
 
 describe("isEntryCopyField", () => {
-  it("可复制字段是账号与密码", () => {
-    expect(ENTRY_COPY_FIELDS).toEqual(["account", "password"]);
+  it("按字段名可复制的是账号, 密码, 网址与备注", () => {
+    expect(ENTRY_COPY_FIELDS).toEqual(["account", "password", "url", "notes"]);
   });
 
-  it("账号与密码通过, 其它值不通过", () => {
+  it("账号, 密码, 网址与备注通过, 其它值不通过", () => {
     expect(isEntryCopyField("account")).toBe(true);
     expect(isEntryCopyField("password")).toBe(true);
+    expect(isEntryCopyField("url")).toBe(true);
+    expect(isEntryCopyField("notes")).toBe(true);
+    expect(isEntryCopyField("customFields")).toBe(false);
     expect(isEntryCopyField("name")).toBe(false);
     expect(isEntryCopyField(undefined)).toBe(false);
     expect(isEntryCopyField(1)).toBe(false);

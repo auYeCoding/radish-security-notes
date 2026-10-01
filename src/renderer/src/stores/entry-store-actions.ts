@@ -94,7 +94,7 @@ export async function selectEntry(
  * 新建一个条目. 成功后条目放到列表最前, 被选中并展示详情, 搜索关键字清空, 让新条目
  * 一定出现在列表里.
  * @param access store 动作能用到的东西.
- * @param input 用户填写的名称, 账号与密码.
+ * @param input 用户填写的名称, 账号, 密码, 网址, 备注与自定义字段.
  * @returns 新建结果, 接口调用抛出错误时为意外错误.
  */
 export async function createEntry(
@@ -131,6 +131,26 @@ export async function copyEntryField(
 ): Promise<boolean> {
   try {
     const result = await bridge.copyField(id, field);
+    return result.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 让主进程把条目的一个自定义字段的值复制到剪贴板.
+ * @param bridge 主进程提供的条目接口.
+ * @param id 条目编号.
+ * @param customFieldId 自定义字段编号.
+ * @returns 复制成功时为 true, 失败或接口调用抛出错误时为 false.
+ */
+export async function copyEntryCustomField(
+  bridge: EntryBridge,
+  id: string,
+  customFieldId: string,
+): Promise<boolean> {
+  try {
+    const result = await bridge.copyCustomField(id, customFieldId);
     return result.ok;
   } catch {
     return false;

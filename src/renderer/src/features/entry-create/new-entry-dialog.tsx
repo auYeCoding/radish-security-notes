@@ -25,7 +25,8 @@ interface NewEntryDialogProps {
 }
 
 /**
- * 新建条目的对话框: 标题, 说明与新建表单. 关闭后表单卸载, 下次打开是空表单.
+ * 新建条目的对话框: 标题, 说明与新建表单. 为容纳自定义字段, 宽度比默认对话框大一档. 关闭后
+ * 表单卸载, 下次打开是空表单.
  * @param props 组件属性.
  * @returns 对话框元素.
  */
@@ -33,7 +34,7 @@ export function NewEntryDialog(props: NewEntryDialogProps): React.JSX.Element {
   const { t } = useTranslation();
   return (
     <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
-      <DialogContent closeLabel={t("common.close")}>
+      <DialogContent closeLabel={t("common.close")} className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("entryCreate.title")}</DialogTitle>
           <DialogDescription>{t("entryCreate.description")}</DialogDescription>

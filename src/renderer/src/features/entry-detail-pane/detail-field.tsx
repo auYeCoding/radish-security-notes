@@ -27,7 +27,7 @@ interface DetailFieldProps {
 export function DetailField(props: DetailFieldProps): React.JSX.Element {
   return (
     <div className="flex flex-col gap-1">
-      <dt className="text-xs text-muted-foreground">{props.label}</dt>
+      <dt className="text-xs break-all text-muted-foreground">{props.label}</dt>
       <dd className="flex items-center gap-2">
         <div className="min-w-0 flex-1 text-sm break-all">{props.children}</div>
         {props.actions}

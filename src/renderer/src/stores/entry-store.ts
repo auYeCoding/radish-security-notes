@@ -8,6 +8,7 @@ import type {
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 import {
+  copyEntryCustomField,
   copyEntryField,
   createEntry,
   loadEntries,
@@ -16,7 +17,7 @@ import {
 import { INITIAL_ENTRY_STATE, type EntryState } from "./entry-state";
 
 /**
- * 条目动作: 经主进程读取, 新建与复制条目, 并维护选中与搜索关键字.
+ * 条目动作: 经主进程读取, 新建与复制条目字段, 并维护选中与搜索关键字.
  */
 export interface EntryActions {
   /**
@@ -37,7 +38,7 @@ export interface EntryActions {
   setQuery: (query: string) => void;
   /**
    * 新建一个条目, 成功后选中它.
-   * @param input 用户填写的名称, 账号与密码.
+   * @param input 用户填写的名称, 账号, 密码, 网址, 备注与自定义字段.
    * @returns 新建结果.
    */
   create: (input: NewEntryInput) => Promise<EntryResult<EntryDetail>>;
@@ -48,6 +49,13 @@ export interface EntryActions {
    * @returns 复制成功时为 true.
    */
   copyField: (id: string, field: EntryCopyField) => Promise<boolean>;
+  /**
+   * 把条目的一个自定义字段的值复制到系统剪贴板.
+   * @param id 条目编号.
+   * @param customFieldId 自定义字段编号.
+   * @returns 复制成功时为 true.
+   */
+  copyCustomField: (id: string, customFieldId: string) => Promise<boolean>;
 }
 
 /**
@@ -83,6 +91,8 @@ export function createEntryStore(
       setQuery: (query) => set({ query }),
       create: (input) => createEntry(access, input),
       copyField: (id, field) => copyEntryField(bridge, id, field),
+      copyCustomField: (id, customFieldId) =>
+        copyEntryCustomField(bridge, id, customFieldId),
     };
   });
 }

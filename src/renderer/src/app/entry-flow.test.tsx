@@ -92,3 +92,38 @@ describe("工作区新建条目", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(4);
   });
 });
+
+describe("工作区新建含网址, 备注与自定义字段的条目", () => {
+  it("保存后详情展示全部内容并可复制", async () => {
+    const { entryBridge } = await renderWorkspace();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole("button", { name: "新建条目" }));
+    await user.type(await screen.findByLabelText("名称"), "钱包");
+    await user.type(
+      screen.getByLabelText("网址"),
+      "https://wallet.example.test",
+    );
+    await user.type(screen.getByLabelText("备注"), "备注一{Enter}备注二");
+    await user.click(screen.getByRole("button", { name: "添加字段" }));
+    await user.type(screen.getByLabelText("字段名"), "助记词");
+    await user.type(screen.getByLabelText("字段值"), "甲 乙{Enter}丙 丁");
+    await user.click(screen.getByRole("checkbox", { name: "隐藏" }));
+    await user.click(screen.getByRole("button", { name: "保存" }));
+
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(screen.getByRole("heading", { name: "钱包" })).toBeDefined();
+    expect(screen.getByText("https://wallet.example.test")).toBeDefined();
+    expect(screen.getByText("备注一 备注二").textContent).toBe(
+      "备注一\n备注二",
+    );
+    expect(screen.queryByText(/甲 乙/)).toBeNull();
+    await user.click(screen.getByRole("button", { name: "显示 助记词" }));
+    expect(screen.getByText(/甲 乙/).textContent).toBe("甲 乙\n丙 丁");
+    await user.click(screen.getByRole("button", { name: "复制 助记词" }));
+    expect(entryBridge.copyCustomField).toHaveBeenCalledWith(
+      "created-4",
+      "created-field-1",
+    );
+  });
+});

@@ -15,6 +15,13 @@
       "when": 1790886046249,
       "tag": "0001_create-entries",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790889678322,
+      "tag": "0002_add-entry-url-notes-custom-fields",
+      "breakpoints": true
     }
   ]
 }

@@ -46,6 +46,7 @@ function createFakeService(): EntryService {
     get: vi.fn(() => ({ ok: false, reason: "not-found" })),
     create: vi.fn(() => ({ ok: true, value: { id: "id-1" } })),
     copyField: vi.fn(() => ({ ok: true, value: undefined })),
+    copyCustomField: vi.fn(() => ({ ok: true, value: undefined })),
   } as unknown as EntryService;
 }
 
@@ -93,29 +94,45 @@ describe("registerEntryIpc 转发", () => {
     expect(result).toEqual({ ok: false, reason: "not-found" });
   });
 
-  it("新建通道把三个字符串字段交给服务", () => {
+  it("新建通道把名称, 账号, 密码, 网址, 备注与自定义字段交给服务", () => {
     const { ipcMain, service } = registerWithFakes();
-
-    ipcMain.invoke(IPC_CHANNELS.entriesCreate, {
+    const input = {
       name: "n",
       account: "a",
       password: "p",
-      extra: "ignored",
-    });
+      url: "https://example.test",
+      notes: "第一行\n第二行",
+      customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
+    };
 
-    expect(service.create).toHaveBeenCalledWith({
-      name: "n",
-      account: "a",
-      password: "p",
-    });
+    ipcMain.invoke(IPC_CHANNELS.entriesCreate, { ...input, extra: "ignored" });
+
+    expect(service.create).toHaveBeenCalledWith(input);
   });
 
   it("复制通道把编号与字段名交给服务", () => {
     const { ipcMain, service } = registerWithFakes();
 
     ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "password");
+    ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "url");
+    ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "notes");
 
-    expect(service.copyField).toHaveBeenCalledWith("id-1", "password");
+    expect(service.copyField).toHaveBeenNthCalledWith(1, "id-1", "password");
+    expect(service.copyField).toHaveBeenNthCalledWith(2, "id-1", "url");
+    expect(service.copyField).toHaveBeenNthCalledWith(3, "id-1", "notes");
+  });
+
+  it("复制自定义字段通道把条目编号与字段编号交给服务", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    const result = ipcMain.invoke(
+      IPC_CHANNELS.entriesCopyCustomField,
+      "id-1",
+      "id-2",
+    );
+
+    expect(service.copyCustomField).toHaveBeenCalledWith("id-1", "id-2");
+    expect(result).toEqual({ ok: true, value: undefined });
   });
 });
 
@@ -133,16 +150,31 @@ describe("registerEntryIpc 参数校验", () => {
     expect(service.copyField).not.toHaveBeenCalled();
   });
 
-  it("复制字段不是账号或密码时被拒绝", () => {
+  it("复制字段不是可复制的字段名时被拒绝", () => {
     const { ipcMain, service } = registerWithFakes();
 
     expect(() =>
       ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "name"),
     ).toThrow("无效的复制字段");
+    expect(() =>
+      ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "customFields"),
+    ).toThrow("无效的复制字段");
     expect(service.copyField).not.toHaveBeenCalled();
   });
 
-  it("新建内容不是三个字符串字段组成的对象时被拒绝", () => {
+  it("复制自定义字段的条目编号或字段编号不是字符串时被拒绝", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    expect(() =>
+      ipcMain.invoke(IPC_CHANNELS.entriesCopyCustomField, 1, "id-2"),
+    ).toThrow("无效的条目编号");
+    expect(() =>
+      ipcMain.invoke(IPC_CHANNELS.entriesCopyCustomField, "id-1", undefined),
+    ).toThrow("无效的字段编号");
+    expect(service.copyCustomField).not.toHaveBeenCalled();
+  });
+
+  it("新建内容类型不对时被拒绝", () => {
     const { ipcMain, service } = registerWithFakes();
 
     for (const input of [
@@ -150,7 +182,8 @@ describe("registerEntryIpc 参数校验", () => {
       null,
       "text",
       { name: "n", account: "a" },
-      { name: "n", account: 1, password: "p" },
+      { name: "n", account: 1, password: "p", url: "", notes: "" },
+      { name: "n", account: "a", password: "p", url: "", notes: "" },
     ]) {
       expect(() => ipcMain.invoke(IPC_CHANNELS.entriesCreate, input)).toThrow(
         "无效的条目内容",

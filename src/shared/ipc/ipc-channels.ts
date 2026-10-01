@@ -13,4 +13,5 @@ export const IPC_CHANNELS = {
   entriesGet: "entries:get",
   entriesCreate: "entries:create",
   entriesCopyField: "entries:copy-field",
+  entriesCopyCustomField: "entries:copy-custom-field",
 } as const;

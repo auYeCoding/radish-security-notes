@@ -1,0 +1,126 @@
+import { readFile } from "node:fs/promises";
+
+import { describe, expect, it } from "vitest";
+
+import {
+  createEntryServiceFixture,
+  detailOf,
+  newEntryInputOf,
+} from "../testing/entry-service-fixture";
+import {
+  prepareMasterPasswordVault,
+  startService,
+  useVaultServiceHarness,
+} from "../testing/vault-service-harness";
+import { TEST_MASTER_PASSWORD } from "../testing/vault-test-fixtures";
+import type { VaultOrm } from "../vault/database/drizzle-adapter";
+
+describe("条目服务: 持久化", () => {
+  const getHarness = useVaultServiceHarness();
+
+  it("关闭重开并解锁后条目与新字段仍在", async () => {
+    const harness = getHarness();
+    const vault = await startService(harness);
+    await vault.setupWithMasterPassword(TEST_MASTER_PASSWORD);
+    createEntryServiceFixture(vault).entries.create(
+      newEntryInputOf({
+        name: "论坛",
+        account: "a",
+        password: "p",
+        url: "https://example.test",
+        notes: "第一行\n第二行",
+        customFields: [{ label: "助记词", value: "x y\nz", isHidden: true }],
+      }),
+    );
+    vault.close();
+
+    const reopened = await startService(harness);
+    await reopened.unlock(TEST_MASTER_PASSWORD);
+    const detail = createEntryServiceFixture(reopened).entries.get("id-1");
+
+    expect(detail).toEqual({
+      ok: true,
+      value: detailOf({
+        name: "论坛",
+        account: "a",
+        password: "p",
+        url: "https://example.test",
+        notes: "第一行\n第二行",
+        customFields: [
+          { id: "id-2", label: "助记词", value: "x y\nz", isHidden: true },
+        ],
+      }),
+    });
+  });
+});
+
+describe("条目服务: 意外错误", () => {
+  const getHarness = useVaultServiceHarness();
+
+  it("数据库抛出错误时通知回调并返回意外错误", async () => {
+    const vault = await startService(getHarness());
+    await vault.setupWithMasterPassword(TEST_MASTER_PASSWORD);
+    const brokenOrm = {
+      select: () => {
+        throw new Error("boom");
+      },
+    } as unknown as VaultOrm;
+    const { entries, failures } = createEntryServiceFixture(
+      vault,
+      () => brokenOrm,
+    );
+
+    const result = entries.list();
+
+    expect(result).toEqual({ ok: false, reason: "unexpected-error" });
+    expect(failures).toHaveLength(1);
+  });
+});
+
+describe("条目服务: 磁盘上没有明文", () => {
+  const getHarness = useVaultServiceHarness();
+
+  it("数据库文件里搜不到条目全部字段的原始, 十六进制与 base64 形式", async () => {
+    const harness = getHarness();
+    await prepareMasterPasswordVault(harness);
+    const vault = await startService(harness);
+    await vault.unlock(TEST_MASTER_PASSWORD);
+    const input = newEntryInputOf({
+      name: "disk-plaintext-name",
+      account: "disk-plaintext-account",
+      password: "disk-plaintext-password",
+      url: "https://disk-plaintext-url.example.test/path",
+      notes: "disk-plaintext-notes-line-1\ndisk-plaintext-notes-line-2",
+      customFields: [
+        {
+          label: "disk-plaintext-label",
+          value: "disk-plaintext-value-1\ndisk-plaintext-value-2",
+          isHidden: true,
+        },
+      ],
+    });
+    createEntryServiceFixture(vault).entries.create(input);
+    vault.close();
+
+    const content = await readFile(harness.paths.databaseFile);
+
+    const secrets = [
+      input.name,
+      input.account,
+      input.password,
+      input.url,
+      input.notes,
+      "disk-plaintext-notes-line-2",
+      "disk-plaintext-label",
+      "disk-plaintext-value-1\ndisk-plaintext-value-2",
+      "disk-plaintext-value-2",
+    ];
+    for (const secret of secrets) {
+      expect(content.includes(Buffer.from(secret))).toBe(false);
+      expect(content.includes(Buffer.from(secret).toString("hex"))).toBe(false);
+      expect(content.includes(Buffer.from(secret).toString("base64"))).toBe(
+        false,
+      );
+    }
+  });
+});

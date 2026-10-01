@@ -1,0 +1,105 @@
+import { vi } from "vitest";
+
+import type { EntryDetail, NewEntryInput } from "@shared/entries/entry-types";
+
+import type { ClipboardPort } from "../entries/clipboard-port";
+import { EntryService } from "../entries/entry-service";
+import type { VaultOrm } from "../vault/database/drizzle-adapter";
+import type { VaultService } from "../vault/vault-service";
+import {
+  startService,
+  type VaultServiceHarness,
+} from "./vault-service-harness";
+import { TEST_MASTER_PASSWORD } from "./vault-test-fixtures";
+
+/**
+ * 测试里的一次条目服务环境.
+ */
+export interface EntryServiceFixture {
+  /**
+   * 被测的条目服务.
+   */
+  readonly entries: EntryService;
+  /**
+   * 假剪贴板写入方法的间谍.
+   */
+  readonly writeText: ReturnType<typeof vi.fn<(text: string) => void>>;
+  /**
+   * 服务通过失败回调报告过的错误.
+   */
+  readonly failures: unknown[];
+}
+
+/**
+ * 在保险库服务之上创建条目服务, 编号依次为 id-1, id-2, 时间依次递增.
+ * @param vault 保险库服务.
+ * @param getOrm 覆盖取数据库的方法, 默认取保险库服务的数据库.
+ * @returns 条目服务环境.
+ */
+export function createEntryServiceFixture(
+  vault: VaultService,
+  getOrm: () => VaultOrm | undefined = () => vault.getOrm(),
+): EntryServiceFixture {
+  const writeText = vi.fn<(text: string) => void>();
+  const clipboard: ClipboardPort = { writeText };
+  const failures: unknown[] = [];
+  let counter = 0;
+  const entries = new EntryService({
+    getOrm,
+    clipboard,
+    createIdentifier: () => `id-${(counter += 1)}`,
+    now: () => 1000 + counter,
+    onFailure: (error) => failures.push(error),
+  });
+  return { entries, writeText, failures };
+}
+
+/**
+ * 用主密码完成首次设置并解锁, 在已解锁的保险库上创建条目服务环境.
+ * @param harness 保险库服务测试环境.
+ * @returns 条目服务环境.
+ */
+export async function createUnlockedEntryFixture(
+  harness: VaultServiceHarness,
+): Promise<EntryServiceFixture> {
+  const vault = await startService(harness);
+  await vault.setupWithMasterPassword(TEST_MASTER_PASSWORD);
+  return createEntryServiceFixture(vault);
+}
+
+/**
+ * 构造新建输入, 没有给出的字段取空值.
+ * @param overrides 要覆盖的字段.
+ * @returns 新建输入.
+ */
+export function newEntryInputOf(
+  overrides: Partial<NewEntryInput> = {},
+): NewEntryInput {
+  return {
+    name: "条目",
+    account: "",
+    password: "",
+    url: "",
+    notes: "",
+    customFields: [],
+    ...overrides,
+  };
+}
+
+/**
+ * 构造期望的条目详情, 没有给出的字段取空值, 编号默认是第一个新建条目的 id-1.
+ * @param overrides 要覆盖的字段.
+ * @returns 条目详情.
+ */
+export function detailOf(overrides: Partial<EntryDetail> = {}): EntryDetail {
+  return {
+    id: "id-1",
+    name: "条目",
+    account: "",
+    password: "",
+    url: "",
+    notes: "",
+    customFields: [],
+    ...overrides,
+  };
+}

@@ -9,6 +9,11 @@ import { createFakeEntryBridge } from "@renderer/testing/fake-entry-bridge";
 
 import { createEntryStore } from "./entry-store";
 
+/**
+ * 新建输入里网址, 备注与自定义字段都为空的部分.
+ */
+const NO_EXTRA_FIELDS = { url: "", notes: "", customFields: [] } as const;
+
 describe("条目 store 读取与选中", () => {
   it("初始状态是读取中, 没有条目也没有选中", () => {
     const store = createEntryStore({ bridge: createFakeEntryBridge() });
@@ -125,6 +130,9 @@ describe("条目 store 新建", () => {
       name: " 新条目 ",
       account: "new-account",
       password: "new-password",
+      url: "https://example.test",
+      notes: "第一行\n第二行",
+      customFields: [{ label: "助记词", value: "a b", isHidden: true }],
     });
 
     expect(result.ok).toBe(true);
@@ -135,7 +143,13 @@ describe("条目 store 新建", () => {
     expect(store.getState().query).toBe("");
     expect(store.getState().selection).toMatchObject({
       status: "ready",
-      detail: { name: "新条目", password: "new-password" },
+      detail: {
+        name: "新条目",
+        password: "new-password",
+        url: "https://example.test",
+        notes: "第一行\n第二行",
+        customFields: [{ label: "助记词", value: "a b", isHidden: true }],
+      },
     });
   });
 
@@ -150,6 +164,7 @@ describe("条目 store 新建", () => {
       name: "",
       account: "",
       password: "",
+      ...NO_EXTRA_FIELDS,
     });
 
     expect(result).toEqual({ ok: false, reason: "invalid-input" });
@@ -158,7 +173,7 @@ describe("条目 store 新建", () => {
   });
 });
 
-describe("条目 store 异常, 搜索与复制", () => {
+describe("条目 store 异常与搜索", () => {
   it("接口调用抛出错误时新建返回意外错误", async () => {
     const store = createEntryStore({
       bridge: createFakeEntryBridge([], {
@@ -170,6 +185,7 @@ describe("条目 store 异常, 搜索与复制", () => {
       name: "n",
       account: "",
       password: "",
+      ...NO_EXTRA_FIELDS,
     });
 
     expect(result).toEqual({ ok: false, reason: "unexpected-error" });
@@ -182,7 +198,9 @@ describe("条目 store 异常, 搜索与复制", () => {
 
     expect(store.getState().query).toBe("abc");
   });
+});
 
+describe("条目 store 复制", () => {
   it("复制把编号与字段名交给接口, 成功返回 true, 失败或抛错返回 false", async () => {
     const bridge = createFakeEntryBridge();
     const store = createEntryStore({ bridge });
@@ -198,5 +216,29 @@ describe("条目 store 异常, 搜索与复制", () => {
     expect(bridge.copyField).toHaveBeenCalledWith("forum", "password");
     expect(copied).toBe(true);
     expect(failed).toBe(false);
+  });
+
+  it("复制自定义字段把条目编号与字段编号交给接口, 成功返回 true, 失败或抛错返回 false", async () => {
+    const bridge = createFakeEntryBridge();
+    const store = createEntryStore({ bridge });
+    const rejected = createEntryStore({
+      bridge: createFakeEntryBridge([], {
+        copyCustomField: () => Promise.resolve(entryFailed("not-found")),
+      }),
+    });
+    const throwing = createEntryStore({
+      bridge: createFakeEntryBridge([], {
+        copyCustomField: () => Promise.reject(new Error("ipc")),
+      }),
+    });
+
+    const copied = await store.getState().copyCustomField("wallet", "seed");
+    const failed = await rejected.getState().copyCustomField("wallet", "seed");
+    const thrown = await throwing.getState().copyCustomField("wallet", "seed");
+
+    expect(bridge.copyCustomField).toHaveBeenCalledWith("wallet", "seed");
+    expect(copied).toBe(true);
+    expect(failed).toBe(false);
+    expect(thrown).toBe(false);
   });
 });

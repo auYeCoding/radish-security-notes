@@ -1,0 +1,90 @@
+import type { NewCustomFieldInput } from "@shared/entries/custom-field-types";
+import type { NewEntryInput } from "@shared/entries/entry-types";
+
+/**
+ * 新建内容类型不对时的错误信息.
+ */
+const INVALID_ENTRY_INPUT_MESSAGE = "无效的条目内容";
+
+/**
+ * 校验渲染进程传来的值是对象.
+ * @param value 渲染进程传来的值.
+ * @returns 校验通过的对象.
+ * @throws Error 当值不是对象时.
+ */
+function requireObject(value: unknown): object {
+  if (typeof value !== "object" || value === null) {
+    throw new Error(INVALID_ENTRY_INPUT_MESSAGE);
+  }
+  return value;
+}
+
+/**
+ * 取出对象上的一个字符串属性.
+ * @param source 对象.
+ * @param key 属性名.
+ * @returns 属性值.
+ * @throws Error 当属性不是字符串时.
+ */
+function readString(source: object, key: string): string {
+  const value: unknown = Reflect.get(source, key);
+  if (typeof value !== "string") {
+    throw new Error(INVALID_ENTRY_INPUT_MESSAGE);
+  }
+  return value;
+}
+
+/**
+ * 取出对象上的一个布尔属性.
+ * @param source 对象.
+ * @param key 属性名.
+ * @returns 属性值.
+ * @throws Error 当属性不是布尔值时.
+ */
+function readBoolean(source: object, key: string): boolean {
+  const value: unknown = Reflect.get(source, key);
+  if (typeof value !== "boolean") {
+    throw new Error(INVALID_ENTRY_INPUT_MESSAGE);
+  }
+  return value;
+}
+
+/**
+ * 校验一个自定义字段由字段名, 字段值两个字符串与一个隐藏标记组成.
+ * @param input 渲染进程传来的值.
+ * @returns 校验通过的自定义字段输入, 多余的属性被丢弃.
+ * @throws Error 当类型不符时.
+ */
+function requireCustomFieldInput(input: unknown): NewCustomFieldInput {
+  const source = requireObject(input);
+  return {
+    label: readString(source, "label"),
+    value: readString(source, "value"),
+    isHidden: readBoolean(source, "isHidden"),
+  };
+}
+
+/**
+ * 校验渲染进程传来的新建输入: 名称, 账号, 密码, 网址, 备注是字符串, 自定义字段是由两个字符串
+ * 与一个布尔值组成的对象的数组. 名称是否为空等规则由服务判定, 这里只保证类型.
+ * @param input 渲染进程传来的值.
+ * @returns 校验通过的新建输入, 多余的属性被丢弃.
+ * @throws Error 当类型不符时.
+ */
+export function requireNewEntryInput(input: unknown): NewEntryInput {
+  const source = requireObject(input);
+  const customFields: unknown = Reflect.get(source, "customFields");
+  if (!Array.isArray(customFields)) {
+    throw new Error(INVALID_ENTRY_INPUT_MESSAGE);
+  }
+  return {
+    name: readString(source, "name"),
+    account: readString(source, "account"),
+    password: readString(source, "password"),
+    url: readString(source, "url"),
+    notes: readString(source, "notes"),
+    customFields: customFields.map((field: unknown) =>
+      requireCustomFieldInput(field),
+    ),
+  };
+}

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { customFieldInputSchema } from "./custom-field-schema";
+
 /**
  * 条目名称允许的最多字符数.
  */
@@ -36,8 +38,10 @@ function isWithinLength(value: string, maxLength: number): boolean {
 }
 
 /**
- * 新建条目的校验方案, 渲染端表单与主进程共用: 名称去首尾空格后不能为空, 三项都不能超过
- * 各自的最多字符数, 账号与密码可以为空. 校验消息是 `NEW_ENTRY_ERROR_CODES` 里的错误代码.
+ * 新建条目的校验方案, 渲染端表单与主进程共用: 名称去首尾空格后不能为空, 名称, 账号,
+ * 密码都不能超过各自的最多字符数, 账号与密码可以为空; 网址, 备注与自定义字段不设长度与
+ * 数量上限, 网址与备注原样保存. 校验消息是 `NEW_ENTRY_ERROR_CODES` 或
+ * `CUSTOM_FIELD_ERROR_CODES` 里的错误代码.
  */
 export const newEntrySchema = z.object({
   name: z
@@ -59,6 +63,9 @@ export const newEntrySchema = z.object({
     .refine((password) => isWithinLength(password, ENTRY_PASSWORD_MAX_LENGTH), {
       message: NEW_ENTRY_ERROR_CODES.passwordTooLong,
     }),
+  url: z.string(),
+  notes: z.string(),
+  customFields: z.array(customFieldInputSchema),
 });
 
 /**

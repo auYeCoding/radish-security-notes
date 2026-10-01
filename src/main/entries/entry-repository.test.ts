@@ -28,6 +28,11 @@ function recordOf(id: string, createdAt: number): EntryRecord {
     name: `name-${id}`,
     account: `account-${id}`,
     password: `password-${id}`,
+    url: `https://example.test/${id}`,
+    notes: `notes-${id}\nline-2`,
+    customFields: [
+      { id: `field-${id}`, label: `label-${id}`, value: "v", isHidden: true },
+    ],
     createdAt,
   };
 }

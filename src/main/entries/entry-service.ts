@@ -14,6 +14,10 @@ import { newEntrySchema } from "@shared/entries/new-entry-schema";
 import type { VaultOrm } from "../vault/database/drizzle-adapter";
 import type { ClipboardPort } from "./clipboard-port";
 import {
+  assignCustomFieldIdentifiers,
+  findCustomField,
+} from "./custom-field-records";
+import {
   findEntry,
   insertEntry,
   listEntrySummaries,
@@ -57,12 +61,15 @@ function toDetail(record: EntryRecord): EntryDetail {
     name: record.name,
     account: record.account,
     password: record.password,
+    url: record.url,
+    notes: record.notes,
+    customFields: record.customFields,
   };
 }
 
 /**
- * 条目服务: 在已解锁的加密数据库里新建与读取条目, 并把条目字段复制到剪贴板. 账号与密码
- * 只在方法执行期间经过内存, 不写入日志.
+ * 条目服务: 在已解锁的加密数据库里新建与读取条目, 并把条目字段复制到剪贴板. 账号, 密码,
+ * 网址, 备注与自定义字段只在方法执行期间经过内存, 不写入日志.
  */
 export class EntryService {
   /**
@@ -94,8 +101,9 @@ export class EntryService {
   }
 
   /**
-   * 新建一个条目: 校验输入, 名称去首尾空格, 生成编号与创建时间后写入数据库.
-   * @param input 用户填写的名称, 账号与密码.
+   * 新建一个条目: 校验输入, 名称与自定义字段的字段名去首尾空格, 生成条目编号, 自定义字段
+   * 编号与创建时间后写入数据库.
+   * @param input 用户填写的名称, 账号, 密码, 网址, 备注与自定义字段.
    * @returns 新建的条目详情, 未解锁或输入不合规时为失败结果.
    */
   create(input: NewEntryInput): EntryResult<EntryDetail> {
@@ -107,6 +115,10 @@ export class EntryService {
       const record: EntryRecord = {
         id: this.dependencies.createIdentifier(),
         ...parsed.data,
+        customFields: assignCustomFieldIdentifiers(
+          parsed.data.customFields,
+          this.dependencies.createIdentifier,
+        ),
         createdAt: this.dependencies.now(),
       };
       insertEntry(orm, record);
@@ -127,6 +139,27 @@ export class EntryService {
         return entryFailed("not-found");
       }
       this.dependencies.clipboard.writeText(record[field]);
+      return entrySucceeded(undefined);
+    });
+  }
+
+  /**
+   * 把条目的一个自定义字段的值写入系统剪贴板.
+   * @param id 条目编号.
+   * @param customFieldId 自定义字段编号.
+   * @returns 复制结果, 未解锁, 没有这个条目或没有这个字段时为失败结果.
+   */
+  copyCustomField(id: string, customFieldId: string): EntryResult<undefined> {
+    return this.withDatabase((orm) => {
+      const record = findEntry(orm, id);
+      const field =
+        record === undefined
+          ? undefined
+          : findCustomField(record.customFields, customFieldId);
+      if (field === undefined) {
+        return entryFailed("not-found");
+      }
+      this.dependencies.clipboard.writeText(field.value);
       return entrySucceeded(undefined);
     });
   }

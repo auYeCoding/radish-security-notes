@@ -1,3 +1,8 @@
+import type {
+  EntryCustomField,
+  NewCustomFieldInput,
+} from "./custom-field-types";
+
 /**
  * 列表里展示的条目摘要. 不含密码, 渲染端用它做列表与搜索.
  */
@@ -17,13 +22,25 @@ export interface EntrySummary {
 }
 
 /**
- * 选中条目后展示的详情, 在摘要之外多一个密码.
+ * 选中条目后展示的详情, 在摘要之外多密码, 网址, 备注与自定义字段.
  */
 export interface EntryDetail extends EntrySummary {
   /**
    * 条目的密码, 可以为空串.
    */
   readonly password: string;
+  /**
+   * 条目的网址, 可以为空串.
+   */
+  readonly url: string;
+  /**
+   * 条目的备注, 纯文本, 可以是多行, 也可以为空串.
+   */
+  readonly notes: string;
+  /**
+   * 条目的自定义字段, 按填写顺序排列, 没有时为空数组.
+   */
+  readonly customFields: readonly EntryCustomField[];
 }
 
 /**
@@ -51,12 +68,29 @@ export interface NewEntryInput {
    * 条目的密码.
    */
   readonly password: string;
+  /**
+   * 条目的网址.
+   */
+  readonly url: string;
+  /**
+   * 条目的备注.
+   */
+  readonly notes: string;
+  /**
+   * 条目的自定义字段, 没有时为空数组.
+   */
+  readonly customFields: readonly NewCustomFieldInput[];
 }
 
 /**
- * 可以复制到剪贴板的条目字段.
+ * 可以按字段名复制到剪贴板的条目字段. 自定义字段按字段编号复制, 不在此列.
  */
-export const ENTRY_COPY_FIELDS = ["account", "password"] as const;
+export const ENTRY_COPY_FIELDS = [
+  "account",
+  "password",
+  "url",
+  "notes",
+] as const;
 
 /**
  * 可以复制到剪贴板的条目字段名.

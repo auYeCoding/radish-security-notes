@@ -29,11 +29,18 @@ export function createFakeEntryBridge(
         id: `created-${details.length + 1}`,
         ...input,
         name: input.name.trim(),
+        customFields: input.customFields.map((field, index) => ({
+          id: `created-field-${index + 1}`,
+          label: field.label.trim(),
+          value: field.value,
+          isHidden: field.isHidden,
+        })),
       };
       details.unshift(detail);
       return Promise.resolve(entrySucceeded(detail));
     }),
     copyField: vi.fn(() => Promise.resolve(entrySucceeded(undefined))),
+    copyCustomField: vi.fn(() => Promise.resolve(entrySucceeded(undefined))),
     ...overrides,
   };
 }
