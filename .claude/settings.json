@@ -7,7 +7,9 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"],
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"
+            ],
             "timeout": 30
           }
         ]
@@ -20,7 +22,9 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"],
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"
+            ],
             "timeout": 30
           }
         ]
@@ -32,7 +36,9 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"],
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"
+            ],
             "timeout": 30
           }
         ]
@@ -44,7 +50,9 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"],
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"
+            ],
             "timeout": 30
           }
         ]
@@ -56,7 +64,9 @@
           {
             "type": "command",
             "command": "node",
-            "args": ["${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"],
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.navigator/bin/runtime/hook.mjs"
+            ],
             "timeout": 30
           }
         ]
