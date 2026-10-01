@@ -3,20 +3,23 @@ import {
   entrySucceeded,
   type EntryResult,
 } from "@shared/entries/entry-result";
-import type {
-  EntryCopyField,
-  EntryDetail,
-  EntrySummary,
-  NewEntryInput,
+import {
+  readAccount,
+  type EntryDetail,
+  type EntrySummary,
+  type NewEntryInput,
 } from "@shared/entries/entry-types";
-import { newEntrySchema } from "@shared/entries/new-entry-schema";
+import { createNewEntrySchema } from "@shared/entries/new-entry-schema";
+import {
+  findEntryType,
+  requireEntryType,
+} from "@shared/entries/preset-entry-types";
 
 import type { VaultOrm } from "../vault/database/drizzle-adapter";
 import type { ClipboardPort } from "./clipboard-port";
-import {
-  assignCustomFieldIdentifiers,
-  findCustomField,
-} from "./custom-field-records";
+import { findCustomField } from "./custom-field-records";
+import { findCopyValue, normalizeFieldValues } from "./entry-field-values";
+import { buildEntryRecord } from "./entry-record-builder";
 import {
   findEntry,
   insertEntry,
@@ -51,25 +54,28 @@ export interface EntryServiceDependencies {
 }
 
 /**
- * 把表里的一行转成条目详情.
+ * 把表里的一行转成条目详情, 类型字段按类型补全.
  * @param record 条目所在的行.
  * @returns 条目详情.
+ * @throws Error 当行里的类型不是预设类型时.
  */
 function toDetail(record: EntryRecord): EntryDetail {
+  const type = requireEntryType(record.type);
+  const fields = normalizeFieldValues(type, record.fields);
   return {
     id: record.id,
     name: record.name,
-    account: record.account,
-    password: record.password,
-    url: record.url,
+    type: type.key,
+    account: readAccount(fields),
+    fields,
     notes: record.notes,
     customFields: record.customFields,
   };
 }
 
 /**
- * 条目服务: 在已解锁的加密数据库里新建与读取条目, 并把条目字段复制到剪贴板. 账号, 密码,
- * 网址, 备注与自定义字段只在方法执行期间经过内存, 不写入日志.
+ * 条目服务: 在已解锁的加密数据库里新建与读取条目, 并把条目字段复制到剪贴板. 类型字段,
+ * 备注与自定义字段只在方法执行期间经过内存, 不写入日志.
  */
 export class EntryService {
   /**
@@ -101,26 +107,27 @@ export class EntryService {
   }
 
   /**
-   * 新建一个条目: 校验输入, 名称与自定义字段的字段名去首尾空格, 生成条目编号, 自定义字段
-   * 编号与创建时间后写入数据库.
-   * @param input 用户填写的名称, 账号, 密码, 网址, 备注与自定义字段.
-   * @returns 新建的条目详情, 未解锁或输入不合规时为失败结果.
+   * 新建一个条目: 按类型校验输入, 名称与自定义字段的字段名去首尾空格, 生成条目编号, 自定义
+   * 字段编号与创建时间后写入数据库.
+   * @param input 用户选的类型, 填写的名称, 类型字段, 备注与自定义字段.
+   * @returns 新建的条目详情, 未解锁或输入不合规 (含未知类型) 时为失败结果.
    */
   create(input: NewEntryInput): EntryResult<EntryDetail> {
     return this.withDatabase((orm) => {
-      const parsed = newEntrySchema.safeParse(input);
-      if (!parsed.success) {
+      const type = findEntryType(input.type);
+      const parsed =
+        type === undefined
+          ? undefined
+          : createNewEntrySchema(type).safeParse(input);
+      if (type === undefined || !parsed?.success) {
         return entryFailed("invalid-input");
       }
-      const record: EntryRecord = {
-        id: this.dependencies.createIdentifier(),
-        ...parsed.data,
-        customFields: assignCustomFieldIdentifiers(
-          parsed.data.customFields,
-          this.dependencies.createIdentifier,
-        ),
+      const record = buildEntryRecord({
+        type,
+        values: parsed.data,
+        createIdentifier: this.dependencies.createIdentifier,
         createdAt: this.dependencies.now(),
-      };
+      });
       insertEntry(orm, record);
       return entrySucceeded(toDetail(record));
     });
@@ -129,16 +136,18 @@ export class EntryService {
   /**
    * 把条目的一个字段写入系统剪贴板.
    * @param id 条目编号.
-   * @param field 要复制的字段.
-   * @returns 复制结果, 未解锁或没有这个编号时为失败结果.
+   * @param field 要复制的字段名, 是备注或条目类型里的字段键.
+   * @returns 复制结果, 未解锁, 没有这个编号或条目类型没有这个字段时为失败结果.
    */
-  copyField(id: string, field: EntryCopyField): EntryResult<undefined> {
+  copyField(id: string, field: string): EntryResult<undefined> {
     return this.withDatabase((orm) => {
       const record = findEntry(orm, id);
-      if (record === undefined) {
+      const value =
+        record === undefined ? undefined : findCopyValue(record, field);
+      if (value === undefined) {
         return entryFailed("not-found");
       }
-      this.dependencies.clipboard.writeText(record[field]);
+      this.dependencies.clipboard.writeText(value);
       return entrySucceeded(undefined);
     });
   }

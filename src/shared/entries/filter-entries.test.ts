@@ -7,9 +7,10 @@ import { filterEntries } from "./filter-entries";
  * 测试用的三个条目摘要.
  */
 const ENTRIES: readonly EntrySummary[] = [
-  { id: "1", name: "Alpha Forum", account: "alice@example.com" },
-  { id: "2", name: "Beta Bank", account: "bob-account" },
-  { id: "3", name: "银行卡", account: "bank-card-user" },
+  { id: "1", name: "Alpha Forum", type: "forum", account: "alice@example.com" },
+  { id: "2", name: "Beta Bank", type: "login", account: "bob-account" },
+  { id: "3", name: "银行卡", type: "login", account: "bank-card-user" },
+  { id: "4", name: "工资", type: "bankCard", account: "" },
 ];
 
 /**
@@ -23,8 +24,8 @@ function matchedIds(query: string): string[] {
 
 describe("filterEntries", () => {
   it("关键字为空或只有空格时返回全部条目", () => {
-    expect(matchedIds("")).toEqual(["1", "2", "3"]);
-    expect(matchedIds("   ")).toEqual(["1", "2", "3"]);
+    expect(matchedIds("")).toEqual(["1", "2", "3", "4"]);
+    expect(matchedIds("   ")).toEqual(["1", "2", "3", "4"]);
   });
 
   it("按名称匹配, 不区分大小写", () => {
@@ -43,6 +44,11 @@ describe("filterEntries", () => {
 
   it("关键字去首尾空格, 支持中文", () => {
     expect(matchedIds("  银行  ")).toEqual(["3"]);
+  });
+
+  it("不按类型匹配, 类型键与没有账号的条目都不会因类型被搜到", () => {
+    expect(matchedIds("bankCard")).toEqual([]);
+    expect(matchedIds("forum")).toEqual(["1"]);
   });
 
   it("没有匹配时返回空列表", () => {

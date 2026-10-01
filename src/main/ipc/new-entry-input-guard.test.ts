@@ -6,10 +6,9 @@ import { requireNewEntryInput } from "./new-entry-input-guard";
  * 一份类型都正确的新建输入.
  */
 const VALID_INPUT = {
+  type: "bankCard",
   name: "n",
-  account: "a",
-  password: "p",
-  url: "https://example.test",
+  fields: { cardNumber: "6222", expiry: "12/30" },
   notes: "第一行\n第二行",
   customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
 };
@@ -25,10 +24,13 @@ describe("requireNewEntryInput", () => {
     expect(result).toEqual(VALID_INPUT);
   });
 
-  it("没有自定义字段时数组为空也通过", () => {
+  it("没有自定义字段时数组为空也通过, 类型字段为空对象也通过", () => {
     expect(
       requireNewEntryInput({ ...VALID_INPUT, customFields: [] }).customFields,
     ).toEqual([]);
+    expect(requireNewEntryInput({ ...VALID_INPUT, fields: {} }).fields).toEqual(
+      {},
+    );
   });
 
   it("不是对象, 缺少字符串字段或字段类型不对时抛出错误", () => {
@@ -37,9 +39,23 @@ describe("requireNewEntryInput", () => {
       null,
       "text",
       { ...VALID_INPUT, name: undefined },
-      { ...VALID_INPUT, account: 1 },
-      { ...VALID_INPUT, url: undefined },
       { ...VALID_INPUT, notes: null },
+    ]) {
+      expect(() => requireNewEntryInput(input)).toThrow("无效的条目内容");
+    }
+  });
+});
+
+describe("requireNewEntryInput 类型与类型字段", () => {
+  it("类型不是预设类型键, 或类型字段不是值都为字符串的对象时抛出错误", () => {
+    for (const input of [
+      { ...VALID_INPUT, type: undefined },
+      { ...VALID_INPUT, type: "custom" },
+      { ...VALID_INPUT, type: 1 },
+      { ...VALID_INPUT, fields: undefined },
+      { ...VALID_INPUT, fields: "text" },
+      { ...VALID_INPUT, fields: { cardNumber: 1 } },
+      { ...VALID_INPUT, fields: { cardNumber: null } },
     ]) {
       expect(() => requireNewEntryInput(input)).toThrow("无效的条目内容");
     }

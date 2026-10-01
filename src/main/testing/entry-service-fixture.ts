@@ -1,6 +1,8 @@
 import { vi } from "vitest";
 
 import type { EntryDetail, NewEntryInput } from "@shared/entries/entry-types";
+import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
+import { LOGIN_TYPE } from "@shared/entries/preset-types/login-type";
 
 import type { ClipboardPort } from "../entries/clipboard-port";
 import { EntryService } from "../entries/entry-service";
@@ -68,7 +70,34 @@ export async function createUnlockedEntryFixture(
 }
 
 /**
- * 构造新建输入, 没有给出的字段取空值.
+ * 类型的全部字段都为空串的取值.
+ * @param type 条目类型定义.
+ * @returns 字段键到空串的取值.
+ */
+export function emptyFieldValuesOf(
+  type: PresetEntryTypeDefinition,
+): Record<string, string> {
+  return Object.fromEntries(type.fields.map((field) => [field.key, ""]));
+}
+
+/**
+ * 类型的全部字段都有值的取值: 值里带类型键与字段键, 彼此不同, 多行字段的值有两行.
+ * @param type 条目类型定义.
+ * @returns 字段键到非空值的取值.
+ */
+export function sampleFieldValuesOf(
+  type: PresetEntryTypeDefinition,
+): Record<string, string> {
+  return Object.fromEntries(
+    type.fields.map((field) => {
+      const value = `${type.key}-${field.key}`;
+      return [field.key, field.isMultiline ? `${value}-1\n${value}-2` : value];
+    }),
+  );
+}
+
+/**
+ * 构造新建输入, 没有给出的字段取通用登录的空值.
  * @param overrides 要覆盖的字段.
  * @returns 新建输入.
  */
@@ -76,10 +105,9 @@ export function newEntryInputOf(
   overrides: Partial<NewEntryInput> = {},
 ): NewEntryInput {
   return {
+    type: "login",
     name: "条目",
-    account: "",
-    password: "",
-    url: "",
+    fields: emptyFieldValuesOf(LOGIN_TYPE),
     notes: "",
     customFields: [],
     ...overrides,
@@ -87,7 +115,7 @@ export function newEntryInputOf(
 }
 
 /**
- * 构造期望的条目详情, 没有给出的字段取空值, 编号默认是第一个新建条目的 id-1.
+ * 构造期望的条目详情, 没有给出的字段取通用登录的空值, 编号默认是第一个新建条目的 id-1.
  * @param overrides 要覆盖的字段.
  * @returns 条目详情.
  */
@@ -95,9 +123,9 @@ export function detailOf(overrides: Partial<EntryDetail> = {}): EntryDetail {
   return {
     id: "id-1",
     name: "条目",
+    type: "login",
     account: "",
-    password: "",
-    url: "",
+    fields: emptyFieldValuesOf(LOGIN_TYPE),
     notes: "",
     customFields: [],
     ...overrides,

@@ -35,6 +35,25 @@ async function renderPane(
   return environment;
 }
 
+/**
+ * 按名称取按钮并判断是否禁用.
+ * @param name 按钮的名称.
+ * @returns 按钮禁用时为 true.
+ */
+function isButtonDisabled(name: string): boolean {
+  return (screen.getByRole("button", { name }) as HTMLButtonElement).disabled;
+}
+
+/**
+ * 取详情里全部字段名的文字, 按显示顺序.
+ * @returns 字段名列表.
+ */
+function readLabels(): (string | null)[] {
+  return Array.from(document.querySelectorAll("dt")).map(
+    (term) => term.textContent,
+  );
+}
+
 describe("EntryDetailPane 展示", () => {
   it("没有选中时提示选择条目", async () => {
     await renderPane();
@@ -42,23 +61,24 @@ describe("EntryDetailPane 展示", () => {
     expect(screen.getByText("选择一个条目查看详情")).toBeDefined();
   });
 
-  it("选中后显示名称与账号, 密码默认遮罩", async () => {
+  it("选中后标明类型, 显示名称与账号, 密码默认遮罩", async () => {
     await renderPane("forum");
 
     expect(screen.getByRole("heading", { name: "论坛" })).toBeDefined();
+    expect(screen.getByText("通用登录")).toBeDefined();
     expect(screen.getByText("forum-account")).toBeDefined();
     expect(screen.queryByText("forum-password")).toBeNull();
-    expect(screen.getByText("密码已隐藏")).toBeDefined();
+    expect(screen.getByText("密码 已隐藏")).toBeDefined();
   });
 
   it("点击显示按钮显示明文, 再点击恢复遮罩", async () => {
     await renderPane("forum");
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole("button", { name: "显示密码" }));
+    await user.click(screen.getByRole("button", { name: "显示 密码" }));
     expect(screen.getByText("forum-password")).toBeDefined();
 
-    await user.click(screen.getByRole("button", { name: "隐藏密码" }));
+    await user.click(screen.getByRole("button", { name: "隐藏 密码" }));
     expect(screen.queryByText("forum-password")).toBeNull();
   });
 
@@ -78,24 +98,24 @@ describe("EntryDetailPane 切换与空字段", () => {
   it("切换到别的条目后密码恢复遮罩", async () => {
     const { entryStore } = await renderPane("forum");
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "显示密码" }));
+    await user.click(screen.getByRole("button", { name: "显示 密码" }));
 
     await entryStore.getState().select("bank");
 
     expect(await screen.findByRole("heading", { name: "银行" })).toBeDefined();
-    expect(screen.queryByText(BANK_ENTRY.password)).toBeNull();
-    expect(screen.getByRole("button", { name: "显示密码" })).toBeDefined();
+    expect(screen.queryByText(BANK_ENTRY.fields["password"] ?? "")).toBeNull();
+    expect(screen.getByRole("button", { name: "显示 密码" })).toBeDefined();
   });
 
-  it("账号, 密码, 网址与备注没有填写时显示未填写, 复制按钮禁用, 没有显示按钮", async () => {
+  it("类型字段与备注没有填写时显示未填写, 复制按钮禁用, 没有显示按钮", async () => {
     await renderPane("empty", {
       entries: [
         {
           id: "empty",
           name: "只有名称",
+          type: "login",
           account: "",
-          password: "",
-          url: "",
+          fields: { account: "", password: "", url: "" },
           notes: "",
           customFields: [],
         },
@@ -103,21 +123,12 @@ describe("EntryDetailPane 切换与空字段", () => {
     });
 
     expect(screen.getAllByText("未填写")).toHaveLength(4);
-    for (const name of ["复制账号", "复制密码", "复制网址", "复制备注"]) {
+    for (const name of ["复制 账号", "复制 密码", "复制 网址", "复制 备注"]) {
       expect(isButtonDisabled(name)).toBe(true);
     }
-    expect(screen.queryByRole("button", { name: "显示密码" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "显示 密码" })).toBeNull();
   });
 });
-
-/**
- * 按名称取按钮并判断是否禁用.
- * @param name 按钮的名称.
- * @returns 按钮禁用时为 true.
- */
-function isButtonDisabled(name: string): boolean {
-  return (screen.getByRole("button", { name }) as HTMLButtonElement).disabled;
-}
 
 /**
  * 选中钱包条目 (带网址, 备注与三个自定义字段) 后渲染详情窗格.
@@ -133,15 +144,11 @@ function renderWalletPane(
   });
 }
 
-describe("EntryDetailPane 网址, 备注与自定义字段", () => {
-  it("按账号, 密码, 网址, 自定义字段, 备注的顺序展示", async () => {
+describe("EntryDetailPane 类型字段, 自定义字段与备注", () => {
+  it("按类型字段, 自定义字段, 备注的顺序展示", async () => {
     await renderWalletPane();
 
-    const labels = Array.from(document.querySelectorAll("dt")).map(
-      (term) => term.textContent,
-    );
-
-    expect(labels).toEqual([
+    expect(readLabels()).toEqual([
       "账号",
       "密码",
       "网址",
@@ -150,17 +157,15 @@ describe("EntryDetailPane 网址, 备注与自定义字段", () => {
       "备用编号",
       "备注",
     ]);
-    expect(screen.getByText(WALLET_ENTRY.url)).toBeDefined();
+    expect(
+      screen.getByText(WALLET_ENTRY.fields["url"] ?? "missing"),
+    ).toBeDefined();
   });
 
   it("没有自定义字段时不显示任何自定义字段行", async () => {
     await renderPane("forum");
 
-    const labels = Array.from(document.querySelectorAll("dt")).map(
-      (term) => term.textContent,
-    );
-
-    expect(labels).toEqual(["账号", "密码", "网址", "备注"]);
+    expect(readLabels()).toEqual(["账号", "密码", "网址", "备注"]);
   });
 
   it("备注与多行字段值保留换行", async () => {
@@ -217,15 +222,15 @@ describe("EntryDetailPane 自定义字段的遮罩与空值", () => {
   });
 });
 
-describe("EntryDetailPane 复制网址, 备注与自定义字段", () => {
+describe("EntryDetailPane 复制备注与自定义字段", () => {
   it("复制网址与备注把编号和字段名交给桥", async () => {
     const { entryBridge } = await renderWalletPane();
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole("button", { name: "复制网址" }));
+    await user.click(screen.getByRole("button", { name: "复制 网址" }));
     expect(entryBridge.copyField).toHaveBeenLastCalledWith("wallet", "url");
 
-    await user.click(screen.getByRole("button", { name: "复制备注" }));
+    await user.click(screen.getByRole("button", { name: "复制 备注" }));
     expect(entryBridge.copyField).toHaveBeenLastCalledWith("wallet", "notes");
   });
 
@@ -267,21 +272,21 @@ describe("EntryDetailPane 复制网址, 备注与自定义字段", () => {
   });
 });
 
-describe("EntryDetailPane 复制", () => {
-  it("复制账号与密码把编号和字段名交给桥, 并显示已复制", async () => {
+describe("EntryDetailPane 复制类型字段", () => {
+  it("复制账号与密码把编号和字段键交给桥, 并显示已复制", async () => {
     const { entryBridge } = await renderPane("forum");
     const user = userEvent.setup();
 
-    await user.click(screen.getByRole("button", { name: "复制账号" }));
+    await user.click(screen.getByRole("button", { name: "复制 账号" }));
     expect(entryBridge.copyField).toHaveBeenLastCalledWith(
       FORUM_ENTRY.id,
       "account",
     );
-    expect(screen.getByRole("button", { name: "复制账号" }).textContent).toBe(
+    expect(screen.getByRole("button", { name: "复制 账号" }).textContent).toBe(
       "已复制",
     );
 
-    await user.click(screen.getByRole("button", { name: "复制密码" }));
+    await user.click(screen.getByRole("button", { name: "复制 密码" }));
     expect(entryBridge.copyField).toHaveBeenLastCalledWith(
       FORUM_ENTRY.id,
       "password",
@@ -298,9 +303,9 @@ describe("EntryDetailPane 复制", () => {
 
     await userEvent
       .setup()
-      .click(screen.getByRole("button", { name: "复制账号" }));
+      .click(screen.getByRole("button", { name: "复制 账号" }));
 
-    expect(screen.getByRole("button", { name: "复制账号" }).textContent).toBe(
+    expect(screen.getByRole("button", { name: "复制 账号" }).textContent).toBe(
       "",
     );
   });

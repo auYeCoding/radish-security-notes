@@ -1,10 +1,6 @@
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import type { EntryResult } from "@shared/entries/entry-result";
-import type {
-  EntryCopyField,
-  EntryDetail,
-  NewEntryInput,
-} from "@shared/entries/entry-types";
+import type { EntryDetail, NewEntryInput } from "@shared/entries/entry-types";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 import {
@@ -38,17 +34,17 @@ export interface EntryActions {
   setQuery: (query: string) => void;
   /**
    * 新建一个条目, 成功后选中它.
-   * @param input 用户填写的名称, 账号, 密码, 网址, 备注与自定义字段.
+   * @param input 用户选的类型, 填写的名称, 类型字段, 备注与自定义字段.
    * @returns 新建结果.
    */
   create: (input: NewEntryInput) => Promise<EntryResult<EntryDetail>>;
   /**
    * 把条目的一个字段复制到系统剪贴板.
    * @param id 条目编号.
-   * @param field 要复制的字段.
+   * @param field 要复制的字段名, 是备注或条目类型里的字段键.
    * @returns 复制成功时为 true.
    */
-  copyField: (id: string, field: EntryCopyField) => Promise<boolean>;
+  copyField: (id: string, field: string) => Promise<boolean>;
   /**
    * 把条目的一个自定义字段的值复制到系统剪贴板.
    * @param id 条目编号.

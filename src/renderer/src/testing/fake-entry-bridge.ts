@@ -1,6 +1,10 @@
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import { entryFailed, entrySucceeded } from "@shared/entries/entry-result";
-import { toEntrySummary, type EntryDetail } from "@shared/entries/entry-types";
+import {
+  readAccount,
+  toEntrySummary,
+  type EntryDetail,
+} from "@shared/entries/entry-types";
 import { vi } from "vitest";
 
 /**
@@ -27,8 +31,11 @@ export function createFakeEntryBridge(
     create: vi.fn((input) => {
       const detail: EntryDetail = {
         id: `created-${details.length + 1}`,
-        ...input,
         name: input.name.trim(),
+        type: input.type,
+        account: readAccount(input.fields),
+        fields: input.fields,
+        notes: input.notes,
         customFields: input.customFields.map((field, index) => ({
           id: `created-field-${index + 1}`,
           label: field.label.trim(),

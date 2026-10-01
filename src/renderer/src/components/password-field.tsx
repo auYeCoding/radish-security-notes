@@ -32,6 +32,14 @@ interface PasswordFieldProps extends Omit<
    * 校验错误或操作错误的文字, 有值时输入框标红并在下方显示.
    */
   readonly error?: string;
+  /**
+   * 已隐藏时显示按钮的名称, 不给时用密码的 "显示密码".
+   */
+  readonly showLabel?: string;
+  /**
+   * 已显示时隐藏按钮的名称, 不给时用密码的 "隐藏密码".
+   */
+  readonly hideLabel?: string;
 }
 
 /**
@@ -58,7 +66,8 @@ function describedByOf(
  * @returns 密码字段元素.
  */
 export function PasswordField(props: PasswordFieldProps): React.JSX.Element {
-  const { label, description, error, ...inputProps } = props;
+  const { label, description, error, showLabel, hideLabel, ...inputProps } =
+    props;
   const identifier = useId();
   const [isRevealed, setIsRevealed] = useState(false);
   const hasError = error !== undefined;
@@ -82,6 +91,8 @@ export function PasswordField(props: PasswordFieldProps): React.JSX.Element {
           <RevealToggleButton
             isRevealed={isRevealed}
             onToggle={() => setIsRevealed(!isRevealed)}
+            showLabel={showLabel}
+            hideLabel={hideLabel}
           />
         </InputGroupAddon>
       </InputGroup>

@@ -1,61 +1,74 @@
 import { describe, expect, it } from "vitest";
 
+import { PRESET_ENTRY_TYPES } from "@shared/entries/preset-entry-types";
+
 import {
   createUnlockedEntryFixture,
   newEntryInputOf,
+  sampleFieldValuesOf,
 } from "../testing/entry-service-fixture";
 import { useVaultServiceHarness } from "../testing/vault-service-harness";
 
-describe("条目服务: 复制账号与密码", () => {
+describe("条目服务: 逐个预设类型复制字段", () => {
   const getHarness = useVaultServiceHarness();
 
-  it("把账号或密码写入剪贴板", async () => {
+  it.each(PRESET_ENTRY_TYPES)(
+    "$key 的每个字段都能复制, 剪贴板收到字段原值, 多行原样",
+    async (type) => {
+      const { entries, writeText } =
+        await createUnlockedEntryFixture(getHarness());
+      const fields = sampleFieldValuesOf(type);
+      entries.create(newEntryInputOf({ type: type.key, fields }));
+
+      const results = type.fields.map((field) =>
+        entries.copyField("id-1", field.key),
+      );
+
+      expect(results).toEqual(
+        type.fields.map(() => ({ ok: true, value: undefined })),
+      );
+      expect(writeText.mock.calls).toEqual(
+        type.fields.map((field) => [fields[field.key]]),
+      );
+    },
+  );
+});
+
+describe("条目服务: 复制备注", () => {
+  const getHarness = useVaultServiceHarness();
+
+  it("把多行备注原样写入剪贴板", async () => {
     const { entries, writeText } =
       await createUnlockedEntryFixture(getHarness());
-    entries.create(
-      newEntryInputOf({ account: "the-account", password: "the-pw" }),
-    );
+    entries.create(newEntryInputOf({ notes: "第一行\n第二行 " }));
 
-    const copiedAccount = entries.copyField("id-1", "account");
-    const copiedPassword = entries.copyField("id-1", "password");
+    const copied = entries.copyField("id-1", "notes");
 
-    expect(copiedAccount).toEqual({ ok: true, value: undefined });
-    expect(copiedPassword).toEqual({ ok: true, value: undefined });
-    expect(writeText).toHaveBeenNthCalledWith(1, "the-account");
-    expect(writeText).toHaveBeenNthCalledWith(2, "the-pw");
-  });
-
-  it("编号不存在时不写剪贴板", async () => {
-    const { entries, writeText } =
-      await createUnlockedEntryFixture(getHarness());
-
-    const result = entries.copyField("missing", "password");
-
-    expect(result).toEqual({ ok: false, reason: "not-found" });
-    expect(writeText).not.toHaveBeenCalled();
+    expect(copied).toEqual({ ok: true, value: undefined });
+    expect(writeText).toHaveBeenCalledWith("第一行\n第二行 ");
   });
 });
 
-describe("条目服务: 复制网址与备注", () => {
+describe("条目服务: 复制失败", () => {
   const getHarness = useVaultServiceHarness();
 
-  it("把网址与多行备注原样写入剪贴板", async () => {
+  it("编号不存在, 或字段名不属于条目的类型时不写剪贴板", async () => {
     const { entries, writeText } =
       await createUnlockedEntryFixture(getHarness());
     entries.create(
       newEntryInputOf({
-        url: "https://example.test/a?b=c",
-        notes: "第一行\n第二行 ",
+        fields: { account: "a", password: "p", url: "https://a.test" },
       }),
     );
 
-    const copiedUrl = entries.copyField("id-1", "url");
-    const copiedNotes = entries.copyField("id-1", "notes");
+    const missingEntry = entries.copyField("missing", "password");
+    const otherTypeField = entries.copyField("id-1", "cardNumber");
+    const unknownField = entries.copyField("id-1", "customFields");
 
-    expect(copiedUrl).toEqual({ ok: true, value: undefined });
-    expect(copiedNotes).toEqual({ ok: true, value: undefined });
-    expect(writeText).toHaveBeenNthCalledWith(1, "https://example.test/a?b=c");
-    expect(writeText).toHaveBeenNthCalledWith(2, "第一行\n第二行 ");
+    for (const result of [missingEntry, otherTypeField, unknownField]) {
+      expect(result).toEqual({ ok: false, reason: "not-found" });
+    }
+    expect(writeText).not.toHaveBeenCalled();
   });
 });
 

@@ -1,6 +1,9 @@
 import { z } from "zod";
 
 import { customFieldInputSchema } from "./custom-field-schema";
+import type { NewCustomFieldInput } from "./custom-field-types";
+import type { EntryFieldDefinition } from "./entry-field-types";
+import type { PresetEntryTypeDefinition } from "./preset-entry-types";
 
 /**
  * 条目名称允许的最多字符数.
@@ -8,14 +11,27 @@ import { customFieldInputSchema } from "./custom-field-schema";
 export const ENTRY_NAME_MAX_LENGTH = 100;
 
 /**
- * 条目账号允许的最多字符数.
+ * 新建条目表单的取值, 不含类型, 类型由选择界面给出. 数组与记录不加只读修饰, 以便表单库
+ * 的字段数组与字段路径使用.
  */
-export const ENTRY_ACCOUNT_MAX_LENGTH = 200;
-
-/**
- * 条目密码允许的最多字符数.
- */
-export const ENTRY_PASSWORD_MAX_LENGTH = 1000;
+export interface NewEntryFormValues {
+  /**
+   * 条目名称.
+   */
+  name: string;
+  /**
+   * 类型字段取值, 类型的每个字段都有一项.
+   */
+  fields: Record<string, string>;
+  /**
+   * 条目的备注.
+   */
+  notes: string;
+  /**
+   * 条目的自定义字段.
+   */
+  customFields: NewCustomFieldInput[];
+}
 
 /**
  * 新建条目校验失败的错误代码, 显示时再换成当前语言的文案.
@@ -23,8 +39,7 @@ export const ENTRY_PASSWORD_MAX_LENGTH = 1000;
 export const NEW_ENTRY_ERROR_CODES = {
   nameRequired: "nameRequired",
   nameTooLong: "nameTooLong",
-  accountTooLong: "accountTooLong",
-  passwordTooLong: "passwordTooLong",
+  fieldTooLong: "fieldTooLong",
 } as const;
 
 /**
@@ -38,37 +53,48 @@ function isWithinLength(value: string, maxLength: number): boolean {
 }
 
 /**
- * 新建条目的校验方案, 渲染端表单与主进程共用: 名称去首尾空格后不能为空, 名称, 账号,
- * 密码都不能超过各自的最多字符数, 账号与密码可以为空; 网址, 备注与自定义字段不设长度与
- * 数量上限, 网址与备注原样保存. 校验消息是 `NEW_ENTRY_ERROR_CODES` 或
- * `CUSTOM_FIELD_ERROR_CODES` 里的错误代码.
+ * 一个类型字段的校验方案: 是字符串, 定义里给了长度上限时不能超过它, 原样保存.
+ * @param field 字段定义.
+ * @returns 字段的校验方案.
  */
-export const newEntrySchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .refine((name) => name.length > 0, {
-      message: NEW_ENTRY_ERROR_CODES.nameRequired,
-    })
-    .refine((name) => isWithinLength(name, ENTRY_NAME_MAX_LENGTH), {
-      message: NEW_ENTRY_ERROR_CODES.nameTooLong,
-    }),
-  account: z
-    .string()
-    .refine((account) => isWithinLength(account, ENTRY_ACCOUNT_MAX_LENGTH), {
-      message: NEW_ENTRY_ERROR_CODES.accountTooLong,
-    }),
-  password: z
-    .string()
-    .refine((password) => isWithinLength(password, ENTRY_PASSWORD_MAX_LENGTH), {
-      message: NEW_ENTRY_ERROR_CODES.passwordTooLong,
-    }),
-  url: z.string(),
-  notes: z.string(),
-  customFields: z.array(customFieldInputSchema),
-});
+function createFieldSchema(field: EntryFieldDefinition): z.ZodString {
+  const { maxLength } = field;
+  const text = z.string();
+  if (maxLength === undefined) {
+    return text;
+  }
+  return text.refine((value) => isWithinLength(value, maxLength), {
+    message: NEW_ENTRY_ERROR_CODES.fieldTooLong,
+  });
+}
 
 /**
- * 新建条目表单的取值.
+ * 按类型生成新建条目的校验方案, 渲染端表单与主进程共用: 名称去首尾空格后不能为空且不超过
+ * 最多字符数, 类型的每个字段都必须是字符串并满足字段定义里的长度上限, 类型之外的字段被丢弃,
+ * 备注与自定义字段不设长度与数量上限. 校验消息是 `NEW_ENTRY_ERROR_CODES` 或
+ * `CUSTOM_FIELD_ERROR_CODES` 里的错误代码.
+ * @param type 条目类型定义.
+ * @returns 该类型的新建条目校验方案.
  */
-export type NewEntryFormValues = z.infer<typeof newEntrySchema>;
+export function createNewEntrySchema(
+  type: PresetEntryTypeDefinition,
+): z.ZodType<NewEntryFormValues, NewEntryFormValues> {
+  return z.object({
+    name: z
+      .string()
+      .trim()
+      .refine((name) => name.length > 0, {
+        message: NEW_ENTRY_ERROR_CODES.nameRequired,
+      })
+      .refine((name) => isWithinLength(name, ENTRY_NAME_MAX_LENGTH), {
+        message: NEW_ENTRY_ERROR_CODES.nameTooLong,
+      }),
+    fields: z.object(
+      Object.fromEntries(
+        type.fields.map((field) => [field.key, createFieldSchema(field)]),
+      ),
+    ),
+    notes: z.string(),
+    customFields: z.array(customFieldInputSchema),
+  });
+}

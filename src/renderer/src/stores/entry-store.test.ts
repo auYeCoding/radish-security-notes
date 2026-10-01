@@ -10,9 +10,15 @@ import { createFakeEntryBridge } from "@renderer/testing/fake-entry-bridge";
 import { createEntryStore } from "./entry-store";
 
 /**
- * 新建输入里网址, 备注与自定义字段都为空的部分.
+ * 通用登录的新建输入, 名称与全部字段都为空.
  */
-const NO_EXTRA_FIELDS = { url: "", notes: "", customFields: [] } as const;
+const EMPTY_LOGIN_INPUT = {
+  type: "login",
+  name: "",
+  fields: { account: "", password: "", url: "" },
+  notes: "",
+  customFields: [],
+} as const;
 
 describe("条目 store 读取与选中", () => {
   it("初始状态是读取中, 没有条目也没有选中", () => {
@@ -35,8 +41,8 @@ describe("条目 store 读取与选中", () => {
 
     expect(store.getState().loadStatus).toBe("ready");
     expect(store.getState().entries).toEqual([
-      { id: "forum", name: "论坛", account: "forum-account" },
-      { id: "bank", name: "银行", account: "bank-account" },
+      { id: "forum", name: "论坛", type: "login", account: "forum-account" },
+      { id: "bank", name: "银行", type: "login", account: "bank-account" },
     ]);
   });
 
@@ -127,10 +133,13 @@ describe("条目 store 新建", () => {
     store.getState().setQuery("zzz");
 
     const result = await store.getState().create({
+      type: "login",
       name: " 新条目 ",
-      account: "new-account",
-      password: "new-password",
-      url: "https://example.test",
+      fields: {
+        account: "new-account",
+        password: "new-password",
+        url: "https://example.test",
+      },
       notes: "第一行\n第二行",
       customFields: [{ label: "助记词", value: "a b", isHidden: true }],
     });
@@ -145,14 +154,21 @@ describe("条目 store 新建", () => {
       status: "ready",
       detail: {
         name: "新条目",
-        password: "new-password",
-        url: "https://example.test",
+        type: "login",
+        account: "new-account",
+        fields: {
+          account: "new-account",
+          password: "new-password",
+          url: "https://example.test",
+        },
         notes: "第一行\n第二行",
         customFields: [{ label: "助记词", value: "a b", isHidden: true }],
       },
     });
   });
+});
 
+describe("条目 store 新建失败", () => {
   it("新建失败时不改动列表与选中, 并返回失败结果", async () => {
     const store = createEntryStore({
       bridge: createFakeEntryBridge([], {
@@ -160,12 +176,7 @@ describe("条目 store 新建", () => {
       }),
     });
 
-    const result = await store.getState().create({
-      name: "",
-      account: "",
-      password: "",
-      ...NO_EXTRA_FIELDS,
-    });
+    const result = await store.getState().create(EMPTY_LOGIN_INPUT);
 
     expect(result).toEqual({ ok: false, reason: "invalid-input" });
     expect(store.getState().entries).toEqual([]);
@@ -182,10 +193,8 @@ describe("条目 store 异常与搜索", () => {
     });
 
     const result = await store.getState().create({
+      ...EMPTY_LOGIN_INPUT,
       name: "n",
-      account: "",
-      password: "",
-      ...NO_EXTRA_FIELDS,
     });
 
     expect(result).toEqual({ ok: false, reason: "unexpected-error" });
@@ -214,6 +223,8 @@ describe("条目 store 复制", () => {
     const failed = await failing.getState().copyField("forum", "account");
 
     expect(bridge.copyField).toHaveBeenCalledWith("forum", "password");
+    await store.getState().copyField("card", "cardNumber");
+    expect(bridge.copyField).toHaveBeenLastCalledWith("card", "cardNumber");
     expect(copied).toBe(true);
     expect(failed).toBe(false);
   });

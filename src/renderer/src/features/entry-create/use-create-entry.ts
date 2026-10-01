@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
+import type { EntryTypeKey } from "@shared/entries/preset-entry-types";
 
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 
@@ -16,7 +17,8 @@ export interface CreateEntry {
    */
   readonly failureMessage: string | undefined;
   /**
-   * 提交表单取值: 经条目 store 新建条目, 成功时调用成功回调, 失败时记下失败文案.
+   * 提交表单取值: 带上所选类型经条目 store 新建条目, 成功时调用成功回调, 失败时记下失败
+   * 文案.
    * @param values 表单取值.
    * @returns 提交完成后兑现.
    */
@@ -25,10 +27,14 @@ export interface CreateEntry {
 
 /**
  * 跟踪新建条目的提交结果.
+ * @param typeKey 用户选的条目类型键.
  * @param onCreated 新建成功后的回调, 例如关闭对话框.
  * @returns 失败文案与提交方法.
  */
-export function useCreateEntry(onCreated: () => void): CreateEntry {
+export function useCreateEntry(
+  typeKey: EntryTypeKey,
+  onCreated: () => void,
+): CreateEntry {
   const { t } = useTranslation();
   const create = useEntryStore((state) => state.create);
   const [failureMessage, setFailureMessage] = useState<string | undefined>(
@@ -37,14 +43,14 @@ export function useCreateEntry(onCreated: () => void): CreateEntry {
   const submit = useCallback(
     async (values: NewEntryFormValues): Promise<void> => {
       setFailureMessage(undefined);
-      const result = await create(values);
+      const result = await create({ type: typeKey, ...values });
       if (result.ok) {
         onCreated();
         return;
       }
       setFailureMessage(describeCreateFailure(result.reason, t));
     },
-    [create, onCreated, t],
+    [create, typeKey, onCreated, t],
   );
   return { failureMessage, submit };
 }

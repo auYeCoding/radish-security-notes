@@ -1,10 +1,5 @@
 import type { EntryResult } from "./entry-result";
-import type {
-  EntryCopyField,
-  EntryDetail,
-  EntrySummary,
-  NewEntryInput,
-} from "./entry-types";
+import type { EntryDetail, EntrySummary, NewEntryInput } from "./entry-types";
 
 /**
  * preload 暴露给渲染进程的条目接口, 渲染进程只经它读写条目与复制字段.
@@ -23,20 +18,17 @@ export interface EntryBridge {
   get: (id: string) => Promise<EntryResult<EntryDetail>>;
   /**
    * 新建一个条目.
-   * @param input 用户填写的名称, 账号, 密码, 网址, 备注与自定义字段.
+   * @param input 用户选的类型, 填写的名称, 类型字段, 备注与自定义字段.
    * @returns 新建的条目详情.
    */
   create: (input: NewEntryInput) => Promise<EntryResult<EntryDetail>>;
   /**
    * 让主进程把条目的一个字段写入系统剪贴板, 字段值不经过渲染进程.
    * @param id 条目编号.
-   * @param field 要复制的字段.
+   * @param field 要复制的字段名, 是备注或条目类型里的字段键.
    * @returns 复制结果.
    */
-  copyField: (
-    id: string,
-    field: EntryCopyField,
-  ) => Promise<EntryResult<undefined>>;
+  copyField: (id: string, field: string) => Promise<EntryResult<undefined>>;
   /**
    * 让主进程把条目的一个自定义字段的值写入系统剪贴板, 字段值不经过渲染进程.
    * @param id 条目编号.

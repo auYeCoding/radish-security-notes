@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
 
-import type { EntryDetail } from "@shared/entries/entry-types";
+import { NOTES_FIELD_KEY, type EntryDetail } from "@shared/entries/entry-types";
+import { requireEntryType } from "@shared/entries/preset-entry-types";
 
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 
-import { DetailCopyRow } from "./detail-copy-row";
 import { DetailCustomFieldRow } from "./detail-custom-field-row";
-import { DetailPasswordRow } from "./detail-password-row";
+import { DetailTypeLabel } from "./detail-type-label";
+import { DetailValueRow } from "./detail-value-row";
 
 /**
  * 条目详情视图的属性.
@@ -19,9 +20,9 @@ interface EntryDetailViewProps {
 }
 
 /**
- * 已选中条目的详情: 标题是名称, 下方依次是账号, 密码, 网址, 自定义字段与备注, 每项带复制
- * 按钮. 复制由主进程写入剪贴板. 调用方用条目编号作 key, 切换条目时密码与隐藏字段的显示状态
- * 随之恢复为遮罩.
+ * 已选中条目的详情: 标题上方标明类型, 标题是名称, 下方依次是该类型的字段, 自定义字段与备注,
+ * 敏感字段默认遮罩, 每项带复制按钮. 复制由主进程写入剪贴板. 调用方用条目编号作 key, 切换
+ * 条目时遮罩字段的显示状态随之恢复为遮罩.
  * @param props 组件属性.
  * @returns 详情视图元素.
  */
@@ -31,26 +32,23 @@ export function EntryDetailView(
   const { t } = useTranslation();
   const copyField = useEntryStore((state) => state.copyField);
   const { detail } = props;
+  const type = requireEntryType(detail.type);
   return (
     <div className="flex flex-col gap-6 p-8">
-      <h2 className="text-xl font-semibold break-words">{detail.name}</h2>
+      <div className="flex flex-col gap-1">
+        <DetailTypeLabel typeKey={type.key} />
+        <h2 className="text-xl font-semibold break-words">{detail.name}</h2>
+      </div>
       <dl className="flex max-w-xl flex-col gap-4">
-        <DetailCopyRow
-          label={t("entryDetail.account")}
-          value={detail.account}
-          copyLabel={t("entryDetail.copyAccount")}
-          onCopy={() => copyField(detail.id, "account")}
-        />
-        <DetailPasswordRow
-          password={detail.password}
-          onCopy={() => copyField(detail.id, "password")}
-        />
-        <DetailCopyRow
-          label={t("entryDetail.url")}
-          value={detail.url}
-          copyLabel={t("entryDetail.copyUrl")}
-          onCopy={() => copyField(detail.id, "url")}
-        />
+        {type.fields.map((field) => (
+          <DetailValueRow
+            key={field.key}
+            label={t(`entryFields.${field.key}`)}
+            value={detail.fields[field.key] ?? ""}
+            isSensitive={field.isSensitive}
+            onCopy={() => copyField(detail.id, field.key)}
+          />
+        ))}
         {detail.customFields.map((field) => (
           <DetailCustomFieldRow
             key={field.id}
@@ -58,11 +56,11 @@ export function EntryDetailView(
             field={field}
           />
         ))}
-        <DetailCopyRow
+        <DetailValueRow
           label={t("entryDetail.notes")}
           value={detail.notes}
-          copyLabel={t("entryDetail.copyNotes")}
-          onCopy={() => copyField(detail.id, "notes")}
+          isSensitive={false}
+          onCopy={() => copyField(detail.id, NOTES_FIELD_KEY)}
         />
       </dl>
     </div>

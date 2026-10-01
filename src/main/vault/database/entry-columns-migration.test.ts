@@ -1,11 +1,11 @@
 import { randomBytes } from "node:crypto";
-import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 
 import { MIGRATIONS_FOLDER } from "../../testing/migrations-folder";
+import { createMigrationsFolderUpTo } from "../../testing/partial-migrations-folder";
 import { useTemporaryDirectory } from "../../testing/temporary-directory";
 import { entries } from "./entry-schema";
 import { openVaultDatabase } from "./open-vault-database";
@@ -13,72 +13,26 @@ import { openVaultDatabase } from "./open-vault-database";
 /**
  * 迁移日志里骨架阶段已有的迁移个数: 0000 建元数据表, 0001 建条目表.
  */
-const LEGACY_MIGRATION_COUNT = 2;
+const SKELETON_MIGRATION_COUNT = 2;
 
-/**
- * 迁移日志里一项迁移的形状, 测试只用到名称.
- */
-interface JournalEntry {
-  /**
-   * 迁移文件的名称, 不含扩展名.
-   */
-  readonly tag: string;
-}
-
-/**
- * 迁移日志文件的形状, 测试只改写迁移列表.
- */
-interface Journal {
-  /**
-   * 迁移列表, 按执行顺序排列.
-   */
-  readonly entries: readonly JournalEntry[];
-}
-
-/**
- * 在临时目录里建一个只含骨架阶段迁移 (0000 与 0001) 的迁移文件夹, 内容从项目的迁移文件夹复制.
- * @param directory 临时目录.
- * @returns 只含旧迁移的迁移文件夹路径.
- */
-async function createLegacyMigrationsFolder(
-  directory: string,
-): Promise<string> {
-  const legacyFolder = join(directory, "legacy-migrations");
-  await mkdir(join(legacyFolder, "meta"), { recursive: true });
-  const journalText = await readFile(
-    join(MIGRATIONS_FOLDER, "meta", "_journal.json"),
-    "utf8",
-  );
-  const journal = JSON.parse(journalText) as Journal;
-  const legacyEntries = journal.entries.slice(0, LEGACY_MIGRATION_COUNT);
-  for (const { tag } of legacyEntries) {
-    await copyFile(
-      join(MIGRATIONS_FOLDER, `${tag}.sql`),
-      join(legacyFolder, `${tag}.sql`),
-    );
-  }
-  await writeFile(
-    join(legacyFolder, "meta", "_journal.json"),
-    JSON.stringify({ ...journal, entries: legacyEntries }),
-  );
-  return legacyFolder;
-}
-
-describe("条目表迁移: 旧条目升级", () => {
+describe("条目表迁移: 骨架阶段的旧条目升级", () => {
   const getDirectory = useTemporaryDirectory("entry-columns-migration");
 
-  it("骨架阶段已建的旧条目升级后照常读出, 新字段为空", async () => {
+  it("骨架阶段已建的旧条目升级后照常读出, 归入通用登录, 新字段为空", async () => {
     const databaseFile = join(getDirectory(), "vault.db");
     const dataKey = randomBytes(32);
-    const legacy = openVaultDatabase({
+    const skeleton = openVaultDatabase({
       databaseFile,
       dataKey,
-      migrationsFolder: await createLegacyMigrationsFolder(getDirectory()),
+      migrationsFolder: await createMigrationsFolderUpTo(
+        getDirectory(),
+        SKELETON_MIGRATION_COUNT,
+      ),
     });
-    legacy.orm.run(
+    skeleton.orm.run(
       sql`insert into entries (id, name, account, password, created_at) values ('old-1', '旧论坛', 'old-account', 'old-password', 7)`,
     );
-    legacy.close();
+    skeleton.close();
 
     const upgraded = openVaultDatabase({
       databaseFile,
@@ -92,9 +46,8 @@ describe("条目表迁移: 旧条目升级", () => {
       {
         id: "old-1",
         name: "旧论坛",
-        account: "old-account",
-        password: "old-password",
-        url: "",
+        type: "login",
+        fields: { account: "old-account", password: "old-password", url: "" },
         notes: "",
         customFields: [],
         createdAt: 7,
@@ -103,10 +56,10 @@ describe("条目表迁移: 旧条目升级", () => {
   });
 });
 
-describe("条目表迁移: 新字段读写", () => {
+describe("条目表迁移: 类型字段, 备注与自定义字段读写", () => {
   const getDirectory = useTemporaryDirectory("entry-columns-migration");
 
-  it("升级后新写入的网址, 多行备注与自定义字段按原样读回", () => {
+  it("升级后新写入的类型字段, 多行备注与自定义字段按原样读回", () => {
     const database = openVaultDatabase({
       databaseFile: join(getDirectory(), "vault.db"),
       dataKey: randomBytes(32),
@@ -115,9 +68,11 @@ describe("条目表迁移: 新字段读写", () => {
     const record = {
       id: "new-1",
       name: "钱包",
-      account: "",
-      password: "",
-      url: "https://example.test/wallet",
+      type: "cryptoWallet" as const,
+      fields: {
+        walletAddress: "0xabc",
+        recoveryPhrase: "a b c\nd e f",
+      },
       notes: "第一行\n第二行",
       customFields: [
         {

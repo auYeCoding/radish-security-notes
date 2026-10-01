@@ -8,20 +8,20 @@ import type {
 } from "@renderer/testing/entry-test-environment";
 import {
   queryCustomFieldGroups,
-  renderOpenedNewEntryDialog,
+  renderOpenedNewEntryForm,
 } from "@renderer/testing/render-new-entry-dialog";
 
 import { NewEntryTrigger } from "./new-entry-trigger";
 
 /**
- * 渲染新建入口并点击它打开对话框.
+ * 渲染新建入口, 打开对话框并选通用登录.
  * @param options 条目环境的选项.
  * @returns 渲染所用的环境.
  */
 function renderDialog(
   options?: EntryTestEnvironmentOptions,
 ): Promise<EntryTestEnvironment> {
-  return renderOpenedNewEntryDialog(<NewEntryTrigger />, options);
+  return renderOpenedNewEntryForm(<NewEntryTrigger />, "通用登录", options);
 }
 
 describe("新建表单 网址与备注", () => {
@@ -39,16 +39,18 @@ describe("新建表单 网址与备注", () => {
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(entryBridge.create).toHaveBeenCalledWith({
+      type: "login",
       name: "钱包",
-      account: "",
-      password: "",
-      url: "https://wallet.example.test",
+      fields: { account: "", password: "", url: "https://wallet.example.test" },
       notes: "第一行\n第二行",
       customFields: [],
     });
     expect(entryStore.getState().selection).toMatchObject({
       status: "ready",
-      detail: { url: "https://wallet.example.test", notes: "第一行\n第二行" },
+      detail: {
+        fields: { url: "https://wallet.example.test" },
+        notes: "第一行\n第二行",
+      },
     });
   });
 });
@@ -104,10 +106,9 @@ describe("新建表单 自定义字段保存", () => {
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(entryBridge.create).toHaveBeenCalledWith({
+      type: "login",
       name: "钱包",
-      account: "",
-      password: "",
-      url: "",
+      fields: { account: "", password: "", url: "" },
       notes: "",
       customFields: [
         { label: "助记词", value: "a b\nc d", isHidden: true },

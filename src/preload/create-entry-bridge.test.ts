@@ -28,10 +28,9 @@ describe("createEntryBridge 读取与新建", () => {
   it("create 调用新建通道并带上输入", async () => {
     const invoke = vi.fn(() => Promise.resolve({ ok: true }));
     const input = {
+      type: "bankCard" as const,
       name: "n",
-      account: "a",
-      password: "p",
-      url: "https://example.test",
+      fields: { cardNumber: "6222" },
       notes: "第一行\n第二行",
       customFields: [{ label: "助记词", value: "a b", isHidden: true }],
     };
@@ -46,12 +45,12 @@ describe("createEntryBridge 复制", () => {
   it("copyField 调用复制通道并带上编号与字段名", async () => {
     const invoke = vi.fn(() => Promise.resolve({ ok: true }));
 
-    await createEntryBridge({ invoke }).copyField("id-1", "account");
+    await createEntryBridge({ invoke }).copyField("id-1", "cardNumber");
 
     expect(invoke).toHaveBeenCalledWith(
       IPC_CHANNELS.entriesCopyField,
       "id-1",
-      "account",
+      "cardNumber",
     );
   });
 

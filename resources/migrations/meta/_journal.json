@@ -22,6 +22,20 @@
       "when": 1790889678322,
       "tag": "0002_add-entry-url-notes-custom-fields",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790893234553,
+      "tag": "0003_add-entry-type-fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1790893247015,
+      "tag": "0004_drop-entry-account-password-url",
+      "breakpoints": true
     }
   ]
 }

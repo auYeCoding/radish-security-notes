@@ -1,9 +1,11 @@
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { entryFailed } from "@shared/entries/entry-result";
+import { BANK_CARD_TYPE } from "@shared/entries/preset-types/bank-card-type";
+import { SERVER_TYPE } from "@shared/entries/preset-types/server-type";
 import { describe, expect, it } from "vitest";
 
-import { TEST_ENTRIES } from "@renderer/testing/entry-fixtures";
+import { sampleEntryOf, TEST_ENTRIES } from "@renderer/testing/entry-fixtures";
 import {
   createEntryTestEnvironment,
   type EntryTestEnvironmentOptions,
@@ -40,6 +42,15 @@ describe("EntryListPane 展示", () => {
     ).toBeDefined();
     expect(screen.getByText("共 3 个条目")).toBeDefined();
     expect(screen.getByText("操作插槽")).toBeDefined();
+  });
+
+  it("第二行是 类型名 · 账号, 没有账号字段的类型只显示类型名", async () => {
+    await renderPane({
+      entries: [sampleEntryOf(BANK_CARD_TYPE), sampleEntryOf(SERVER_TYPE)],
+    });
+
+    expect(screen.getByText("银行卡")).toBeDefined();
+    expect(screen.getByText("服务器 · server-account")).toBeDefined();
   });
 
   it("没有条目时显示空状态", async () => {

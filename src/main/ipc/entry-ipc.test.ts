@@ -94,13 +94,12 @@ describe("registerEntryIpc 转发", () => {
     expect(result).toEqual({ ok: false, reason: "not-found" });
   });
 
-  it("新建通道把名称, 账号, 密码, 网址, 备注与自定义字段交给服务", () => {
+  it("新建通道把类型, 名称, 类型字段, 备注与自定义字段交给服务", () => {
     const { ipcMain, service } = registerWithFakes();
     const input = {
+      type: "bankCard",
       name: "n",
-      account: "a",
-      password: "p",
-      url: "https://example.test",
+      fields: { cardNumber: "6222", expiry: "12/30" },
       notes: "第一行\n第二行",
       customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
     };
@@ -114,11 +113,11 @@ describe("registerEntryIpc 转发", () => {
     const { ipcMain, service } = registerWithFakes();
 
     ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "password");
-    ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "url");
+    ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "cardNumber");
     ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "notes");
 
     expect(service.copyField).toHaveBeenNthCalledWith(1, "id-1", "password");
-    expect(service.copyField).toHaveBeenNthCalledWith(2, "id-1", "url");
+    expect(service.copyField).toHaveBeenNthCalledWith(2, "id-1", "cardNumber");
     expect(service.copyField).toHaveBeenNthCalledWith(3, "id-1", "notes");
   });
 
@@ -150,14 +149,14 @@ describe("registerEntryIpc 参数校验", () => {
     expect(service.copyField).not.toHaveBeenCalled();
   });
 
-  it("复制字段不是可复制的字段名时被拒绝", () => {
+  it("复制字段不是字符串时被拒绝", () => {
     const { ipcMain, service } = registerWithFakes();
 
     expect(() =>
-      ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "name"),
+      ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", undefined),
     ).toThrow("无效的复制字段");
     expect(() =>
-      ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", "customFields"),
+      ipcMain.invoke(IPC_CHANNELS.entriesCopyField, "id-1", { key: "account" }),
     ).toThrow("无效的复制字段");
     expect(service.copyField).not.toHaveBeenCalled();
   });
@@ -173,17 +172,28 @@ describe("registerEntryIpc 参数校验", () => {
     ).toThrow("无效的字段编号");
     expect(service.copyCustomField).not.toHaveBeenCalled();
   });
+});
 
+describe("registerEntryIpc 新建参数校验", () => {
   it("新建内容类型不对时被拒绝", () => {
     const { ipcMain, service } = registerWithFakes();
 
+    const valid = {
+      type: "login",
+      name: "n",
+      fields: { account: "a" },
+      notes: "",
+      customFields: [],
+    };
     for (const input of [
       undefined,
       null,
       "text",
-      { name: "n", account: "a" },
-      { name: "n", account: 1, password: "p", url: "", notes: "" },
-      { name: "n", account: "a", password: "p", url: "", notes: "" },
+      { name: "n" },
+      { ...valid, type: "custom" },
+      { ...valid, fields: { account: 1 } },
+      { ...valid, fields: undefined },
+      { ...valid, customFields: undefined },
     ]) {
       expect(() => ipcMain.invoke(IPC_CHANNELS.entriesCreate, input)).toThrow(
         "无效的条目内容",

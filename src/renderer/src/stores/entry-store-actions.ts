@@ -2,7 +2,6 @@ import type { EntryBridge } from "@shared/entries/entry-bridge";
 import { entryFailed, type EntryResult } from "@shared/entries/entry-result";
 import {
   toEntrySummary,
-  type EntryCopyField,
   type EntryDetail,
   type NewEntryInput,
 } from "@shared/entries/entry-types";
@@ -94,7 +93,7 @@ export async function selectEntry(
  * 新建一个条目. 成功后条目放到列表最前, 被选中并展示详情, 搜索关键字清空, 让新条目
  * 一定出现在列表里.
  * @param access store 动作能用到的东西.
- * @param input 用户填写的名称, 账号, 密码, 网址, 备注与自定义字段.
+ * @param input 用户选的类型, 填写的名称, 类型字段, 备注与自定义字段.
  * @returns 新建结果, 接口调用抛出错误时为意外错误.
  */
 export async function createEntry(
@@ -121,13 +120,13 @@ export async function createEntry(
  * 让主进程把条目的一个字段复制到剪贴板.
  * @param bridge 主进程提供的条目接口.
  * @param id 条目编号.
- * @param field 要复制的字段.
+ * @param field 要复制的字段名, 是备注或条目类型里的字段键.
  * @returns 复制成功时为 true, 失败或接口调用抛出错误时为 false.
  */
 export async function copyEntryField(
   bridge: EntryBridge,
   id: string,
-  field: EntryCopyField,
+  field: string,
 ): Promise<boolean> {
   try {
     const result = await bridge.copyField(id, field);

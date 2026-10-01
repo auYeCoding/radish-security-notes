@@ -1,7 +1,3 @@
-import {
-  isEntryCopyField,
-  type EntryCopyField,
-} from "@shared/entries/entry-types";
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 
 import type { EntryService } from "../entries/entry-service";
@@ -22,13 +18,13 @@ function requireEntryIdentifier(id: unknown): string {
 }
 
 /**
- * 校验渲染进程传来的复制字段是可复制的字段名.
+ * 校验渲染进程传来的复制字段名是字符串. 字段名是否属于条目的类型由服务判定.
  * @param field 渲染进程传来的值.
  * @returns 校验通过的字段名.
- * @throws Error 当参数不是可复制字段名时.
+ * @throws Error 当参数不是字符串时.
  */
-function requireCopyField(field: unknown): EntryCopyField {
-  if (!isEntryCopyField(field)) {
+function requireCopyField(field: unknown): string {
+  if (typeof field !== "string") {
     throw new Error("无效的复制字段");
   }
   return field;

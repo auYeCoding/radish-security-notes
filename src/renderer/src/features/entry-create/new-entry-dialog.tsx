@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+
+import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 
 import {
   Dialog,
@@ -8,6 +11,7 @@ import {
   DialogTitle,
 } from "@renderer/components/ui/dialog";
 
+import { EntryTypeGrid } from "./entry-type-grid";
 import { NewEntryForm } from "./new-entry-form";
 
 /**
@@ -25,21 +29,49 @@ interface NewEntryDialogProps {
 }
 
 /**
- * 新建条目的对话框: 标题, 说明与新建表单. 为容纳自定义字段, 宽度比默认对话框大一档. 关闭后
- * 表单卸载, 下次打开是空表单.
+ * 新建条目的对话框, 分两步: 第一步标题是 "选择条目类型", 里面是类型网格, 点选一个类型进入
+ * 第二步; 第二步标题是 "新建条目", 里面是该类型的新建表单, 表单顶部的返回按钮回到第一步并
+ * 丢弃已填内容. 为容纳自定义字段, 宽度比默认对话框大一档. 关闭时回到第一步, 下次打开是类型
+ * 选择.
  * @param props 组件属性.
  * @returns 对话框元素.
  */
 export function NewEntryDialog(props: NewEntryDialogProps): React.JSX.Element {
   const { t } = useTranslation();
+  const [selectedType, setSelectedType] = useState<
+    PresetEntryTypeDefinition | undefined
+  >(undefined);
+  const handleOpenChange = (isOpen: boolean): void => {
+    if (!isOpen) {
+      setSelectedType(undefined);
+    }
+    props.onOpenChange(isOpen);
+  };
+  const step = selectedType === undefined ? "typeStep" : "form";
   return (
-    <Dialog open={props.isOpen} onOpenChange={props.onOpenChange}>
+    <Dialog open={props.isOpen} onOpenChange={handleOpenChange}>
       <DialogContent closeLabel={t("common.close")} className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("entryCreate.title")}</DialogTitle>
-          <DialogDescription>{t("entryCreate.description")}</DialogDescription>
+          <DialogTitle>
+            {step === "typeStep"
+              ? t("entryCreate.typeStep.title")
+              : t("entryCreate.title")}
+          </DialogTitle>
+          <DialogDescription>
+            {step === "typeStep"
+              ? t("entryCreate.typeStep.description")
+              : t("entryCreate.description")}
+          </DialogDescription>
         </DialogHeader>
-        <NewEntryForm onCreated={() => props.onOpenChange(false)} />
+        {selectedType === undefined ? (
+          <EntryTypeGrid onSelect={setSelectedType} />
+        ) : (
+          <NewEntryForm
+            type={selectedType}
+            onBack={() => setSelectedType(undefined)}
+            onCreated={() => handleOpenChange(false)}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
