@@ -2,6 +2,7 @@ import { electronApp, optimizer } from "@electron-toolkit/utils";
 import { BrowserWindow, app, ipcMain } from "electron";
 
 import icon from "../../../resources/icon.png?asset";
+import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
 import { registerVaultIpc } from "../ipc/vault-ipc";
 import { resolveWindowBackground } from "../theme/window-background";
@@ -11,6 +12,7 @@ import {
   createPreferencesRuntime,
   type PreferencesRuntime,
 } from "./preferences-runtime";
+import { createEntryRuntime } from "./entry-runtime";
 import { createVaultRuntime } from "./vault-runtime";
 
 /**
@@ -65,6 +67,7 @@ export async function startApplication(): Promise<void> {
   const vault = await createVaultRuntime();
   registerPreferencesIpc(ipcMain, runtime.service);
   registerVaultIpc(ipcMain, vault.service);
+  registerEntryIpc(ipcMain, createEntryRuntime(vault.service).service);
   app.on("will-quit", () => vault.service.close());
   keepWindowsInSync(runtime);
   openMainWindow(runtime);

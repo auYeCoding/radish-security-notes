@@ -3,8 +3,11 @@
     "title": "Security Notes"
   },
   "search": {
-    "placeholder": "Search entries",
+    "placeholder": "Search by name or account",
     "label": "Search"
+  },
+  "common": {
+    "close": "Close"
   },
   "folderPane": {
     "foldersHeading": "Folders",
@@ -15,10 +18,42 @@
   "entryListPane": {
     "heading": "Entries",
     "count": "{count, plural, one {# entry} other {# entries}}",
-    "empty": "No entries yet"
+    "empty": "No entries yet",
+    "noMatches": "No matching entries",
+    "loadFailed": "Unable to load entries. Close the app and try again."
   },
   "entryDetailPane": {
-    "empty": "Select an entry to see its details"
+    "heading": "Entry details",
+    "empty": "Select an entry to see its details",
+    "loadFailed": "Unable to load the details of this entry."
+  },
+  "entryDetail": {
+    "account": "Account",
+    "password": "Password",
+    "notFilled": "Not filled in",
+    "passwordHidden": "Password hidden",
+    "copyAccount": "Copy account",
+    "copyPassword": "Copy password",
+    "copied": "Copied"
+  },
+  "entryCreate": {
+    "open": "New entry",
+    "title": "New entry",
+    "description": "The name is required. The account and password can stay empty.",
+    "nameLabel": "Name",
+    "accountLabel": "Account",
+    "passwordLabel": "Password",
+    "cancel": "Cancel",
+    "submit": "Save",
+    "submitting": "Saving...",
+    "error": {
+      "nameRequired": "Enter a name.",
+      "nameTooLong": "The name can have at most {maxLength} characters.",
+      "accountTooLong": "The account can have at most {maxLength} characters.",
+      "passwordTooLong": "The password can have at most {maxLength} characters.",
+      "invalid": "The content is not valid. Check it and try again.",
+      "unexpected": "Saving failed. Close the app and try again."
+    }
   },
   "settings": {
     "open": "Settings"

@@ -9,4 +9,8 @@ export const IPC_CHANNELS = {
   vaultSetupWithMasterPassword: "vault:setup-with-master-password",
   vaultSetupWithoutMasterPassword: "vault:setup-without-master-password",
   vaultUnlock: "vault:unlock",
+  entriesList: "entries:list",
+  entriesGet: "entries:get",
+  entriesCreate: "entries:create",
+  entriesCopyField: "entries:copy-field",
 } as const;

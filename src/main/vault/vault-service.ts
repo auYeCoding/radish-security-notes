@@ -9,6 +9,7 @@ import type { VaultStatus } from "@shared/vault/vault-status";
 import { KeyUnwrapError } from "./aes-gcm-key-wrapper";
 import type { Argon2Parameters } from "./argon2-parameters";
 import { generateDataKey } from "./data-key";
+import type { VaultOrm } from "./database/drizzle-adapter";
 import {
   openVaultDatabase,
   type VaultDatabase,
@@ -198,6 +199,14 @@ export class VaultService {
         throw error;
       }
     });
+  }
+
+  /**
+   * 读取已解锁数据库的查询入口, 条目服务经它读写表.
+   * @returns 已解锁时是查询入口, 未解锁时为 undefined.
+   */
+  getOrm(): VaultOrm | undefined {
+    return this.database?.orm;
   }
 
   /**

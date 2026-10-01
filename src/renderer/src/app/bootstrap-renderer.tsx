@@ -5,6 +5,8 @@ import { createRoot } from "react-dom/client";
 
 import { App } from "@renderer/app/app";
 import { syncDocumentLanguage } from "@renderer/i18n/sync-document-language";
+import { createEntryStore } from "@renderer/stores/entry-store";
+import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
 import { createPreferencesStore } from "@renderer/stores/preferences-store";
 import { PreferencesStoreProvider } from "@renderer/stores/preferences-store-provider";
 import { createVaultStore } from "@renderer/stores/vault-store";
@@ -15,8 +17,8 @@ import {
 } from "@renderer/theme/dark-class";
 
 /**
- * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store 与保险库 store,
- * 让深色类名跟随系统外观, 最后把根组件挂到容器上.
+ * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store 与
+ * 条目 store, 让深色类名跟随系统外观, 最后把根组件挂到容器上.
  * @param container 挂载根组件的容器元素.
  * @returns 挂载完成后兑现.
  */
@@ -28,6 +30,7 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
     bridge: vaultBridge,
     initialStatus: await vaultBridge.getStatus(),
   });
+  const entryStore = createEntryStore({ bridge: window.api.entries });
   const i18n = await createI18nInstance({
     language: snapshot.language,
     isPseudoLocalizationEnabled: snapshot.isPseudoLocalizationEnabled,
@@ -43,7 +46,9 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
       <I18nextProvider i18n={i18n}>
         <PreferencesStoreProvider store={store}>
           <VaultStoreProvider store={vaultStore}>
-            <App />
+            <EntryStoreProvider store={entryStore}>
+              <App />
+            </EntryStoreProvider>
           </VaultStoreProvider>
         </PreferencesStoreProvider>
       </I18nextProvider>

@@ -2,15 +2,15 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { createPreferencesTestEnvironment } from "@renderer/testing/preferences-test-environment";
+import { createEntryTestEnvironment } from "@renderer/testing/entry-test-environment";
 
 import { AppShell } from "./app-shell";
 
 /**
- * 在偏好环境里渲染三栏主界面.
+ * 在条目环境里渲染三栏主界面.
  */
 async function renderShell(): Promise<void> {
-  const { Providers } = await createPreferencesTestEnvironment();
+  const { Providers } = await createEntryTestEnvironment();
   render(<AppShell />, { wrapper: Providers });
 }
 

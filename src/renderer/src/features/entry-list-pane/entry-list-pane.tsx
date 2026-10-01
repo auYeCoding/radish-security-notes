@@ -1,20 +1,31 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
-import { EmptyState } from "@renderer/components/empty-state";
 import { PaneHeading } from "@renderer/components/pane-heading";
 import { ScrollArea } from "@renderer/components/ui/scroll-area";
+import { useVisibleEntries } from "@renderer/stores/use-visible-entries";
+
+import { EntryListBody } from "./entry-list-body";
 
 /**
- * 当前列表里的条目数量. 条目功能接入前恒为 0.
+ * 条目列表窗格的属性.
  */
-const EMPTY_ENTRY_COUNT = 0;
+interface EntryListPaneProps {
+  /**
+   * 标题行最右侧的操作, 例如新建按钮. 由 app 层传入, feature 之间不互相引用.
+   */
+  readonly headerAction?: ReactNode;
+}
 
 /**
- * 中间的条目列表窗格. 现在只有标题, 数量与空状态说明, 没有数据.
+ * 中间的条目列表窗格: 标题行显示当前列出的条目数量与操作, 下方是按搜索关键字过滤后的
+ * 条目, 点击一项选中它.
+ * @param props 组件属性.
  * @returns 条目列表窗格元素.
  */
-export function EntryListPane(): React.JSX.Element {
+export function EntryListPane(props: EntryListPaneProps): React.JSX.Element {
   const { t } = useTranslation();
+  const entries = useVisibleEntries();
   return (
     <section
       aria-label={t("entryListPane.heading")}
@@ -22,10 +33,11 @@ export function EntryListPane(): React.JSX.Element {
     >
       <PaneHeading
         title={t("entryListPane.heading")}
-        trailing={t("entryListPane.count", { count: EMPTY_ENTRY_COUNT })}
+        trailing={t("entryListPane.count", { count: entries.length })}
+        action={props.headerAction}
       />
       <ScrollArea className="min-h-0 flex-1">
-        <EmptyState message={t("entryListPane.empty")} />
+        <EntryListBody entries={entries} />
       </ScrollArea>
     </section>
   );

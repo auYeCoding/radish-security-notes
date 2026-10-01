@@ -3,8 +3,11 @@
     "title": "安全笔记"
   },
   "search": {
-    "placeholder": "搜索条目",
+    "placeholder": "搜索名称或账号",
     "label": "搜索"
+  },
+  "common": {
+    "close": "关闭"
   },
   "folderPane": {
     "foldersHeading": "文件夹",
@@ -15,10 +18,42 @@
   "entryListPane": {
     "heading": "条目",
     "count": "共 {count} 个条目",
-    "empty": "还没有条目"
+    "empty": "还没有条目",
+    "noMatches": "没有匹配的条目",
+    "loadFailed": "无法读取条目. 请关闭应用后重试."
   },
   "entryDetailPane": {
-    "empty": "选择一个条目查看详情"
+    "heading": "条目详情",
+    "empty": "选择一个条目查看详情",
+    "loadFailed": "无法读取这个条目的详情."
+  },
+  "entryDetail": {
+    "account": "账号",
+    "password": "密码",
+    "notFilled": "未填写",
+    "passwordHidden": "密码已隐藏",
+    "copyAccount": "复制账号",
+    "copyPassword": "复制密码",
+    "copied": "已复制"
+  },
+  "entryCreate": {
+    "open": "新建条目",
+    "title": "新建条目",
+    "description": "名称必填, 账号与密码可以留空.",
+    "nameLabel": "名称",
+    "accountLabel": "账号",
+    "passwordLabel": "密码",
+    "cancel": "取消",
+    "submit": "保存",
+    "submitting": "正在保存...",
+    "error": {
+      "nameRequired": "请填写名称.",
+      "nameTooLong": "名称最多 {maxLength} 个字符.",
+      "accountTooLong": "账号最多 {maxLength} 个字符.",
+      "passwordTooLong": "密码最多 {maxLength} 个字符.",
+      "invalid": "内容不符合要求. 请检查后重试.",
+      "unexpected": "保存失败. 请关闭应用后重试."
+    }
   },
   "settings": {
     "open": "设置"

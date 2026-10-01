@@ -1,3 +1,4 @@
+import type { EntryBridge } from "../entries/entry-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
 
@@ -13,4 +14,8 @@ export interface RendererApi {
    * 保险库接口: 查询启动状态, 设置主密码, 跳过, 解锁.
    */
   readonly vault: VaultBridge;
+  /**
+   * 条目接口: 读取列表与详情, 新建条目, 复制字段.
+   */
+  readonly entries: EntryBridge;
 }

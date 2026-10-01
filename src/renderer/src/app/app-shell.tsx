@@ -1,4 +1,5 @@
 import { EntryDetailPane } from "@renderer/features/entry-detail-pane/entry-detail-pane";
+import { NewEntryTrigger } from "@renderer/features/entry-create/new-entry-trigger";
 import { EntryListPane } from "@renderer/features/entry-list-pane/entry-list-pane";
 import { FolderPane } from "@renderer/features/folder-pane/folder-pane";
 import { PreferencesSwitchers } from "@renderer/features/preferences-switchers/preferences-switchers";
@@ -9,8 +10,8 @@ import { SidebarBrand } from "./sidebar-brand";
 
 /**
  * 三栏主界面的布局: 左侧栏通高, 含应用名称, 标签与文件夹和底部的设置按钮;
- * 右侧区域顶部是搜索栏与右侧的主题和语言切换, 下方是条目列表与条目详情.
- * 只负责布局, 不含业务逻辑.
+ * 右侧区域顶部是搜索栏与右侧的主题和语言切换, 下方是条目列表与条目详情, 列表标题行
+ * 放新建按钮. 只负责布局与组装, 不含业务逻辑.
  * @returns 三栏主界面元素.
  */
 export function AppShell(): React.JSX.Element {
@@ -29,7 +30,7 @@ export function AppShell(): React.JSX.Element {
           <PreferencesSwitchers />
         </header>
         <div className="flex min-h-0 flex-1">
-          <EntryListPane />
+          <EntryListPane headerAction={<NewEntryTrigger />} />
           <EntryDetailPane />
         </div>
       </div>

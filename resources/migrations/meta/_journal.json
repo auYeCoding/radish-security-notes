@@ -8,6 +8,13 @@
       "when": 1790878779847,
       "tag": "0000_create-vault-metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790886046249,
+      "tag": "0001_create-entries",
+      "breakpoints": true
     }
   ]
 }

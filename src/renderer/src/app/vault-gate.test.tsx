@@ -3,9 +3,9 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import {
-  createVaultTestEnvironment,
-  type VaultTestEnvironment,
-} from "@renderer/testing/vault-test-environment";
+  createEntryTestEnvironment,
+  type EntryTestEnvironment,
+} from "@renderer/testing/entry-test-environment";
 import type { VaultStatus } from "@shared/vault/vault-status";
 
 import { VaultGate } from "./vault-gate";
@@ -15,8 +15,8 @@ import { VaultGate } from "./vault-gate";
  * @param status 保险库的初始状态.
  * @returns 渲染所用的环境.
  */
-async function renderGate(status: VaultStatus): Promise<VaultTestEnvironment> {
-  const environment = await createVaultTestEnvironment({ status });
+async function renderGate(status: VaultStatus): Promise<EntryTestEnvironment> {
+  const environment = await createEntryTestEnvironment({ status });
   render(<VaultGate />, { wrapper: environment.Providers });
   return environment;
 }
