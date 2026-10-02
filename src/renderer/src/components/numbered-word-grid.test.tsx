@@ -1,12 +1,9 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { NumberedWordGrid } from "./numbered-word-grid";
+import { RECOVERY_WORD_COUNT } from "@shared/vault/recovery-words";
 
-/**
- * 测试用的词个数, 与恢复词的 24 个一致.
- */
-const WORD_COUNT = 24;
+import { NumberedWordGrid } from "./numbered-word-grid";
 
 /**
  * 渲染一个格子里只写序号的网格.
@@ -16,7 +13,7 @@ function renderGrid(): HTMLElement {
   render(
     <NumberedWordGrid
       label="恢复词"
-      count={WORD_COUNT}
+      count={RECOVERY_WORD_COUNT}
       renderCell={(position) => <span>{`cell-${position}`}</span>}
     />,
   );
@@ -27,10 +24,10 @@ describe("NumberedWordGrid 内容", () => {
   it("按序号从 1 到 count 渲染, 每个格子拿到自己的序号", () => {
     const items = within(renderGrid()).getAllByRole("listitem");
 
-    expect(items).toHaveLength(WORD_COUNT);
+    expect(items).toHaveLength(RECOVERY_WORD_COUNT);
     expect(items.map((item) => item.textContent)).toEqual(
       Array.from(
-        { length: WORD_COUNT },
+        { length: RECOVERY_WORD_COUNT },
         (_, index) => `${index + 1}.cell-${index + 1}`,
       ),
     );
@@ -42,7 +39,7 @@ describe("NumberedWordGrid 列数", () => {
     const list = renderGrid();
 
     expect(list.classList.contains("grid-cols-4")).toBe(true);
-    expect(WORD_COUNT / 4).toBe(6);
+    expect(RECOVERY_WORD_COUNT / 4).toBe(6);
   });
 
   it("不随窗口宽度或打印媒体改变列数", () => {

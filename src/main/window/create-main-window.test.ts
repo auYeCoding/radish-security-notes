@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { MAIN_WINDOW_MIN_WIDTH, createMainWindow } from "./create-main-window";
+import {
+  MAIN_WINDOW_HEIGHT,
+  MAIN_WINDOW_MIN_WIDTH,
+  MAIN_WINDOW_WIDTH,
+  createMainWindow,
+} from "./create-main-window";
 
 /**
  * 替身 electron 模块里的窗口构造函数间谍, 记录收到的窗口选项, 返回只有创建流程用到的方法的假窗口.
@@ -52,8 +57,8 @@ describe("createMainWindow 窗口尺寸", () => {
     expect(electronMocks.createWindow).toHaveBeenCalledWith(
       expect.objectContaining({
         useContentSize: true,
-        width: 1100,
-        height: 720,
+        width: MAIN_WINDOW_WIDTH,
+        height: MAIN_WINDOW_HEIGHT,
       }),
     );
   });

@@ -2,24 +2,10 @@ import type { ReactNode } from "react";
 
 import { cn } from "@renderer/lib/class-names";
 
-/**
- * 外框上下内边距的档位: 默认与改动前一致, 宽松档给页面比窗口高时留出余地.
- */
-export type GateFrameSpacing = "default" | "roomy";
-
-/**
- * 整屏页面外框的版式.
- */
-export interface GateFrameLayout {
-  /**
-   * 上下内边距的档位.
-   */
-  readonly spacing: GateFrameSpacing;
-  /**
-   * 页面是否带打印套件: 为真时打印取消最小高度与内边距, 右上角控件隐藏, 避免纸上多出空白页.
-   */
-  readonly isPrintKit: boolean;
-}
+import {
+  DEFAULT_GATE_FRAME_LAYOUT,
+  type GateFrameLayout,
+} from "./gate-frame-layout";
 
 /**
  * 整屏页面外框的属性.
@@ -56,12 +42,13 @@ const GATE_FRAME_PRINT_KIT_CLASSES = "print:block print:min-h-0 print:p-0";
  * @returns 外框元素.
  */
 export function GateFrame(props: GateFrameProps): React.JSX.Element {
-  const isPrintKit = props.isPrintKit ?? false;
+  const spacing = props.spacing ?? DEFAULT_GATE_FRAME_LAYOUT.spacing;
+  const isPrintKit = props.isPrintKit ?? DEFAULT_GATE_FRAME_LAYOUT.isPrintKit;
   return (
     <main
       className={cn(
         "relative flex min-h-screen items-center justify-center bg-background text-foreground",
-        GATE_FRAME_SPACING_CLASSES[props.spacing ?? "default"],
+        GATE_FRAME_SPACING_CLASSES[spacing],
         isPrintKit && GATE_FRAME_PRINT_KIT_CLASSES,
       )}
     >

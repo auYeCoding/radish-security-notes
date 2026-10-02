@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { GateFrame } from "./gate-frame";
+import { DEFAULT_GATE_FRAME_LAYOUT } from "./gate-frame-layout";
 
 /**
  * 渲染出的外框里被检查的两个元素.
@@ -50,6 +51,24 @@ describe("GateFrame 上下内边距", () => {
     expect(main.classList.contains("px-6")).toBe(true);
     expect(main.classList.contains("py-16")).toBe(true);
     expect(main.classList.contains("p-6")).toBe(false);
+  });
+});
+
+describe("GateFrame 默认版式", () => {
+  it("不传版式属性与传默认版式渲染出相同的类名", () => {
+    const withoutLayout = renderFrame();
+    const withoutLayoutClasses = [
+      withoutLayout.main.className,
+      withoutLayout.corner.className,
+    ];
+    cleanup();
+
+    const withDefaultLayout = renderFrame({ ...DEFAULT_GATE_FRAME_LAYOUT });
+
+    expect([
+      withDefaultLayout.main.className,
+      withDefaultLayout.corner.className,
+    ]).toEqual(withoutLayoutClasses);
   });
 });
 

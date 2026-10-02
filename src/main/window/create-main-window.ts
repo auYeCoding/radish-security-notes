@@ -29,12 +29,12 @@ export const MAIN_WINDOW_MIN_WIDTH = 768;
 /**
  * 主窗口的初始宽度, 按内容区计.
  */
-const MAIN_WINDOW_WIDTH = 1100;
+export const MAIN_WINDOW_WIDTH = 1100;
 
 /**
  * 主窗口的初始高度, 按内容区计.
  */
-const MAIN_WINDOW_HEIGHT = 720;
+export const MAIN_WINDOW_HEIGHT = 720;
 
 /**
  * 创建主窗口, 渲染完成后再显示. 开发环境加载 electron-vite 提供的渲染进程地址,

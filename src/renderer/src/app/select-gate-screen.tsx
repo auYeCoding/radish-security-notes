@@ -1,6 +1,9 @@
 import type { VaultStatus } from "@shared/vault/vault-status";
 
-import type { GateFrameLayout } from "@renderer/components/gate-frame";
+import {
+  DEFAULT_GATE_FRAME_LAYOUT,
+  type GateFrameLayout,
+} from "@renderer/components/gate-frame-layout";
 import { RecoverySetupScreen } from "@renderer/features/vault-recovery-setup/recovery-setup-screen";
 import { RestoreScreen } from "@renderer/features/vault-recovery-restore/restore-screen";
 import { VaultFailureScreen } from "@renderer/features/vault-failure/vault-failure-screen";
@@ -40,25 +43,18 @@ export interface GateScreenSelection {
 }
 
 /**
- * 引导页, 解锁页与失败页的外框版式, 与恢复功能加入之前一致.
- */
-const DEFAULT_LAYOUT: GateFrameLayout = {
-  spacing: "default",
-  isPrintKit: false,
-};
-
-/**
- * 恢复页的外框版式: 页面可能比窗口高, 上下留宽, 不打印.
+ * 恢复页的外框版式: 页面可能比窗口高, 上下留宽, 其余沿用默认版式.
  */
 const RESTORE_LAYOUT: GateFrameLayout = {
+  ...DEFAULT_GATE_FRAME_LAYOUT,
   spacing: "roomy",
-  isPrintKit: false,
 };
 
 /**
  * 恢复词页的外框版式: 上下留宽, 打印时只留恢复套件.
  */
 const RECOVERY_SETUP_LAYOUT: GateFrameLayout = {
+  ...DEFAULT_GATE_FRAME_LAYOUT,
   spacing: "roomy",
   isPrintKit: true,
 };
@@ -75,7 +71,7 @@ function orRestoreScreen(
 ): GateScreenSelection {
   return isRestoreRequested
     ? { screen: <RestoreScreen />, layout: RESTORE_LAYOUT }
-    : { screen: fallback, layout: DEFAULT_LAYOUT };
+    : { screen: fallback, layout: DEFAULT_GATE_FRAME_LAYOUT };
 }
 
 /**
@@ -97,7 +93,10 @@ export function selectGateScreen(
     case "unlocked":
       return undefined;
     case "needs-setup":
-      return { screen: <OnboardingScreen />, layout: DEFAULT_LAYOUT };
+      return {
+        screen: <OnboardingScreen />,
+        layout: DEFAULT_GATE_FRAME_LAYOUT,
+      };
     case "locked":
       return orRestoreScreen(input.isRestoreRequested, <UnlockScreen />);
     default:

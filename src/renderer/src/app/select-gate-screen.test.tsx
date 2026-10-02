@@ -1,17 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import type { GateFrameLayout } from "@renderer/components/gate-frame";
+import { DEFAULT_GATE_FRAME_LAYOUT } from "@renderer/components/gate-frame-layout";
 import type { VaultStatus } from "@shared/vault/vault-status";
 
 import { selectGateScreen, type GateScreenInput } from "./select-gate-screen";
-
-/**
- * 与恢复功能加入之前一致的外框版式.
- */
-const DEFAULT_LAYOUT: GateFrameLayout = {
-  spacing: "default",
-  isPrintKit: false,
-};
 
 /**
  * 按状态组装选页输入, 没有待确认的恢复词, 没有请求恢复.
@@ -33,10 +25,10 @@ function inputFor(
 
 describe("selectGateScreen 外框版式", () => {
   it.each<VaultStatus>(["needs-setup", "locked", "failed"])(
-    "%s 的页面沿用恢复功能加入之前的外框版式",
+    "%s 的页面沿用恢复功能加入之前的外框版式, 即默认版式",
     (status) => {
       expect(selectGateScreen(inputFor(status))?.layout).toEqual(
-        DEFAULT_LAYOUT,
+        DEFAULT_GATE_FRAME_LAYOUT,
       );
     },
   );
