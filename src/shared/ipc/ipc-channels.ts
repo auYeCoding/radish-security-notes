@@ -14,4 +14,9 @@ export const IPC_CHANNELS = {
   entriesCreate: "entries:create",
   entriesCopyField: "entries:copy-field",
   entriesCopyCustomField: "entries:copy-custom-field",
+  totpGetCode: "totp:get-code",
+  totpRevealSecret: "totp:reveal-secret",
+  totpCopyCode: "totp:copy-code",
+  totpCopySecret: "totp:copy-secret",
+  totpDecodeQrImage: "totp:decode-qr-image",
 } as const;

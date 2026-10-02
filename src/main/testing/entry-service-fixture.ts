@@ -110,6 +110,7 @@ export function newEntryInputOf(
     fields: emptyFieldValuesOf(LOGIN_TYPE),
     notes: "",
     customFields: [],
+    totp: "",
     ...overrides,
   };
 }
@@ -128,6 +129,7 @@ export function detailOf(overrides: Partial<EntryDetail> = {}): EntryDetail {
     fields: emptyFieldValuesOf(LOGIN_TYPE),
     notes: "",
     customFields: [],
+    hasTotp: false,
     ...overrides,
   };
 }

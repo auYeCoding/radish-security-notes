@@ -118,6 +118,7 @@ describe("EntryDetailPane 切换与空字段", () => {
           fields: { account: "", password: "", url: "" },
           notes: "",
           customFields: [],
+          hasTotp: false,
         },
       ],
     });

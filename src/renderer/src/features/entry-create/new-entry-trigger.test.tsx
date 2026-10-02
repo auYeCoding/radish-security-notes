@@ -159,6 +159,7 @@ describe("NewEntryTrigger 保存", () => {
       fields: { account: "someone", password: "s3cret", url: "" },
       notes: "",
       customFields: [],
+      totp: "",
     });
     expect(entryStore.getState().selection).toMatchObject({
       status: "ready",
@@ -180,9 +181,12 @@ describe("NewEntryTrigger 保存", () => {
       fields: { account: "", password: "", url: "" },
       notes: "",
       customFields: [],
+      totp: "",
     });
   });
+});
 
+describe("NewEntryTrigger 保存失败", () => {
   it("保存失败时对话框保持打开并显示原因", async () => {
     await renderLoginForm({
       entryBridgeOverrides: {

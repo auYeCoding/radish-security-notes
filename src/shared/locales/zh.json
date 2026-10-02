@@ -36,6 +36,14 @@
     "fieldHidden": "{label} 已隐藏",
     "copied": "已复制"
   },
+  "entryTotp": {
+    "codeLabel": "验证码",
+    "secretLabel": "TOTP 密钥",
+    "remaining": "还剩 {seconds} 秒",
+    "ending": "即将换码",
+    "progressLabel": "距离换码的剩余时间",
+    "loadFailed": "无法读取验证码."
+  },
   "entryTypes": {
     "login": "通用登录",
     "forum": "论坛账号",
@@ -111,10 +119,25 @@
       "hiddenLabel": "隐藏",
       "remove": "删除字段 {index}"
     },
+    "totp": {
+      "label": "TOTP 密钥或链接",
+      "description": "粘贴 Base32 密钥或 otpauth 链接, 也可以在这里粘贴二维码截图.",
+      "pickImage": "选择二维码图片",
+      "status": {
+        "reading": "正在读取二维码...",
+        "read": "已读取二维码, 保存后生效.",
+        "unreadable": "没有读到二维码, 请换一张更清晰的图片.",
+        "notTotp": "这张二维码里不是可用的 TOTP 链接.",
+        "tooLarge": "图片太大, 请选择 {maxSize} MB 以内的图片.",
+        "failed": "读取二维码失败. 请重试."
+      }
+    },
     "cancel": "取消",
     "submit": "保存",
     "submitting": "正在保存...",
     "error": {
+      "totpInvalid": "TOTP 密钥或链接不合法. 请检查后重试.",
+      "totpUnsupported": "暂不支持这个链接. 支持 TOTP 类型, 算法 SHA1, SHA256, SHA512, 位数 6 或 8, 周期 1 至 {maxPeriod} 秒.",
       "customFieldLabelRequired": "请填写字段名.",
       "nameRequired": "请填写名称.",
       "nameTooLong": "名称最多 {maxLength} 个字符.",

@@ -18,6 +18,10 @@ import {
 import type { VaultOrm } from "../vault/database/drizzle-adapter";
 import type { ClipboardPort } from "./clipboard-port";
 import { findCustomField } from "./custom-field-records";
+import {
+  runWithEntryDatabase,
+  type EntryDatabaseAccess,
+} from "./entry-database-access";
 import { findCopyValue, normalizeFieldValues } from "./entry-field-values";
 import { buildEntryRecord } from "./entry-record-builder";
 import {
@@ -30,11 +34,7 @@ import {
 /**
  * 条目服务的依赖.
  */
-export interface EntryServiceDependencies {
-  /**
-   * 取已解锁数据库的查询入口, 未解锁时返回 undefined.
-   */
-  readonly getOrm: () => VaultOrm | undefined;
+export interface EntryServiceDependencies extends EntryDatabaseAccess {
   /**
    * 系统剪贴板.
    */
@@ -47,10 +47,6 @@ export interface EntryServiceDependencies {
    * 读取当前时间的毫秒时间戳.
    */
   readonly now: () => number;
-  /**
-   * 操作意外失败时的回调, 参数是底层错误.
-   */
-  readonly onFailure: (error: unknown) => void;
 }
 
 /**
@@ -70,6 +66,7 @@ function toDetail(record: EntryRecord): EntryDetail {
     fields,
     notes: record.notes,
     customFields: record.customFields,
+    hasTotp: record.totp !== null,
   };
 }
 
@@ -174,23 +171,13 @@ export class EntryService {
   }
 
   /**
-   * 在已解锁的数据库上执行一个操作. 未解锁时返回失败结果; 操作抛出错误时通知回调,
-   * 并返回意外错误的失败结果.
+   * 在已解锁的数据库上执行一个操作, 未解锁与意外失败的处理见 `runWithEntryDatabase`.
    * @param operation 要执行的操作.
    * @returns 操作结果.
    */
   private withDatabase<Value>(
     operation: (orm: VaultOrm) => EntryResult<Value>,
   ): EntryResult<Value> {
-    const orm = this.dependencies.getOrm();
-    if (orm === undefined) {
-      return entryFailed("vault-locked");
-    }
-    try {
-      return operation(orm);
-    } catch (error) {
-      this.dependencies.onFailure(error);
-      return entryFailed("unexpected-error");
-    }
+    return runWithEntryDatabase(this.dependencies, operation);
   }
 }

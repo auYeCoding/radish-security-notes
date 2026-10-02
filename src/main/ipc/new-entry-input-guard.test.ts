@@ -11,6 +11,7 @@ const VALID_INPUT = {
   fields: { cardNumber: "6222", expiry: "12/30" },
   notes: "第一行\n第二行",
   customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
+  totp: "JBSWY3DPEHPK3PXP",
 };
 
 describe("requireNewEntryInput", () => {
@@ -40,6 +41,8 @@ describe("requireNewEntryInput", () => {
       "text",
       { ...VALID_INPUT, name: undefined },
       { ...VALID_INPUT, notes: null },
+      { ...VALID_INPUT, totp: undefined },
+      { ...VALID_INPUT, totp: 123456 },
     ]) {
       expect(() => requireNewEntryInput(input)).toThrow("无效的条目内容");
     }

@@ -2,7 +2,7 @@ import { readAccount, type EntryDetail } from "@shared/entries/entry-types";
 import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 
 /**
- * 测试用的论坛条目, 通用登录类型, 网址, 备注与自定义字段都为空.
+ * 测试用的论坛条目, 通用登录类型, 网址, 备注与自定义字段都为空, 不带 TOTP.
  */
 export const FORUM_ENTRY: EntryDetail = {
   id: "forum",
@@ -12,10 +12,11 @@ export const FORUM_ENTRY: EntryDetail = {
   fields: { account: "forum-account", password: "forum-password", url: "" },
   notes: "",
   customFields: [],
+  hasTotp: false,
 };
 
 /**
- * 测试用的银行条目, 通用登录类型, 网址, 备注与自定义字段都为空.
+ * 测试用的银行条目, 通用登录类型, 网址, 备注与自定义字段都为空, 不带 TOTP.
  */
 export const BANK_ENTRY: EntryDetail = {
   id: "bank",
@@ -25,10 +26,11 @@ export const BANK_ENTRY: EntryDetail = {
   fields: { account: "bank-account", password: "bank-password", url: "" },
   notes: "",
   customFields: [],
+  hasTotp: false,
 };
 
 /**
- * 测试用的维基条目, 通用登录类型, 网址, 备注与自定义字段都为空.
+ * 测试用的维基条目, 通用登录类型, 网址, 备注与自定义字段都为空, 不带 TOTP.
  */
 export const WIKI_ENTRY: EntryDetail = {
   id: "wiki",
@@ -38,11 +40,12 @@ export const WIKI_ENTRY: EntryDetail = {
   fields: { account: "wiki-account", password: "wiki-password", url: "" },
   notes: "",
   customFields: [],
+  hasTotp: false,
 };
 
 /**
  * 测试用的钱包条目, 通用登录类型, 带网址, 多行备注, 一个普通与一个隐藏的多行自定义字段,
- * 以及一个值为空的自定义字段.
+ * 以及一个值为空的自定义字段, 不带 TOTP.
  */
 export const WALLET_ENTRY: EntryDetail = {
   id: "wallet",
@@ -70,6 +73,23 @@ export const WALLET_ENTRY: EntryDetail = {
     },
     { id: "wallet-empty", label: "备用编号", value: "", isHidden: false },
   ],
+  hasTotp: false,
+};
+
+/**
+ * 测试用的带 TOTP 的邮箱条目, 通用登录类型, 带一个自定义字段与备注.
+ */
+export const MAIL_ENTRY: EntryDetail = {
+  id: "mail",
+  name: "邮箱",
+  type: "login",
+  account: "mail-account",
+  fields: { account: "mail-account", password: "mail-password", url: "" },
+  notes: "邮箱备注",
+  customFields: [
+    { id: "mail-pin", label: "备用码", value: "pin-0000", isHidden: false },
+  ],
+  hasTotp: true,
 };
 
 /**
@@ -98,7 +118,7 @@ export function sampleFieldValuesOf(
 }
 
 /**
- * 某个类型的样例条目: 每个字段都有值, 备注为一行文字, 没有自定义字段.
+ * 某个类型的样例条目: 每个字段都有值, 备注为一行文字, 没有自定义字段, 不带 TOTP.
  * @param type 条目类型定义.
  * @returns 条目详情, 编号是 `sample-` 加类型键.
  */
@@ -112,5 +132,6 @@ export function sampleEntryOf(type: PresetEntryTypeDefinition): EntryDetail {
     fields,
     notes: `${type.key}-notes`,
     customFields: [],
+    hasTotp: false,
   };
 }

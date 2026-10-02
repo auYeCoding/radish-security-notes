@@ -36,6 +36,7 @@ function recordOf(id: string, createdAt: number): EntryRecord {
     customFields: [
       { id: `field-${id}`, label: `label-${id}`, value: "v", isHidden: true },
     ],
+    totp: null,
     createdAt,
   };
 }
@@ -72,6 +73,20 @@ describe("条目仓库: 读写", () => {
 
   it("没有这个编号时读不到", () => {
     expect(findEntry(getDatabase().orm, "missing")).toBeUndefined();
+  });
+
+  it("TOTP 配置原样读回, 不带 TOTP 的条目读回 null", () => {
+    const totp = {
+      secret: "JBSWY3DPEHPK3PXP",
+      algorithm: "SHA512",
+      digits: 8,
+      periodSeconds: 60,
+    } as const;
+    insertEntry(getDatabase().orm, { ...recordOf("with", 1), totp });
+    insertEntry(getDatabase().orm, recordOf("without", 2));
+
+    expect(findEntry(getDatabase().orm, "with")?.totp).toEqual(totp);
+    expect(findEntry(getDatabase().orm, "without")?.totp).toBeNull();
   });
 });
 

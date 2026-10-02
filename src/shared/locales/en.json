@@ -36,6 +36,14 @@
     "fieldHidden": "{label} hidden",
     "copied": "Copied"
   },
+  "entryTotp": {
+    "codeLabel": "Verification code",
+    "secretLabel": "TOTP secret",
+    "remaining": "{seconds} s left",
+    "ending": "Changing soon",
+    "progressLabel": "Time left until the code changes",
+    "loadFailed": "Unable to load the verification code."
+  },
   "entryTypes": {
     "login": "Login",
     "forum": "Forum account",
@@ -111,10 +119,25 @@
       "hiddenLabel": "Hidden",
       "remove": "Remove field {index}"
     },
+    "totp": {
+      "label": "TOTP secret or link",
+      "description": "Paste a Base32 secret or an otpauth link. You can also paste a QR code screenshot here.",
+      "pickImage": "Choose QR code image",
+      "status": {
+        "reading": "Reading the QR code...",
+        "read": "QR code read. It takes effect when you save.",
+        "unreadable": "No QR code found. Try a clearer image.",
+        "notTotp": "This QR code does not contain a usable TOTP link.",
+        "tooLarge": "The image is too large. Choose one under {maxSize} MB.",
+        "failed": "Reading the QR code failed. Try again."
+      }
+    },
     "cancel": "Cancel",
     "submit": "Save",
     "submitting": "Saving...",
     "error": {
+      "totpInvalid": "The TOTP secret or link is not valid. Check it and try again.",
+      "totpUnsupported": "This link is not supported. Supported: TOTP type, SHA1, SHA256 or SHA512, 6 or 8 digits, a period of 1 to {maxPeriod} seconds.",
       "customFieldLabelRequired": "Enter a field name.",
       "nameRequired": "Enter a name.",
       "nameTooLong": "The name can have at most {maxLength} characters.",

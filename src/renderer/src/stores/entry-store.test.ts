@@ -18,6 +18,7 @@ const EMPTY_LOGIN_INPUT = {
   fields: { account: "", password: "", url: "" },
   notes: "",
   customFields: [],
+  totp: "",
 } as const;
 
 describe("条目 store 读取与选中", () => {
@@ -142,6 +143,7 @@ describe("条目 store 新建", () => {
       },
       notes: "第一行\n第二行",
       customFields: [{ label: "助记词", value: "a b", isHidden: true }],
+      totp: "",
     });
 
     expect(result.ok).toBe(true);

@@ -4,12 +4,8 @@ import { useTranslation } from "react-i18next";
 import { CopyButton } from "@renderer/components/copy-button";
 import { RevealToggleButton } from "@renderer/components/reveal-toggle-button";
 
-import { DetailField, NotFilledText } from "./detail-field";
-
-/**
- * 遮罩时显示的圆点, 个数固定, 不暴露内容的长度.
- */
-const MASKED_VALUE = "•".repeat(8);
+import { DetailField } from "./detail-field";
+import { SecretValue } from "./secret-value";
 
 /**
  * 详情遮罩行的属性.
@@ -43,47 +39,6 @@ interface DetailSecretRowProps {
    * 已显示时隐藏按钮的名称, 不给时用密码的 "隐藏密码".
    */
   readonly hideLabel?: string;
-}
-
-/**
- * 遮罩值的属性.
- */
-interface SecretValueProps {
-  /**
-   * 字段的值.
-   */
-  readonly value: string;
-  /**
-   * 是否显示明文.
-   */
-  readonly isRevealed: boolean;
-  /**
-   * 遮罩时只给读屏软件读的文字.
-   */
-  readonly hiddenText: string;
-}
-
-/**
- * 遮罩行的展示值: 没有填写时是辅助文字, 默认是固定个数的圆点, 点击显示按钮后是按原有换行
- * 完整显示的等宽明文.
- * @param props 值, 是否显示明文与遮罩时的读屏文字.
- * @returns 展示值元素.
- */
-function SecretValue(props: SecretValueProps): React.JSX.Element {
-  if (props.value === "") {
-    return <NotFilledText />;
-  }
-  if (props.isRevealed) {
-    return <span className="font-mono whitespace-pre-wrap">{props.value}</span>;
-  }
-  return (
-    <>
-      <span aria-hidden="true" className="font-mono">
-        {MASKED_VALUE}
-      </span>
-      <span className="sr-only">{props.hiddenText}</span>
-    </>
-  );
 }
 
 /**

@@ -44,6 +44,7 @@ describe("新建表单 网址与备注", () => {
       fields: { account: "", password: "", url: "https://wallet.example.test" },
       notes: "第一行\n第二行",
       customFields: [],
+      totp: "",
     });
     expect(entryStore.getState().selection).toMatchObject({
       status: "ready",
@@ -114,6 +115,7 @@ describe("新建表单 自定义字段保存", () => {
         { label: "助记词", value: "a b\nc d", isHidden: true },
         { label: "取款码", value: "", isHidden: false },
       ],
+      totp: "",
     });
   });
 });

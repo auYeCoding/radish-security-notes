@@ -12,6 +12,7 @@ import {
 } from "./new-entry-schema";
 import { PRESET_ENTRY_TYPES } from "./preset-entry-types";
 import { LOGIN_TYPE } from "./preset-types/login-type";
+import { TOTP_INPUT_ERROR_CODES } from "./totp-input-parser";
 
 /**
  * 通用登录的新建校验方案, 多数测试用它.
@@ -29,6 +30,7 @@ function loginInputOf(input: Record<string, unknown>): Record<string, unknown> {
     fields: { account: "", password: "", url: "" },
     notes: "",
     customFields: [],
+    totp: "",
     ...input,
   };
 }
@@ -75,6 +77,7 @@ describe("createNewEntrySchema 名称与必填", () => {
       fields: { account: " a ", password: " p ", url: " u " },
       notes: "",
       customFields: [],
+      totp: "",
     });
   });
 });
@@ -226,9 +229,48 @@ describe("createNewEntrySchema 逐个类型", () => {
         fields,
         notes: "",
         customFields: [],
+        totp: "",
       });
 
       expect(result.data?.fields).toEqual(fields);
     },
   );
+});
+
+describe("createNewEntrySchema TOTP 输入", () => {
+  it("为空或只有空白时通过, 表示不带 TOTP", () => {
+    expect(firstErrorOf(loginInputOf({ totp: "" }))).toBeUndefined();
+    expect(firstErrorOf(loginInputOf({ totp: "  \n " }))).toBeUndefined();
+  });
+
+  it("Base32 密钥与受支持的 otpauth 链接通过, 输入原样保存", () => {
+    const link =
+      "otpauth://totp/a?secret=JBSWY3DPEHPK3PXP&algorithm=SHA256&digits=8";
+
+    expect(firstErrorOf(loginInputOf({ totp: "jbsw y3dp" }))).toBeUndefined();
+    expect(loginSchema.safeParse(loginInputOf({ totp: link })).data?.totp).toBe(
+      link,
+    );
+  });
+
+  it("密钥或链接不合法时给出 totpInvalid, 不受支持时给出 totpUnsupported", () => {
+    const hotpLink = "otpauth://hotp/a?secret=JBSWY3DPEHPK3PXP&counter=1";
+
+    expect(firstErrorOf(loginInputOf({ totp: "not base32!" }))).toBe(
+      TOTP_INPUT_ERROR_CODES.invalid,
+    );
+    expect(firstErrorOf(loginInputOf({ totp: hotpLink }))).toBe(
+      TOTP_INPUT_ERROR_CODES.unsupported,
+    );
+  });
+
+  it("TOTP 输入缺失或不是字符串时不通过", () => {
+    const { totp: omitted, ...withoutTotp } = loginInputOf({});
+
+    expect(omitted).toBe("");
+    expect(loginSchema.safeParse(withoutTotp).success).toBe(false);
+    expect(loginSchema.safeParse(loginInputOf({ totp: 1 })).success).toBe(
+      false,
+    );
+  });
 });

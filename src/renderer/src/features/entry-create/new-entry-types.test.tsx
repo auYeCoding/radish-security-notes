@@ -79,6 +79,7 @@ describe("新建表单 逐个预设类型保存", () => {
         fields: values,
         notes: "",
         customFields: [],
+        totp: "",
       });
       expect(entryStore.getState().selection).toMatchObject({
         status: "ready",

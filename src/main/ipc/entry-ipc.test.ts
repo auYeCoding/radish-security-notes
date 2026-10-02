@@ -102,6 +102,7 @@ describe("registerEntryIpc 转发", () => {
       fields: { cardNumber: "6222", expiry: "12/30" },
       notes: "第一行\n第二行",
       customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
+      totp: "JBSWY3DPEHPK3PXP",
     };
 
     ipcMain.invoke(IPC_CHANNELS.entriesCreate, { ...input, extra: "ignored" });
@@ -184,6 +185,7 @@ describe("registerEntryIpc 新建参数校验", () => {
       fields: { account: "a" },
       notes: "",
       customFields: [],
+      totp: "",
     };
     for (const input of [
       undefined,

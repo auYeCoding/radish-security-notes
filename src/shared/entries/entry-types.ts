@@ -53,6 +53,10 @@ export interface EntryDetail extends EntrySummary {
    * 条目的自定义字段, 按填写顺序排列, 没有时为空数组.
    */
   readonly customFields: readonly EntryCustomField[];
+  /**
+   * 条目是否带 TOTP. 密钥与验证码不在详情里, 渲染端经 TOTP 桥按需读取.
+   */
+  readonly hasTotp: boolean;
 }
 
 /**
@@ -102,4 +106,8 @@ export interface NewEntryInput {
    * 条目的自定义字段, 没有时为空数组.
    */
   readonly customFields: readonly NewCustomFieldInput[];
+  /**
+   * TOTP 输入: Base32 密钥或 otpauth 链接, 空串表示不带 TOTP.
+   */
+  readonly totp: string;
 }

@@ -33,6 +33,7 @@ describe("createEntryBridge 读取与新建", () => {
       fields: { cardNumber: "6222" },
       notes: "第一行\n第二行",
       customFields: [{ label: "助记词", value: "a b", isHidden: true }],
+      totp: "",
     };
 
     await createEntryBridge({ invoke }).create(input);

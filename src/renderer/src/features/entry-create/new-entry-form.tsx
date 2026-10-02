@@ -18,6 +18,7 @@ import { createDefaultFormValues } from "./new-entry-defaults";
 import { NewEntryActions } from "./new-entry-actions";
 import { NewEntryNameField } from "./new-entry-name-field";
 import { NewEntryTypeBar } from "./new-entry-type-bar";
+import { TotpInputField } from "./totp-input-field";
 import { TypeFieldsEditor } from "./type-fields-editor";
 import { useCreateEntry } from "./use-create-entry";
 
@@ -40,8 +41,8 @@ interface NewEntryFormProps {
 }
 
 /**
- * 新建条目的表单: 顶部是类型栏, 之后依次是名称, 该类型的字段, 自定义字段与备注, 最后是取消,
- * 保存按钮. 字段区域超过限定高度时在区域内滚动, 保存失败的原因显示在字段区域上方的提示条里,
+ * 新建条目的表单: 顶部是类型栏, 之后依次是名称, 该类型的字段, 自定义字段, 备注与 TOTP, 最后是
+ * 取消, 保存按钮. 字段区域超过限定高度时在区域内滚动, 保存失败的原因显示在字段区域上方的提示条里,
  * 校验错误显示在对应字段下方.
  * @param props 组件属性.
  * @returns 表单元素.
@@ -82,6 +83,7 @@ export function NewEntryForm(props: NewEntryFormProps): React.JSX.Element {
               label={t("entryCreate.notesLabel")}
               autoComplete="off"
             />
+            <TotpInputField />
           </FieldGroup>
         </div>
         <NewEntryActions isSubmitting={form.formState.isSubmitting} />

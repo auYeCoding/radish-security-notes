@@ -42,6 +42,7 @@ export function createFakeEntryBridge(
           value: field.value,
           isHidden: field.isHidden,
         })),
+        hasTotp: input.totp.trim() !== "",
       };
       details.unshift(detail);
       return Promise.resolve(entrySucceeded(detail));

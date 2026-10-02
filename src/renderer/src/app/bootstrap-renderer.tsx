@@ -9,6 +9,7 @@ import { createEntryStore } from "@renderer/stores/entry-store";
 import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
 import { createPreferencesStore } from "@renderer/stores/preferences-store";
 import { PreferencesStoreProvider } from "@renderer/stores/preferences-store-provider";
+import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
 import { createVaultStore } from "@renderer/stores/vault-store";
 import { VaultStoreProvider } from "@renderer/stores/vault-store-provider";
 import {
@@ -47,7 +48,9 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
         <PreferencesStoreProvider store={store}>
           <VaultStoreProvider store={vaultStore}>
             <EntryStoreProvider store={entryStore}>
-              <App />
+              <TotpBridgeProvider bridge={window.api.totp}>
+                <App />
+              </TotpBridgeProvider>
             </EntryStoreProvider>
           </VaultStoreProvider>
         </PreferencesStoreProvider>

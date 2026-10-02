@@ -26,6 +26,7 @@ describe("toEntrySummary", () => {
       fields: { account: "someone", password: "secret", email: "", url: "" },
       notes: "备注",
       customFields: [],
+      hasTotp: true,
     };
 
     expect(toEntrySummary(detail)).toEqual({
@@ -45,6 +46,7 @@ describe("toEntrySummary", () => {
       fields: { cardNumber: "6222" },
       notes: "",
       customFields: [],
+      hasTotp: false,
     };
 
     expect(toEntrySummary(detail).account).toBe("");

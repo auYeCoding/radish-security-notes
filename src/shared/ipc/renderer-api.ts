@@ -1,4 +1,5 @@
 import type { EntryBridge } from "../entries/entry-bridge";
+import type { TotpBridge } from "../entries/totp-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
 
@@ -18,4 +19,8 @@ export interface RendererApi {
    * 条目接口: 读取列表与详情, 新建条目, 复制字段.
    */
   readonly entries: EntryBridge;
+  /**
+   * TOTP 接口: 读取验证码与密钥, 复制验证码与密钥, 解码二维码图片.
+   */
+  readonly totp: TotpBridge;
 }

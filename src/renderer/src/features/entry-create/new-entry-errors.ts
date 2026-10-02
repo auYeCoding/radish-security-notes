@@ -6,11 +6,13 @@ import {
   NEW_ENTRY_ERROR_CODES,
 } from "@shared/entries/new-entry-schema";
 import type { EntryFieldKey } from "@shared/entries/preset-entry-types";
+import { MAX_TOTP_PERIOD_SECONDS } from "@shared/entries/totp-config";
+import { TOTP_INPUT_ERROR_CODES } from "@shared/entries/totp-input-parser";
 import type { TFunction } from "i18next";
 
 /**
- * 把新建表单里名称与自定义字段的校验错误代码换成当前语言的文案.
- * @param code 校验消息, 由新建校验方案与自定义字段的校验方案产生.
+ * 把新建表单里名称, 自定义字段与 TOTP 的校验错误代码换成当前语言的文案.
+ * @param code 校验消息, 由新建校验方案, 自定义字段的校验方案与 TOTP 解析产生.
  * @param translate 翻译函数.
  * @returns 文案, 不认识的代码返回 undefined.
  */
@@ -27,6 +29,12 @@ export function describeNewEntryError(
       });
     case CUSTOM_FIELD_ERROR_CODES.labelRequired:
       return translate("entryCreate.error.customFieldLabelRequired");
+    case TOTP_INPUT_ERROR_CODES.invalid:
+      return translate("entryCreate.error.totpInvalid");
+    case TOTP_INPUT_ERROR_CODES.unsupported:
+      return translate("entryCreate.error.totpUnsupported", {
+        maxPeriod: MAX_TOTP_PERIOD_SECONDS,
+      });
     default:
       return undefined;
   }

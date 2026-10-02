@@ -6,6 +6,8 @@ import { requireEntryType } from "@shared/entries/preset-entry-types";
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 
 import { DetailCustomFieldRow } from "./detail-custom-field-row";
+import { DetailTotpCodeRow } from "./detail-totp-code-row";
+import { DetailTotpSecretRow } from "./detail-totp-secret-row";
 import { DetailTypeLabel } from "./detail-type-label";
 import { DetailValueRow } from "./detail-value-row";
 
@@ -20,9 +22,10 @@ interface EntryDetailViewProps {
 }
 
 /**
- * 已选中条目的详情: 标题上方标明类型, 标题是名称, 下方依次是该类型的字段, 自定义字段与备注,
- * 敏感字段默认遮罩, 每项带复制按钮. 复制由主进程写入剪贴板. 调用方用条目编号作 key, 切换
- * 条目时遮罩字段的显示状态随之恢复为遮罩.
+ * 已选中条目的详情: 标题上方标明类型, 标题是名称, 下方依次是该类型的字段, 带 TOTP 时的验证码
+ * 与 TOTP 密钥, 自定义字段与备注, 敏感字段默认遮罩, 每项带复制按钮. 复制由主进程写入剪贴板.
+ * 调用方用条目编号作 key, 切换条目时遮罩字段的显示状态随之恢复为遮罩, 验证码与已显示的密钥
+ * 随组件卸载而丢弃.
  * @param props 组件属性.
  * @returns 详情视图元素.
  */
@@ -49,6 +52,12 @@ export function EntryDetailView(
             onCopy={() => copyField(detail.id, field.key)}
           />
         ))}
+        {detail.hasTotp ? (
+          <>
+            <DetailTotpCodeRow entryId={detail.id} />
+            <DetailTotpSecretRow entryId={detail.id} />
+          </>
+        ) : null}
         {detail.customFields.map((field) => (
           <DetailCustomFieldRow
             key={field.id}

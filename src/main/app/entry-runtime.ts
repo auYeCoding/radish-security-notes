@@ -3,6 +3,12 @@ import { randomUUID } from "node:crypto";
 import { clipboard } from "electron";
 
 import { EntryService } from "../entries/entry-service";
+import {
+  createQrDecoder,
+  resolveZxingWasmFile,
+  type QrImageDecoder,
+} from "../entries/qr-decoder";
+import { TotpService } from "../entries/totp-service";
 import type { VaultService } from "../vault/vault-service";
 
 /**
@@ -13,6 +19,14 @@ export interface EntryRuntime {
    * 条目服务.
    */
   readonly service: EntryService;
+  /**
+   * TOTP 服务.
+   */
+  readonly totpService: TotpService;
+  /**
+   * 二维码图片解码器.
+   */
+  readonly decodeQrImage: QrImageDecoder;
 }
 
 /**
@@ -26,7 +40,8 @@ function reportEntryFailure(error: unknown): void {
 }
 
 /**
- * 创建条目运行时对象: 条目服务读写保险库已解锁的加密数据库, 复制时写入系统剪贴板.
+ * 创建条目运行时对象: 条目服务与 TOTP 服务读写保险库已解锁的加密数据库, 复制时写入系统
+ * 剪贴板; 二维码解码器在主进程里用 zxing-wasm 解码图片.
  * @param vault 保险库服务.
  * @returns 条目运行时对象.
  */
@@ -38,5 +53,15 @@ export function createEntryRuntime(vault: VaultService): EntryRuntime {
     now: Date.now,
     onFailure: reportEntryFailure,
   });
-  return { service };
+  const totpService = new TotpService({
+    getOrm: () => vault.getOrm(),
+    clipboard,
+    now: Date.now,
+    onFailure: reportEntryFailure,
+  });
+  const decodeQrImage = createQrDecoder({
+    wasmFile: resolveZxingWasmFile(),
+    onFailure: reportEntryFailure,
+  });
+  return { service, totpService, decodeQrImage };
 }

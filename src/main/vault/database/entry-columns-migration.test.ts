@@ -50,6 +50,7 @@ describe("条目表迁移: 骨架阶段的旧条目升级", () => {
         fields: { account: "old-account", password: "old-password", url: "" },
         notes: "",
         customFields: [],
+        totp: null,
         createdAt: 7,
       },
     ]);
@@ -83,6 +84,7 @@ describe("条目表迁移: 类型字段, 备注与自定义字段读写", () => 
         },
         { id: "field-2", label: "编号", value: "", isHidden: false },
       ],
+      totp: null,
       createdAt: 9,
     };
 

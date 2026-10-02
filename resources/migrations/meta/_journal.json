@@ -36,6 +36,13 @@
       "when": 1790893247015,
       "tag": "0004_drop-entry-account-password-url",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1790927316365,
+      "tag": "0005_add-entry-totp",
+      "breakpoints": true
     }
   ]
 }

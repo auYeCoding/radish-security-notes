@@ -53,6 +53,7 @@ const UPGRADED_ROWS = [
     customFields: [
       { id: "f-1", label: "助记词", value: "a b\nc d", isHidden: true },
     ],
+    totp: null,
     createdAt: 5,
   },
   {
@@ -62,6 +63,7 @@ const UPGRADED_ROWS = [
     fields: { account: "", password: "", url: "" },
     notes: "",
     customFields: [],
+    totp: null,
     createdAt: 6,
   },
 ];
@@ -99,7 +101,7 @@ describe("条目表迁移: 0003 与 0004 把旧条目归入通用登录", () => 
 describe("条目表迁移: 升级后的表结构", () => {
   const getDirectory = useTemporaryDirectory("entry-type-migration");
 
-  it("条目表不再有账号, 密码与网址三列", () => {
+  it("条目表不再有账号, 密码与网址三列, 多了 TOTP 一列", () => {
     const database = openVaultDatabase({
       databaseFile: join(getDirectory(), "vault.db"),
       dataKey: randomBytes(32),
@@ -117,6 +119,7 @@ describe("条目表迁移: 升级后的表结构", () => {
       "id",
       "name",
       "notes",
+      "totp",
       "type",
     ]);
   });

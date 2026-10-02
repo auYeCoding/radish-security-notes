@@ -4,6 +4,7 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import icon from "../../../resources/icon.png?asset";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
+import { registerTotpIpc } from "../ipc/totp-ipc";
 import { registerVaultIpc } from "../ipc/vault-ipc";
 import { resolveWindowBackground } from "../theme/window-background";
 import { createMainWindow } from "../window/create-main-window";
@@ -67,7 +68,9 @@ export async function startApplication(): Promise<void> {
   const vault = await createVaultRuntime();
   registerPreferencesIpc(ipcMain, runtime.service);
   registerVaultIpc(ipcMain, vault.service);
-  registerEntryIpc(ipcMain, createEntryRuntime(vault.service).service);
+  const entries = createEntryRuntime(vault.service);
+  registerEntryIpc(ipcMain, entries.service);
+  registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
   app.on("will-quit", () => vault.service.close());
   keepWindowsInSync(runtime);
   openMainWindow(runtime);

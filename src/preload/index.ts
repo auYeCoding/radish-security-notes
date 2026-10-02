@@ -4,6 +4,7 @@ import { contextBridge, ipcRenderer } from "electron";
 
 import { createEntryBridge } from "./create-entry-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
+import { createTotpBridge } from "./create-totp-bridge";
 import { createVaultBridge } from "./create-vault-bridge";
 
 /**
@@ -13,6 +14,7 @@ const api: RendererApi = {
   preferences: createPreferencesBridge(ipcRenderer),
   vault: createVaultBridge(ipcRenderer),
   entries: createEntryBridge(ipcRenderer),
+  totp: createTotpBridge(ipcRenderer),
 };
 
 if (process.contextIsolated) {

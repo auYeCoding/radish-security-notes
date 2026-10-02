@@ -6,12 +6,14 @@ import {
   LEGACY_ENTRY_TYPE_KEY,
   type EntryTypeKey,
 } from "@shared/entries/preset-entry-types";
+import type { TotpConfig } from "@shared/entries/totp-config";
 
 /**
  * 条目表: 每行是一个条目. 创建时间只用来排序, 不展示给用户. 备注与自定义字段在迁移 0002
  * 加入, 对所有条目共有, 自定义字段按填写顺序存成 JSON 数组. 类型与类型字段在迁移 0003 加入:
  * `type` 是类型键, `fields` 是 JSON 对象, 键是该类型的字段键, 值是用户填写的文本; 旧的账号,
- * 密码与网址三列在同一迁移里搬进 `fields` 后删除, 旧条目归入通用登录.
+ * 密码与网址三列在迁移 0004 里删除, 旧条目归入通用登录. TOTP 在迁移 0005 加入, 对所有条目共有:
+ * `totp` 是 JSON 对象, 含密钥, 算法, 位数与周期, 条目不带 TOTP 时为 NULL.
  */
 export const entries = sqliteTable("entries", {
   id: text("id").primaryKey(),
@@ -29,5 +31,6 @@ export const entries = sqliteTable("entries", {
     .$type<readonly EntryCustomField[]>()
     .notNull()
     .default([]),
+  totp: text("totp", { mode: "json" }).$type<TotpConfig>(),
   createdAt: integer("created_at").notNull(),
 });
