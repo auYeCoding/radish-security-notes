@@ -1,6 +1,7 @@
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 import type { VaultBridge } from "@shared/vault/vault-bridge";
 import type { VaultOperationResult } from "@shared/vault/vault-operation-result";
+import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 import type { VaultStatus } from "@shared/vault/vault-status";
 
 import type { IpcRendererPort } from "./create-preferences-bridge";
@@ -21,13 +22,13 @@ export function createVaultBridge(ipcRenderer: IpcRendererPort): VaultBridge {
         IPC_CHANNELS.vaultSetupWithMasterPassword,
         masterPassword,
       );
-      return result as VaultOperationResult;
+      return result as VaultSetupResult;
     },
     setupWithoutMasterPassword: async () => {
       const result = await ipcRenderer.invoke(
         IPC_CHANNELS.vaultSetupWithoutMasterPassword,
       );
-      return result as VaultOperationResult;
+      return result as VaultSetupResult;
     },
     unlock: async (masterPassword) => {
       const result = await ipcRenderer.invoke(

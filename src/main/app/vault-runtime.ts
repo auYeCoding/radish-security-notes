@@ -11,6 +11,7 @@ import {
 } from "../vault/system-key-persistence";
 import { resolveVaultPaths } from "../vault/vault-paths";
 import { VaultService } from "../vault/vault-service";
+import { reportFailure } from "./report-failure";
 
 /**
  * 迁移文件夹相对应用目录的路径. 开发时应用目录是项目根目录, 打包后是 asar 根,
@@ -34,13 +35,16 @@ export interface VaultRuntime {
 }
 
 /**
- * 把保险库的意外失败写入控制台. 只输出错误名称与信息, 不输出底层原因与任何密钥材料.
+ * 保险库失败日志的前缀.
+ */
+const VAULT_FAILURE_SCOPE = "保险库";
+
+/**
+ * 把保险库的意外失败写入控制台.
  * @param error 底层错误.
  */
 function reportVaultFailure(error: unknown): void {
-  const description =
-    error instanceof Error ? `${error.name}: ${error.message}` : "未知错误";
-  console.error(`[保险库] 操作失败, ${description}`);
+  reportFailure(VAULT_FAILURE_SCOPE, error);
 }
 
 /**

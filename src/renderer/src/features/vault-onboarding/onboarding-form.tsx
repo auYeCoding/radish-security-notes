@@ -2,15 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { PasswordField } from "@renderer/components/password-field";
+import { NewPasswordFields } from "@renderer/components/new-password-fields";
+import { PasswordSetupActions } from "@renderer/components/password-setup-actions";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { FieldGroup } from "@renderer/components/ui/field";
-import { MASTER_PASSWORD_MIN_LENGTH } from "@shared/vault/master-password-policy";
 
 import { AcknowledgementField } from "./acknowledgement-field";
-import { OnboardingActions } from "./onboarding-actions";
 import {
-  describeOnboardingError,
   onboardingSchema,
   type OnboardingFormValues,
 } from "./onboarding-schema";
@@ -73,27 +71,21 @@ export function OnboardingForm(props: OnboardingFormProps): React.JSX.Element {
             <AlertDescription>{props.alertMessage}</AlertDescription>
           </Alert>
         )}
-        <PasswordField
-          {...register("password")}
-          label={t("vault.onboarding.passwordLabel")}
-          description={t("vault.onboarding.passwordHint", {
-            minLength: MASTER_PASSWORD_MIN_LENGTH,
-          })}
-          autoComplete="new-password"
-          error={describeOnboardingError(errors.password?.message, t)}
-        />
-        <PasswordField
-          {...register("confirmation")}
-          label={t("vault.onboarding.confirmationLabel")}
-          autoComplete="new-password"
-          error={describeOnboardingError(errors.confirmation?.message, t)}
+        <NewPasswordFields
+          passwordProps={register("password")}
+          confirmationProps={register("confirmation")}
+          passwordErrorCode={errors.password?.message}
+          confirmationErrorCode={errors.confirmation?.message}
         />
         <AcknowledgementField
           control={control}
           errorCode={errors.acknowledged?.message}
         />
-        <OnboardingActions
+        <PasswordSetupActions
           isPending={props.isPending}
+          submitLabel={t("vault.onboarding.submit")}
+          pendingLabel={t("vault.onboarding.submitting")}
+          skipLabel={t("vault.onboarding.skip")}
           onSkipRequest={props.onSkipRequest}
         />
       </FieldGroup>

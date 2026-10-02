@@ -1,6 +1,7 @@
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
+import type { RecoveryBridge } from "../vault/recovery-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
 
 /**
@@ -15,6 +16,10 @@ export interface RendererApi {
    * 保险库接口: 查询启动状态, 设置主密码, 跳过, 解锁.
    */
   readonly vault: VaultBridge;
+  /**
+   * 恢复接口: 校验恢复词, 凭词恢复保险库, 保存恢复词文本文件.
+   */
+  readonly recovery: RecoveryBridge;
   /**
    * 条目接口: 读取列表与详情, 新建条目, 复制字段.
    */

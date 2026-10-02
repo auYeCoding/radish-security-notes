@@ -16,10 +16,11 @@ import {
   DARK_COLOR_SCHEME_QUERY,
   followSystemTheme,
 } from "@renderer/theme/dark-class";
+import { forceLightThemeWhilePrinting } from "@renderer/theme/print-theme";
 
 /**
  * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store 与
- * 条目 store, 让深色类名跟随系统外观, 最后把根组件挂到容器上.
+ * 条目 store, 让深色类名跟随系统外观 (打印时强制浅色), 最后把根组件挂到容器上.
  * @param container 挂载根组件的容器元素.
  * @returns 挂载完成后兑现.
  */
@@ -29,6 +30,7 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
   const vaultBridge = window.api.vault;
   const vaultStore = createVaultStore({
     bridge: vaultBridge,
+    recoveryBridge: window.api.recovery,
     initialStatus: await vaultBridge.getStatus(),
   });
   const entryStore = createEntryStore({ bridge: window.api.entries });
@@ -42,6 +44,7 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
     document.documentElement,
     window.matchMedia(DARK_COLOR_SCHEME_QUERY),
   );
+  forceLightThemeWhilePrinting(document.documentElement, window);
   createRoot(container).render(
     <StrictMode>
       <I18nextProvider i18n={i18n}>

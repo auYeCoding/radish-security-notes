@@ -3,12 +3,12 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { GateCard } from "@renderer/components/gate-card";
+import { SkipConfirmDialog } from "@renderer/components/skip-confirm-dialog";
 import { useVaultOperation } from "@renderer/stores/use-vault-operation";
 import { useVaultStore } from "@renderer/stores/use-vault-store";
 import type { VaultFailureReason } from "@shared/vault/vault-operation-result";
 
 import { OnboardingForm } from "./onboarding-form";
-import { SkipConfirmDialog } from "./skip-confirm-dialog";
 
 /**
  * 把设置失败的原因换成提示条里的文案.

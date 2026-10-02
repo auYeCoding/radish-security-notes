@@ -1,20 +1,8 @@
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 
 import type { VaultService } from "../vault/vault-service";
+import { requireMasterPassword } from "./ipc-arguments";
 import type { IpcMainPort } from "./preferences-ipc";
-
-/**
- * 校验渲染进程传来的主密码参数是字符串.
- * @param masterPassword 渲染进程传来的值.
- * @returns 校验通过的主密码.
- * @throws Error 当参数不是字符串时.
- */
-function requireMasterPassword(masterPassword: unknown): string {
-  if (typeof masterPassword !== "string") {
-    throw new Error("无效的主密码");
-  }
-  return masterPassword;
-}
 
 /**
  * 注册保险库相关的 IPC 通道, 参数在进程边界处校验后才交给保险库服务. 主密码的长度规则

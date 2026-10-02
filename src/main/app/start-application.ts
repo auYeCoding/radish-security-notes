@@ -4,6 +4,7 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import icon from "../../../resources/icon.png?asset";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
+import { registerRecoveryIpc } from "../ipc/recovery-ipc";
 import { registerTotpIpc } from "../ipc/totp-ipc";
 import { registerVaultIpc } from "../ipc/vault-ipc";
 import { resolveWindowBackground } from "../theme/window-background";
@@ -14,6 +15,7 @@ import {
   type PreferencesRuntime,
 } from "./preferences-runtime";
 import { createEntryRuntime } from "./entry-runtime";
+import { createRecoveryRuntime } from "./recovery-runtime";
 import { createVaultRuntime } from "./vault-runtime";
 
 /**
@@ -68,6 +70,8 @@ export async function startApplication(): Promise<void> {
   const vault = await createVaultRuntime();
   registerPreferencesIpc(ipcMain, runtime.service);
   registerVaultIpc(ipcMain, vault.service);
+  const recovery = createRecoveryRuntime(runtime.i18n);
+  registerRecoveryIpc(ipcMain, vault.service, recovery.textFileSaver);
   const entries = createEntryRuntime(vault.service);
   registerEntryIpc(ipcMain, entries.service);
   registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);

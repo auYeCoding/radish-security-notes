@@ -167,21 +167,25 @@
       "show": "显示密码",
       "hide": "隐藏密码"
     },
-    "onboarding": {
-      "title": "设置主密码",
-      "description": "主密码用于在每次打开应用时解锁数据.",
+    "newPassword": {
       "passwordLabel": "主密码",
       "confirmationLabel": "确认主密码",
       "passwordHint": "至少 {minLength} 个字符",
-      "forgetNotice": "主密码不会保存, 忘记后无法找回, 数据将无法打开.",
+      "error": {
+        "tooShort": "主密码至少需要 {minLength} 个字符.",
+        "mismatch": "两次输入的主密码不一致."
+      }
+    },
+    "onboarding": {
+      "title": "设置主密码",
+      "description": "主密码用于在每次打开应用时解锁数据.",
+      "forgetNotice": "主密码不会保存. 忘记后只能用接下来展示的 24 个恢复词找回数据, 请务必保管好.",
       "acknowledgeLabel": "我已了解",
       "submit": "设置主密码",
       "submitting": "正在设置...",
       "skip": "跳过",
       "error": {
-        "tooShort": "主密码至少需要 {minLength} 个字符.",
-        "mismatch": "两次输入的主密码不一致.",
-        "notAcknowledged": "请先确认已了解主密码无法找回.",
+        "notAcknowledged": "请先确认已了解忘记主密码需用恢复词找回.",
         "systemUnavailable": "系统无法保护数据密钥, 无法跳过. 请设置主密码.",
         "unexpected": "操作失败. 请关闭应用后重试."
       }
@@ -198,6 +202,7 @@
       "passwordLabel": "主密码",
       "submit": "解锁",
       "submitting": "正在解锁...",
+      "forgot": "忘记主密码?",
       "error": {
         "wrongPassword": "主密码不正确, 请重新输入.",
         "unexpected": "解锁失败. 请关闭应用后重试."
@@ -205,7 +210,69 @@
     },
     "failure": {
       "title": "无法打开数据",
-      "description": "数据文件缺失或已损坏, 或系统无法解开受保护的密钥. 请关闭应用后重试, 不要删除数据目录中的 vault 文件夹."
+      "description": "数据文件缺失或已损坏, 或系统无法解开受保护的密钥. 请关闭应用后重试, 不要删除数据目录中的 vault 文件夹. 如果保存了恢复词, 可以凭它恢复.",
+      "restore": "用恢复词恢复"
+    },
+    "recovery": {
+      "title": "恢复密钥",
+      "generated": "生成日期: {date}",
+      "usage": "忘记主密码, 或密钥文件丢失时, 在解锁页选择 '忘记主密码' 或 '用恢复词恢复', 按序号输入这 24 个词.",
+      "warning": "这 24 个词等同于万能钥匙: 任何人拿到它, 就能绕过主密码打开你的全部数据. 请离线保管, 不要存进本保险库, 不要随邮箱备份发出, 不要拍照上传. 词一旦泄露, 目前版本无法更换; 词丢失且忘记主密码时, 数据无法找回.",
+      "wordLabel": "第 {position} 个词",
+      "wordsLabel": "24 个恢复词",
+      "file": {
+        "dialogTitle": "保存恢复词文本文件",
+        "fileTypeName": "文本文件"
+      },
+      "show": {
+        "title": "保存你的恢复词",
+        "description": "忘记主密码, 或密钥文件丢失时, 只能凭这 24 个词找回数据. 请现在抄下或保存, 接下来会要求你重输其中 3 个词.",
+        "noCopy": "为避免被其它程序读取, 这里不提供复制到剪贴板.",
+        "continue": "我已保存, 继续"
+      },
+      "save": {
+        "print": "打印恢复套件",
+        "textFile": "保存为文本文件",
+        "textFileWarning": "文本文件是明文, 同步工具, 备份与云盘都会把它带走, 请保存到不会被同步的位置.",
+        "saved": "已保存文本文件.",
+        "failed": "无法保存文件. 请换一个位置重试."
+      },
+      "confirm": {
+        "title": "确认恢复词",
+        "description": "输入你保存的第 {positions} 个词, 确认已正确保存.",
+        "submit": "确认",
+        "back": "返回再看一遍",
+        "wrongWord": "第 {position} 个词不正确, 请对照你保存的副本."
+      },
+      "print": {
+        "notesHeading": "保管记录",
+        "locationLabel": "保管位置",
+        "notesLabel": "备注"
+      }
+    },
+    "restore": {
+      "words": {
+        "title": "用恢复词恢复",
+        "description": "输入保存的 24 个恢复词. 验证通过后可以设置新的主密码, 原有数据不会改变.",
+        "pasteHint": "可以把 24 个词一次粘贴到任意一个输入框.",
+        "submit": "验证恢复词",
+        "submitting": "正在验证...",
+        "back": "返回"
+      },
+      "protection": {
+        "title": "设置新的保护",
+        "description": "恢复词已验证. 为保险库设置新的主密码, 或选择不设主密码.",
+        "submit": "设置并解锁",
+        "skip": "跳过主密码"
+      },
+      "error": {
+        "unknownWord": "第 {position} 个词不在词表中, 请检查拼写.",
+        "wordCount": "需要填满 24 个词.",
+        "checksum": "词的拼写或顺序有误, 请逐个核对.",
+        "keyRejected": "这组词与当前数据不匹配. 请确认是这个保险库的恢复词.",
+        "systemUnavailable": "系统无法保护数据密钥. 请设置主密码.",
+        "unexpected": "恢复失败. 请关闭应用后重试."
+      }
     }
   }
 }

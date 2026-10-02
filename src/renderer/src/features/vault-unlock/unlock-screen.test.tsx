@@ -56,6 +56,45 @@ describe("UnlockScreen 内容", () => {
   });
 });
 
+describe("UnlockScreen 忘记主密码入口", () => {
+  it("表单下方有 忘记主密码? 入口, 位于解锁按钮之后", async () => {
+    await renderUnlock();
+
+    const unlockButton = screen.getByRole("button", { name: "解锁" });
+    const forgotButton = screen.getByRole("button", { name: "忘记主密码?" });
+
+    expect(
+      unlockButton.compareDocumentPosition(forgotButton) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("点击后进入恢复流程, 不调用解锁也不改变状态", async () => {
+    const { vaultBridge, vaultStore } = await renderUnlock();
+
+    await userEvent
+      .setup()
+      .click(screen.getByRole("button", { name: "忘记主密码?" }));
+
+    expect(vaultStore.getState().isRestoreRequested).toBe(true);
+    expect(vaultStore.getState().status).toBe("locked");
+    expect(vaultBridge.unlock).not.toHaveBeenCalled();
+  });
+
+  it("解锁进行中入口被禁用", async () => {
+    await renderUnlock({
+      bridgeOverrides: {
+        unlock: () => new Promise<VaultOperationResult>(() => undefined),
+      },
+    });
+
+    await enterPasswordAndUnlock("anything");
+
+    const forgotButton = screen.getByRole("button", { name: "忘记主密码?" });
+    expect(forgotButton.hasAttribute("disabled")).toBe(true);
+  });
+});
+
 describe("UnlockScreen 解锁", () => {
   it("正确的主密码交给桥, 保险库状态变为 unlocked", async () => {
     const { vaultBridge, vaultStore } = await renderUnlock();

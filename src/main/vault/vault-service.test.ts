@@ -24,7 +24,7 @@ describe("VaultService 设置主密码", () => {
 
     const result = await service.setupWithMasterPassword(TEST_MASTER_PASSWORD);
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, recoveryWords: expect.any(Array) });
     expect(service.getStatus()).toBe("unlocked");
     expect(await fileExists(harness.paths.keyFile)).toBe(true);
     expect(await fileExists(harness.paths.databaseFile)).toBe(true);
@@ -68,7 +68,7 @@ describe("VaultService 跳过主密码", () => {
 
     const result = await service.setupWithoutMasterPassword();
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, recoveryWords: expect.any(Array) });
     expect(service.getStatus()).toBe("unlocked");
     expect((await harness.keyFileStore.read())?.protection).toBe(
       "system-protected",

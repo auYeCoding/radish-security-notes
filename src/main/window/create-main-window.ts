@@ -22,12 +22,17 @@ export interface MainWindowOptions {
 }
 
 /**
- * 主窗口的初始宽度.
+ * 主窗口内容区的最小宽度, 与 Tailwind 的 md 断点一致, 保证恢复词网格固定的 4 列放得下.
+ */
+export const MAIN_WINDOW_MIN_WIDTH = 768;
+
+/**
+ * 主窗口的初始宽度, 按内容区计.
  */
 const MAIN_WINDOW_WIDTH = 1100;
 
 /**
- * 主窗口的初始高度.
+ * 主窗口的初始高度, 按内容区计.
  */
 const MAIN_WINDOW_HEIGHT = 720;
 
@@ -39,8 +44,10 @@ const MAIN_WINDOW_HEIGHT = 720;
  */
 export function createMainWindow(options: MainWindowOptions): BrowserWindow {
   const mainWindow = new BrowserWindow({
+    useContentSize: true,
     width: MAIN_WINDOW_WIDTH,
     height: MAIN_WINDOW_HEIGHT,
+    minWidth: MAIN_WINDOW_MIN_WIDTH,
     show: false,
     autoHideMenuBar: true,
     icon: options.icon,

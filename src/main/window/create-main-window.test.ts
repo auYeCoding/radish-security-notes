@@ -1,0 +1,60 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { MAIN_WINDOW_MIN_WIDTH, createMainWindow } from "./create-main-window";
+
+/**
+ * 替身 electron 模块里的窗口构造函数间谍, 记录收到的窗口选项, 返回只有创建流程用到的方法的假窗口.
+ */
+const electronMocks = vi.hoisted(() => ({
+  createWindow: vi.fn(function () {
+    return {
+      webContents: { setWindowOpenHandler: vi.fn() },
+      on: vi.fn(),
+      loadURL: vi.fn(),
+      loadFile: vi.fn(),
+    };
+  }),
+}));
+
+vi.mock("electron", () => ({
+  BrowserWindow: electronMocks.createWindow,
+  shell: { openExternal: vi.fn() },
+}));
+
+vi.mock("@electron-toolkit/utils", () => ({ is: { dev: false } }));
+
+/**
+ * 创建主窗口所需的最小选项.
+ */
+const WINDOW_OPTIONS = {
+  icon: "icon.png",
+  title: "Radish",
+  backgroundColor: "#ffffff",
+};
+
+afterEach(() => {
+  electronMocks.createWindow.mockClear();
+});
+
+describe("createMainWindow 窗口尺寸", () => {
+  it("内容区最小宽度是 768 像素, 与恢复词网格固定 4 列配套", () => {
+    createMainWindow(WINDOW_OPTIONS);
+
+    expect(MAIN_WINDOW_MIN_WIDTH).toBe(768);
+    expect(electronMocks.createWindow).toHaveBeenCalledWith(
+      expect.objectContaining({ minWidth: MAIN_WINDOW_MIN_WIDTH }),
+    );
+  });
+
+  it("宽高与最小宽度都按内容区计, 不含窗口边框", () => {
+    createMainWindow(WINDOW_OPTIONS);
+
+    expect(electronMocks.createWindow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        useContentSize: true,
+        width: 1100,
+        height: 720,
+      }),
+    );
+  });
+});

@@ -167,21 +167,25 @@
       "show": "Show password",
       "hide": "Hide password"
     },
-    "onboarding": {
-      "title": "Set a master password",
-      "description": "The master password unlocks your data each time you open the app.",
+    "newPassword": {
       "passwordLabel": "Master password",
       "confirmationLabel": "Confirm master password",
       "passwordHint": "At least {minLength} characters",
-      "forgetNotice": "The master password is not stored. If you forget it, it cannot be recovered and your data cannot be opened.",
+      "error": {
+        "tooShort": "The master password needs at least {minLength} characters.",
+        "mismatch": "The two passwords do not match."
+      }
+    },
+    "onboarding": {
+      "title": "Set a master password",
+      "description": "The master password unlocks your data each time you open the app.",
+      "forgetNotice": "The master password is not stored. If you forget it, the 24 recovery words shown next are the only way to get your data back. Keep them safe.",
       "acknowledgeLabel": "I understand",
       "submit": "Set master password",
       "submitting": "Setting up...",
       "skip": "Skip",
       "error": {
-        "tooShort": "The master password needs at least {minLength} characters.",
-        "mismatch": "The two passwords do not match.",
-        "notAcknowledged": "Confirm that you understand first.",
+        "notAcknowledged": "Confirm that you understand that recovery needs the recovery words first.",
         "systemUnavailable": "The system cannot protect the data key, so you cannot skip. Set a master password.",
         "unexpected": "The operation failed. Close the app and try again."
       }
@@ -198,6 +202,7 @@
       "passwordLabel": "Master password",
       "submit": "Unlock",
       "submitting": "Unlocking...",
+      "forgot": "Forgot master password?",
       "error": {
         "wrongPassword": "The master password is incorrect. Try again.",
         "unexpected": "Unlock failed. Close the app and try again."
@@ -205,7 +210,69 @@
     },
     "failure": {
       "title": "Unable to open your data",
-      "description": "A data file is missing or damaged, or the system cannot open the protected key. Close the app and try again. Do not delete the vault folder in the data directory."
+      "description": "A data file is missing or damaged, or the system cannot open the protected key. Close the app and try again. Do not delete the vault folder in the data directory. If you saved your recovery words, you can restore with them.",
+      "restore": "Restore with recovery words"
+    },
+    "recovery": {
+      "title": "Recovery key",
+      "generated": "Generated: {date}",
+      "usage": "If you forget the master password or the key file is lost, choose 'Forgot master password' or 'Restore with recovery words' on the unlock page and enter these 24 words in order.",
+      "warning": "These 24 words work like a master key: anyone who has them can bypass the master password and open all of your data. Keep them offline. Do not store them in this vault, do not send them with an email backup, and do not photograph or upload them. If the words leak, they cannot be replaced in this version; if you lose the words and forget the master password, your data cannot be recovered.",
+      "wordLabel": "Word {position}",
+      "wordsLabel": "24 recovery words",
+      "file": {
+        "dialogTitle": "Save recovery words as a text file",
+        "fileTypeName": "Text file"
+      },
+      "show": {
+        "title": "Save your recovery words",
+        "description": "If you forget the master password or the key file is lost, these 24 words are the only way to get your data back. Save them now. You will be asked to re-enter 3 of them next.",
+        "noCopy": "Copying to the clipboard is not offered, so other programs cannot read the words.",
+        "continue": "I have saved them, continue"
+      },
+      "save": {
+        "print": "Print recovery kit",
+        "textFile": "Save as text file",
+        "textFileWarning": "A text file is plain text. Sync tools, backups and cloud drives will carry it along, so save it somewhere that is not synced.",
+        "saved": "Text file saved.",
+        "failed": "Could not save the file. Try another location."
+      },
+      "confirm": {
+        "title": "Confirm your recovery words",
+        "description": "Enter words {positions} from your saved copy to confirm you saved them correctly.",
+        "submit": "Confirm",
+        "back": "Back to the words",
+        "wrongWord": "Word {position} is not correct. Check it against your saved copy."
+      },
+      "print": {
+        "notesHeading": "Storage notes",
+        "locationLabel": "Where it is kept",
+        "notesLabel": "Notes"
+      }
+    },
+    "restore": {
+      "words": {
+        "title": "Restore with recovery words",
+        "description": "Enter your 24 saved recovery words. Once they are verified you can set a new master password. Your existing data is not changed.",
+        "pasteHint": "You can paste all 24 words into any box at once.",
+        "submit": "Verify words",
+        "submitting": "Verifying...",
+        "back": "Back"
+      },
+      "protection": {
+        "title": "Set new protection",
+        "description": "Your words are verified. Set a new master password for the vault, or continue without one.",
+        "submit": "Set password and unlock",
+        "skip": "Skip master password"
+      },
+      "error": {
+        "unknownWord": "Word {position} is not in the word list. Check the spelling.",
+        "wordCount": "Fill in all 24 words.",
+        "checksum": "A word is misspelled or out of order. Check each word.",
+        "keyRejected": "These words do not match the current data. Make sure they belong to this vault.",
+        "systemUnavailable": "The system cannot protect the data key. Set a master password.",
+        "unexpected": "Recovery failed. Close the app and try again."
+      }
     }
   }
 }

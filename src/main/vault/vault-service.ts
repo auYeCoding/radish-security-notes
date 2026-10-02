@@ -1,9 +1,11 @@
 import {
   VAULT_OPERATION_SUCCEEDED,
   vaultOperationFailed,
+  type VaultOperationFailure,
   type VaultOperationResult,
 } from "@shared/vault/vault-operation-result";
 import { isMasterPasswordLongEnough } from "@shared/vault/master-password-policy";
+import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 import type { VaultStatus } from "@shared/vault/vault-status";
 
 import { KeyUnwrapError } from "./aes-gcm-key-wrapper";
@@ -16,18 +18,15 @@ import {
 } from "./database/open-vault-database";
 import { fileExists } from "./file-exists";
 import type { KeyFileStore } from "./key-file-store";
-import { MASTER_PASSWORD_PROTECTION, type SystemKeyRecord } from "./key-record";
-import {
-  protectWithMasterPassword,
-  unprotectWithMasterPassword,
-} from "./master-password-key-protector";
+import { MASTER_PASSWORD_PROTECTION } from "./key-record";
+import { KeyProtectionWriter } from "./key-protection-writer";
+import { unprotectWithMasterPassword } from "./master-password-key-protector";
+import type { DataKeyRecovery } from "./recover-data-key";
+import { dataKeyToRecoveryWords } from "./recovery-phrase";
 import type { SafeStoragePort } from "./safe-storage-port";
 import type { SystemKeyPersistence } from "./system-key-persistence";
-import {
-  SystemProtectionUnavailableError,
-  protectWithSystem,
-  unprotectWithSystem,
-} from "./system-key-protector";
+import { unprotectWithSystem } from "./system-key-protector";
+import { VaultRecovery } from "./vault-recovery";
 import type { VaultPaths } from "./vault-paths";
 
 /**
@@ -85,10 +84,26 @@ export class VaultService {
   private isOperationRunning = false;
 
   /**
+   * 把数据密钥保护起来并写成密钥文件, 设置与恢复共用.
+   */
+  private readonly keyProtection: KeyProtectionWriter;
+
+  /**
+   * 凭恢复词找回数据密钥并换上新保护.
+   */
+  private readonly recovery: VaultRecovery;
+
+  /**
    * 创建保险库服务.
    * @param dependencies 服务依赖.
    */
-  constructor(private readonly dependencies: VaultServiceDependencies) {}
+  constructor(private readonly dependencies: VaultServiceDependencies) {
+    this.keyProtection = new KeyProtectionWriter(dependencies);
+    this.recovery = new VaultRecovery({
+      databaseFile: dependencies.paths.databaseFile,
+      keyProtection: this.keyProtection,
+    });
+  }
 
   /**
    * 判定启动状态: 没有任何文件时需要设置, 主密码保护时等待解锁, 系统保护时直接解锁.
@@ -112,13 +127,12 @@ export class VaultService {
   }
 
   /**
-   * 首次设置主密码: 生成数据密钥, 用主密码保护后写入密钥文件, 再创建加密数据库.
+   * 首次设置主密码: 生成数据密钥, 用主密码保护后写入密钥文件, 再创建加密数据库. 成功时
+   * 带回由数据密钥编码的恢复词, 这是主进程唯一一次生成它, 之后不再保存.
    * @param masterPassword 用户设置的主密码.
    * @returns 设置结果.
    */
-  setupWithMasterPassword(
-    masterPassword: string,
-  ): Promise<VaultOperationResult> {
+  setupWithMasterPassword(masterPassword: string): Promise<VaultSetupResult> {
     return this.guard(async () => {
       if (this.status !== "needs-setup") {
         return vaultOperationFailed("unexpected-state");
@@ -127,48 +141,36 @@ export class VaultService {
         return vaultOperationFailed("password-too-short");
       }
       const dataKey = generateDataKey();
-      await this.dependencies.keyFileStore.write(
-        await protectWithMasterPassword(
-          dataKey,
-          masterPassword,
-          this.dependencies.argon2Parameters,
-        ),
+      const recoveryWords = dataKeyToRecoveryWords(dataKey);
+      await this.keyProtection.writeMasterPasswordProtection(
+        dataKey,
+        masterPassword,
       );
-      return this.completeUnlock(dataKey);
+      this.completeUnlock(dataKey);
+      return { ok: true, recoveryWords };
     });
   }
 
   /**
    * 首次启动时跳过主密码: 生成数据密钥, 交给系统保护, 等系统密钥写入磁盘后写入密钥文件, 再
    * 创建加密数据库. 系统密钥没有落盘就写入, 进程被强制结束后数据密钥会永远解不开, 所以
-   * 全新的用户数据目录里这一步最多要等十几秒; 超时按系统不能保护数据密钥处理.
+   * 全新的用户数据目录里这一步最多要等十几秒; 超时按系统不能保护数据密钥处理. 成功时带回
+   * 由数据密钥编码的恢复词.
    * @returns 设置结果.
    */
-  setupWithoutMasterPassword(): Promise<VaultOperationResult> {
+  setupWithoutMasterPassword(): Promise<VaultSetupResult> {
     return this.guard(async () => {
       if (this.status !== "needs-setup") {
         return vaultOperationFailed("unexpected-state");
       }
       const dataKey = generateDataKey();
-      let record: SystemKeyRecord;
-      try {
-        record = await protectWithSystem(
-          dataKey,
-          this.dependencies.safeStorage,
-        );
-      } catch (error) {
-        if (error instanceof SystemProtectionUnavailableError) {
-          return vaultOperationFailed("system-protection-unavailable");
-        }
-        throw error;
-      }
-      const isPersisted =
-        await this.dependencies.systemKeyPersistence.waitUntilPersisted();
-      if (!isPersisted) {
+      const recoveryWords = dataKeyToRecoveryWords(dataKey);
+      if (!(await this.keyProtection.writeSystemProtection(dataKey))) {
+        dataKey.fill(0);
         return vaultOperationFailed("system-protection-unavailable");
       }
-      await this.dependencies.keyFileStore.write(record);
-      return this.completeUnlock(dataKey);
+      this.completeUnlock(dataKey);
+      return { ok: true, recoveryWords };
     });
   }
 
@@ -199,6 +201,42 @@ export class VaultService {
         throw error;
       }
     });
+  }
+
+  /**
+   * 校验恢复词: 词数, 词表, 校验和都对, 且现有数据库能被它打开才算通过. 不改动文件与状态,
+   * 恢复页第一步用它在用户设置新保护之前拒绝抄错的词.
+   * @param words 用户输入的恢复词.
+   * @returns 校验结果.
+   */
+  verifyRecoveryWords(words: readonly string[]): Promise<VaultOperationResult> {
+    return this.guardRecovery(() => this.recovery.verifyWords(words));
+  }
+
+  /**
+   * 凭恢复词恢复保险库并设置新主密码: 重新包裹同一个数据密钥并改写密钥文件, 原恢复词仍然有效.
+   * @param words 用户输入的恢复词.
+   * @param masterPassword 新主密码.
+   * @returns 恢复结果, 成功时转入已解锁.
+   */
+  restoreWithMasterPassword(
+    words: readonly string[],
+    masterPassword: string,
+  ): Promise<VaultOperationResult> {
+    return this.restore(() =>
+      this.recovery.recoverWithMasterPassword(words, masterPassword),
+    );
+  }
+
+  /**
+   * 凭恢复词恢复保险库并改用系统保护数据密钥, 原恢复词仍然有效.
+   * @param words 用户输入的恢复词.
+   * @returns 恢复结果, 成功时转入已解锁.
+   */
+  restoreWithoutMasterPassword(
+    words: readonly string[],
+  ): Promise<VaultOperationResult> {
+    return this.restore(() => this.recovery.recoverWithSystemProtection(words));
   }
 
   /**
@@ -271,15 +309,53 @@ export class VaultService {
   }
 
   /**
+   * 判断当前状态是否允许凭恢复词恢复: 忘记主密码时是锁定, 密钥文件丢失, 损坏或系统密钥
+   * 失效时是失败.
+   * @returns 允许时返回 true.
+   */
+  private canRecover(): boolean {
+    return this.status === "locked" || this.status === "failed";
+  }
+
+  /**
+   * 在允许恢复的状态下执行恢复操作, 其它状态按状态不符拒绝.
+   * @param operation 要执行的恢复操作.
+   * @returns 操作结果.
+   */
+  private guardRecovery(
+    operation: () => Promise<VaultOperationResult>,
+  ): Promise<VaultOperationResult> {
+    return this.guard(async () =>
+      this.canRecover()
+        ? operation()
+        : vaultOperationFailed("unexpected-state"),
+    );
+  }
+
+  /**
+   * 凭恢复词恢复保险库: 取回已换上新保护的数据密钥, 再打开数据库.
+   * @param recover 找回数据密钥并换上新保护的步骤.
+   * @returns 恢复结果, 成功时转入已解锁.
+   */
+  private restore(
+    recover: () => Promise<DataKeyRecovery>,
+  ): Promise<VaultOperationResult> {
+    return this.guardRecovery(async () => {
+      const recovery = await recover();
+      return recovery.ok ? this.completeUnlock(recovery.dataKey) : recovery;
+    });
+  }
+
+  /**
    * 执行一个操作. 同一时间只允许一个操作: 已有操作在执行时直接按状态不符拒绝, 避免两次
    * 设置同时通过状态检查, 后写入的密钥文件盖掉先写入的, 让已创建的数据库永远打不开.
    * 意外失败时转入失败状态, 回调通知并返回失败结果.
    * @param operation 要执行的操作.
    * @returns 操作结果.
    */
-  private async guard(
-    operation: () => Promise<VaultOperationResult>,
-  ): Promise<VaultOperationResult> {
+  private async guard<Result extends VaultOperationResult | VaultSetupResult>(
+    operation: () => Promise<Result>,
+  ): Promise<Result | VaultOperationFailure> {
     if (this.isOperationRunning) {
       return vaultOperationFailed("unexpected-state");
     }

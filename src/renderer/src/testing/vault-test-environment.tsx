@@ -1,5 +1,7 @@
+import type { RecoveryBridge } from "@shared/vault/recovery-bridge";
 import type { VaultBridge } from "@shared/vault/vault-bridge";
 import { VAULT_OPERATION_SUCCEEDED } from "@shared/vault/vault-operation-result";
+import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 import type { VaultStatus } from "@shared/vault/vault-status";
 import type { ReactNode } from "react";
 import { vi } from "vitest";
@@ -16,6 +18,44 @@ import {
 } from "./preferences-test-environment";
 
 /**
+ * 假保险库桥设置成功时给出的恢复词: 词表最前面的 24 个词, 渲染端不校验词表, 只要互不相同.
+ */
+export const TEST_RECOVERY_WORDS: readonly string[] = [
+  "abandon",
+  "ability",
+  "able",
+  "about",
+  "above",
+  "absent",
+  "absorb",
+  "abstract",
+  "absurd",
+  "abuse",
+  "access",
+  "accident",
+  "account",
+  "accuse",
+  "achieve",
+  "acid",
+  "acoustic",
+  "acquire",
+  "across",
+  "act",
+  "action",
+  "actor",
+  "actress",
+  "actual",
+];
+
+/**
+ * 假保险库桥设置成功的结果, 带上测试用的恢复词.
+ */
+const TEST_SETUP_SUCCEEDED: VaultSetupResult = {
+  ok: true,
+  recoveryWords: TEST_RECOVERY_WORDS,
+};
+
+/**
  * 创建保险库测试环境的选项.
  */
 export interface VaultTestEnvironmentOptions {
@@ -27,6 +67,10 @@ export interface VaultTestEnvironmentOptions {
    * 覆盖假保险库桥上的方法, 例如让解锁失败.
    */
   readonly bridgeOverrides?: Partial<VaultBridge>;
+  /**
+   * 覆盖假恢复桥上的方法, 例如让校验恢复词失败.
+   */
+  readonly recoveryBridgeOverrides?: Partial<RecoveryBridge>;
 }
 
 /**
@@ -48,6 +92,10 @@ export interface VaultTestEnvironment extends PreferencesTestEnvironment {
    */
   readonly vaultBridge: VaultBridge;
   /**
+   * 带间谍方法的假恢复桥.
+   */
+  readonly recoveryBridge: RecoveryBridge;
+  /**
    * 被测的保险库 store.
    */
   readonly vaultStore: VaultStore;
@@ -65,17 +113,27 @@ export async function createVaultTestEnvironment(
   const preferences = await createPreferencesTestEnvironment();
   const vaultBridge: VaultBridge = {
     getStatus: vi.fn(() => Promise.resolve(status)),
-    setupWithMasterPassword: vi.fn(() =>
-      Promise.resolve(VAULT_OPERATION_SUCCEEDED),
-    ),
+    setupWithMasterPassword: vi.fn(() => Promise.resolve(TEST_SETUP_SUCCEEDED)),
     setupWithoutMasterPassword: vi.fn(() =>
-      Promise.resolve(VAULT_OPERATION_SUCCEEDED),
+      Promise.resolve(TEST_SETUP_SUCCEEDED),
     ),
     unlock: vi.fn(() => Promise.resolve(VAULT_OPERATION_SUCCEEDED)),
     ...options.bridgeOverrides,
   };
+  const recoveryBridge: RecoveryBridge = {
+    verifyWords: vi.fn(() => Promise.resolve(VAULT_OPERATION_SUCCEEDED)),
+    restoreWithMasterPassword: vi.fn(() =>
+      Promise.resolve(VAULT_OPERATION_SUCCEEDED),
+    ),
+    restoreWithoutMasterPassword: vi.fn(() =>
+      Promise.resolve(VAULT_OPERATION_SUCCEEDED),
+    ),
+    saveTextFile: vi.fn(() => Promise.resolve("saved" as const)),
+    ...options.recoveryBridgeOverrides,
+  };
   const vaultStore = createVaultStore({
     bridge: vaultBridge,
+    recoveryBridge,
     initialStatus: status,
   });
   const Providers = (props: VaultTestProvidersProps): React.JSX.Element => (
@@ -85,5 +143,5 @@ export async function createVaultTestEnvironment(
       </VaultStoreProvider>
     </preferences.Providers>
   );
-  return { ...preferences, vaultBridge, vaultStore, Providers };
+  return { ...preferences, vaultBridge, recoveryBridge, vaultStore, Providers };
 }

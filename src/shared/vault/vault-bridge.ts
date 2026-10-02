@@ -1,4 +1,5 @@
 import type { VaultOperationResult } from "./vault-operation-result";
+import type { VaultSetupResult } from "./vault-setup-result";
 import type { VaultStatus } from "./vault-status";
 
 /**
@@ -13,16 +14,16 @@ export interface VaultBridge {
   /**
    * 首次设置主密码, 主进程创建加密数据库并解锁.
    * @param masterPassword 用户设置的主密码.
-   * @returns 设置结果.
+   * @returns 设置结果, 成功时带恢复词.
    */
   setupWithMasterPassword: (
     masterPassword: string,
-  ) => Promise<VaultOperationResult>;
+  ) => Promise<VaultSetupResult>;
   /**
    * 首次启动时跳过主密码, 主进程用系统保护数据密钥, 创建加密数据库并解锁.
-   * @returns 设置结果.
+   * @returns 设置结果, 成功时带恢复词.
    */
-  setupWithoutMasterPassword: () => Promise<VaultOperationResult>;
+  setupWithoutMasterPassword: () => Promise<VaultSetupResult>;
   /**
    * 用主密码解锁已设置主密码的保险库.
    * @param masterPassword 用户输入的主密码.

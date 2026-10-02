@@ -4,42 +4,42 @@ import { Button } from "@renderer/components/ui/button";
 import { Field } from "@renderer/components/ui/field";
 
 /**
- * 引导表单按钮区的属性.
+ * 恢复词表单按钮区的属性.
  */
-interface OnboardingActionsProps {
+interface RecoveryWordsActionsProps {
   /**
-   * 设置操作是否正在执行, 执行中禁用按钮并显示处理中的文案.
+   * 校验是否正在执行, 执行中禁用按钮并显示处理中的文案.
    */
   readonly isPending: boolean;
   /**
-   * 点击 "跳过" 时的回调.
+   * 点击 "返回" 时的回调.
    */
-  readonly onSkipRequest: () => void;
+  readonly onBack: () => void;
 }
 
 /**
- * 引导表单的按钮区: 主按钮 "设置主密码" 与次要按钮 "跳过".
+ * 恢复词表单的按钮区: 主按钮 "验证恢复词" 与次要按钮 "返回".
  * @param props 组件属性.
  * @returns 按钮区元素.
  */
-export function OnboardingActions(
-  props: OnboardingActionsProps,
+export function RecoveryWordsActions(
+  props: RecoveryWordsActionsProps,
 ): React.JSX.Element {
   const { t } = useTranslation();
   return (
     <Field>
       <Button type="submit" disabled={props.isPending}>
         {props.isPending
-          ? t("vault.onboarding.submitting")
-          : t("vault.onboarding.submit")}
+          ? t("vault.restore.words.submitting")
+          : t("vault.restore.words.submit")}
       </Button>
       <Button
         type="button"
         variant="secondary"
         disabled={props.isPending}
-        onClick={props.onSkipRequest}
+        onClick={props.onBack}
       >
-        {t("vault.onboarding.skip")}
+        {t("vault.restore.words.back")}
       </Button>
     </Field>
   );

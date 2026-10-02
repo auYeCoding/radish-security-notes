@@ -9,6 +9,11 @@ export const IPC_CHANNELS = {
   vaultSetupWithMasterPassword: "vault:setup-with-master-password",
   vaultSetupWithoutMasterPassword: "vault:setup-without-master-password",
   vaultUnlock: "vault:unlock",
+  recoveryVerifyWords: "recovery:verify-words",
+  recoveryRestoreWithMasterPassword: "recovery:restore-with-master-password",
+  recoveryRestoreWithoutMasterPassword:
+    "recovery:restore-without-master-password",
+  recoverySaveTextFile: "recovery:save-text-file",
   entriesList: "entries:list",
   entriesGet: "entries:get",
   entriesCreate: "entries:create",

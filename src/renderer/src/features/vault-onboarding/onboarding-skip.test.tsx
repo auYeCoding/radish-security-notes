@@ -3,11 +3,12 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import {
+  TEST_RECOVERY_WORDS,
   createVaultTestEnvironment,
   type VaultTestEnvironment,
   type VaultTestEnvironmentOptions,
 } from "@renderer/testing/vault-test-environment";
-import type { VaultOperationResult } from "@shared/vault/vault-operation-result";
+import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 
 import { OnboardingScreen } from "./onboarding-screen";
 
@@ -66,11 +67,11 @@ describe("OnboardingScreen 跳过确认框", () => {
 
 describe("OnboardingScreen 跳过进行中", () => {
   it("等待系统密钥落盘期间确认按钮显示处理中并被禁用, 确认框不能被关闭", async () => {
-    let finish: (result: VaultOperationResult) => void = () => undefined;
+    let finish: (result: VaultSetupResult) => void = () => undefined;
     await openSkipDialog({
       bridgeOverrides: {
         setupWithoutMasterPassword: () =>
-          new Promise<VaultOperationResult>((resolve) => {
+          new Promise<VaultSetupResult>((resolve) => {
             finish = resolve;
           }),
       },
@@ -84,12 +85,12 @@ describe("OnboardingScreen 跳过进行中", () => {
     expect(pending.hasAttribute("disabled")).toBe(true);
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("alertdialog")).not.toBeNull();
-    finish({ ok: true });
+    finish({ ok: true, recoveryWords: TEST_RECOVERY_WORDS });
   });
 });
 
 describe("OnboardingScreen 确认跳过", () => {
-  it("确认后调用桥, 保险库状态变为 unlocked", async () => {
+  it("确认后调用桥, 保险库状态变为 unlocked 并记下待确认的恢复词", async () => {
     const { vaultBridge, vaultStore } = await openSkipDialog();
     const dialog = await findDialog();
 
@@ -98,6 +99,9 @@ describe("OnboardingScreen 确认跳过", () => {
     await waitFor(() => {
       expect(vaultStore.getState().status).toBe("unlocked");
     });
+    expect(vaultStore.getState().pendingRecoveryWords).toEqual(
+      TEST_RECOVERY_WORDS,
+    );
     expect(vaultBridge.setupWithoutMasterPassword).toHaveBeenCalledTimes(1);
   });
 

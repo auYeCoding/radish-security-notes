@@ -5,6 +5,10 @@ export type VaultFailureReason =
   | "password-too-short"
   | "wrong-password"
   | "system-protection-unavailable"
+  | "recovery-word-count"
+  | "recovery-unknown-word"
+  | "recovery-checksum"
+  | "recovery-key-rejected"
   | "unexpected-state"
   | "unexpected-error";
 
@@ -30,6 +34,10 @@ export interface VaultOperationFailure {
    * 失败的原因.
    */
   readonly reason: VaultFailureReason;
+  /**
+   * 不在词表的词在恢复词中的序号 (从 1 起), 只有 `recovery-unknown-word` 带有.
+   */
+  readonly wordPosition?: number;
 }
 
 /**
@@ -46,10 +54,14 @@ export const VAULT_OPERATION_SUCCEEDED: VaultOperationSuccess = { ok: true };
 /**
  * 构造表示操作失败的结果.
  * @param reason 失败的原因.
+ * @param wordPosition 不在词表的词的序号, 只有恢复词不在词表时给出.
  * @returns 带原因的失败结果.
  */
 export function vaultOperationFailed(
   reason: VaultFailureReason,
+  wordPosition?: number,
 ): VaultOperationFailure {
-  return { ok: false, reason };
+  return wordPosition === undefined
+    ? { ok: false, reason }
+    : { ok: false, reason, wordPosition };
 }

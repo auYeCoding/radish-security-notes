@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import {
+  TEST_RECOVERY_WORDS,
   createVaultTestEnvironment,
   type VaultTestEnvironment,
   type VaultTestEnvironmentOptions,
@@ -68,7 +69,9 @@ describe("OnboardingScreen 内容", () => {
     ).toBeDefined();
     expect(screen.getByText("至少 8 个字符")).toBeDefined();
     expect(
-      screen.getByText("主密码不会保存, 忘记后无法找回, 数据将无法打开."),
+      screen.getByText(
+        "主密码不会保存. 忘记后只能用接下来展示的 24 个恢复词找回数据, 请务必保管好.",
+      ),
     ).toBeDefined();
     expect(screen.getByRole("button", { name: "设置主密码" })).toBeDefined();
     expect(screen.getByRole("button", { name: "跳过" })).toBeDefined();
@@ -105,14 +108,14 @@ describe("OnboardingScreen 校验", () => {
     await submit();
 
     expect(
-      await screen.findByText("请先确认已了解主密码无法找回."),
+      await screen.findByText("请先确认已了解忘记主密码需用恢复词找回."),
     ).toBeDefined();
     expect(vaultBridge.setupWithMasterPassword).not.toHaveBeenCalled();
   });
 });
 
 describe("OnboardingScreen 设置主密码", () => {
-  it("校验通过后把主密码交给桥, 保险库状态变为 unlocked", async () => {
+  it("校验通过后把主密码交给桥, 保险库状态变为 unlocked 并记下待确认的恢复词", async () => {
     const { vaultBridge, vaultStore } = await renderOnboarding();
     await typePasswords("long enough 1", "long enough 1");
     await acknowledge();
@@ -122,6 +125,9 @@ describe("OnboardingScreen 设置主密码", () => {
     await waitFor(() => {
       expect(vaultStore.getState().status).toBe("unlocked");
     });
+    expect(vaultStore.getState().pendingRecoveryWords).toEqual(
+      TEST_RECOVERY_WORDS,
+    );
     expect(vaultBridge.setupWithMasterPassword).toHaveBeenCalledWith(
       "long enough 1",
     );
