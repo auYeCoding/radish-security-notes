@@ -39,6 +39,7 @@ function recordOf(id: string, createdAt: number): EntryRecord {
       { id: `field-${id}`, label: `label-${id}`, value: "v", isHidden: true },
     ],
     totp: null,
+    folderId: null,
     createdAt,
   };
 }
@@ -129,6 +130,7 @@ describe("条目仓库: 更新", () => {
       notes: "new-notes",
       customFields: [{ id: "f", label: "l", value: "v", isHidden: false }],
       totp,
+      folderId: null,
       createdAt: 7,
     });
   });

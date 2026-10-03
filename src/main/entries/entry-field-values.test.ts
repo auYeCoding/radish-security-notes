@@ -16,6 +16,7 @@ const BANK_CARD_RECORD: EntryRecord = {
   notes: "备注\n第二行",
   customFields: [],
   totp: null,
+  folderId: null,
   createdAt: 1,
 };
 

@@ -11,7 +11,12 @@ export function describeCreateFailure(
   reason: EntryFailureReason,
   translate: TFunction,
 ): string {
-  return reason === "invalid-input"
-    ? translate("entryCreate.error.invalid")
-    : translate("entryCreate.error.unexpected");
+  switch (reason) {
+    case "invalid-input":
+      return translate("entryCreate.error.invalid");
+    case "folder-not-found":
+      return translate("entryCreate.error.folderNotFound");
+    default:
+      return translate("entryCreate.error.unexpected");
+  }
 }

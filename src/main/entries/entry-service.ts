@@ -17,6 +17,7 @@ import {
   requireEntryType,
 } from "@shared/entries/preset-entry-types";
 
+import { isFolderChoiceValid } from "../folders/folder-repository";
 import type { VaultOrm } from "../vault/database/drizzle-adapter";
 import type { ClipboardPort } from "./clipboard-port";
 import { findCustomField } from "./custom-field-records";
@@ -72,6 +73,7 @@ function toDetail(record: EntryRecord): EntryDetail {
     notes: record.notes,
     customFields: record.customFields,
     hasTotp: record.totp !== null,
+    folderId: record.folderId ?? undefined,
   };
 }
 
@@ -110,9 +112,9 @@ export class EntryService {
 
   /**
    * 新建一个条目: 按类型校验输入, 名称与自定义字段的字段名去首尾空格, 生成条目编号, 自定义
-   * 字段编号与创建时间后写入数据库.
-   * @param input 用户选的类型, 填写的名称, 类型字段, 备注与自定义字段.
-   * @returns 新建的条目详情, 未解锁或输入不合规 (含未知类型) 时为失败结果.
+   * 字段编号与创建时间后写入数据库. 选了所属文件夹时, 文件夹必须存在.
+   * @param input 用户选的类型, 填写的名称, 类型字段, 备注, 自定义字段与所属文件夹.
+   * @returns 新建的条目详情, 未解锁, 输入不合规 (含未知类型) 或所选文件夹不存在时为失败结果.
    */
   create(input: NewEntryInput): EntryResult<EntryDetail> {
     return this.withDatabase((orm) => {
@@ -123,6 +125,9 @@ export class EntryService {
           : createNewEntrySchema(type).safeParse(input);
       if (type === undefined || !parsed?.success) {
         return entryFailed("invalid-input");
+      }
+      if (!isFolderChoiceValid(orm, parsed.data.folderId)) {
+        return entryFailed("folder-not-found");
       }
       const record = buildEntryRecord({
         type,
@@ -137,10 +142,11 @@ export class EntryService {
 
   /**
    * 更新一个条目: 按条目已保存的类型校验输入, 名称与自定义字段的字段名去首尾空格, 自定义字段
-   * 重新分配编号后写回数据库. 条目的编号, 类型与创建时间不变.
+   * 重新分配编号后写回数据库. 条目的编号, 类型与创建时间不变, 所属文件夹以输入为准, 省略表示
+   * 未分类, 选了文件夹时文件夹必须存在.
    * @param id 条目编号.
-   * @param input 用户填写的名称, 类型字段, 备注, 自定义字段与 TOTP 的处理方式.
-   * @returns 更新后的条目详情, 未解锁, 没有这个编号或输入不合规时为失败结果.
+   * @param input 用户填写的名称, 类型字段, 备注, 自定义字段, TOTP 的处理方式与所属文件夹.
+   * @returns 更新后的条目详情, 未解锁, 没有这个编号, 输入不合规或所选文件夹不存在时为失败结果.
    */
   update(id: string, input: UpdateEntryInput): EntryResult<EntryDetail> {
     return this.withDatabase((orm) => {
@@ -155,6 +161,9 @@ export class EntryService {
           : createEditEntrySchema(type).safeParse(input);
       if (!parsed?.success) {
         return entryFailed("invalid-input");
+      }
+      if (!isFolderChoiceValid(orm, parsed.data.folderId)) {
+        return entryFailed("folder-not-found");
       }
       const record = buildUpdatedRecord({
         existing,

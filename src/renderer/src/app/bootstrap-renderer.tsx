@@ -7,6 +7,8 @@ import { App } from "@renderer/app/app";
 import { syncDocumentLanguage } from "@renderer/i18n/sync-document-language";
 import { createEntryStore } from "@renderer/stores/entry-store";
 import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
+import { createFolderStore } from "@renderer/stores/folder-store";
+import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { createPreferencesStore } from "@renderer/stores/preferences-store";
 import { PreferencesStoreProvider } from "@renderer/stores/preferences-store-provider";
 import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
@@ -19,8 +21,8 @@ import {
 import { forceLightThemeWhilePrinting } from "@renderer/theme/print-theme";
 
 /**
- * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store 与
- * 条目 store, 让深色类名跟随系统外观 (打印时强制浅色), 最后把根组件挂到容器上.
+ * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store, 条目 store 与
+ * 文件夹 store, 让深色类名跟随系统外观 (打印时强制浅色), 最后把根组件挂到容器上.
  * @param container 挂载根组件的容器元素.
  * @returns 挂载完成后兑现.
  */
@@ -34,6 +36,7 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
     initialStatus: await vaultBridge.getStatus(),
   });
   const entryStore = createEntryStore({ bridge: window.api.entries });
+  const folderStore = createFolderStore({ bridge: window.api.folders });
   const i18n = await createI18nInstance({
     language: snapshot.language,
     isPseudoLocalizationEnabled: snapshot.isPseudoLocalizationEnabled,
@@ -51,9 +54,11 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
         <PreferencesStoreProvider store={store}>
           <VaultStoreProvider store={vaultStore}>
             <EntryStoreProvider store={entryStore}>
-              <TotpBridgeProvider bridge={window.api.totp}>
-                <App />
-              </TotpBridgeProvider>
+              <FolderStoreProvider store={folderStore}>
+                <TotpBridgeProvider bridge={window.api.totp}>
+                  <App />
+                </TotpBridgeProvider>
+              </FolderStoreProvider>
             </EntryStoreProvider>
           </VaultStoreProvider>
         </PreferencesStoreProvider>

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { EntrySummary } from "@shared/entries/entry-types";
 
 import { Button } from "@renderer/components/ui/button";
+import { useDragSource } from "@renderer/lib/drag-drop/use-drag-source";
 
 import { formatEntrySubtitle } from "./entry-subtitle";
 
@@ -27,22 +28,30 @@ interface EntryListItemProps {
 
 /**
  * 条目列表里的一项: 第一行名称, 第二行 "类型名 · 账号", 没有账号时只有类型名. 选中项除
- * 底色外, 起始侧还有强调色竖条, 并标记为当前项, 状态不只靠颜色区分.
+ * 底色外, 起始侧还有强调色竖条, 并标记为当前项, 状态不只靠颜色区分. 列表项可以拖到左侧栏的
+ * 文件夹上, 鼠标移动一小段距离后才算拖拽, 单击仍是选中; 正被拖拽时原位置变淡.
  * @param props 组件属性.
  * @returns 列表项元素.
  */
 export function EntryListItem(props: EntryListItemProps): React.JSX.Element {
   const { t } = useTranslation();
   const { entry, isSelected, onSelect } = props;
+  const { setNodeRef, dragProps, isDragging } = useDragSource(
+    entry.id,
+    t("dragDrop.roleDescription"),
+  );
   return (
     <li>
       <Button
+        ref={setNodeRef}
+        {...dragProps}
         variant="ghost"
         aria-current={isSelected ? "true" : undefined}
         onClick={() => onSelect(entry.id)}
         className={cn(
           "h-(--list-row-height) w-full flex-col items-start justify-center gap-0.5 rounded-none border-0 border-s-2 border-s-transparent px-4 text-start",
           isSelected && "border-s-brand bg-muted",
+          isDragging && "opacity-50",
         )}
       >
         <span className="w-full truncate text-sm font-semibold">

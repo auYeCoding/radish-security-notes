@@ -49,6 +49,7 @@ describe("buildEntryRecord", () => {
         { id: "id-3", label: "二", value: "2", isHidden: true },
       ],
       totp: null,
+      folderId: null,
       createdAt: 42,
     });
   });

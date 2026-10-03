@@ -35,6 +35,10 @@ export interface EntrySummary {
    * 条目的账号, 类型没有账号字段或没有填写时为空串.
    */
   readonly account: string;
+  /**
+   * 条目所属文件夹的编号, 条目未分类时没有这一项.
+   */
+  readonly folderId?: string;
 }
 
 /**
@@ -79,6 +83,7 @@ export function toEntrySummary(detail: EntryDetail): EntrySummary {
     name: detail.name,
     type: detail.type,
     account: readAccount(detail.fields),
+    folderId: detail.folderId,
   };
 }
 
@@ -110,6 +115,10 @@ export interface NewEntryInput {
    * TOTP 输入: Base32 密钥或 otpauth 链接, 空串表示不带 TOTP.
    */
   readonly totp: string;
+  /**
+   * 条目所属文件夹的编号, 未分类时省略. 编辑时省略表示移出文件夹, 不表示保持原来的归属.
+   */
+  readonly folderId?: string;
 }
 
 /**

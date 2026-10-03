@@ -3,6 +3,7 @@ import type { RendererApi } from "@shared/ipc/renderer-api";
 import { contextBridge, ipcRenderer } from "electron";
 
 import { createEntryBridge } from "./create-entry-bridge";
+import { createFolderBridge } from "./create-folder-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
 import { createRecoveryBridge } from "./create-recovery-bridge";
 import { createTotpBridge } from "./create-totp-bridge";
@@ -16,6 +17,7 @@ const api: RendererApi = {
   vault: createVaultBridge(ipcRenderer),
   recovery: createRecoveryBridge(ipcRenderer),
   entries: createEntryBridge(ipcRenderer),
+  folders: createFolderBridge(ipcRenderer),
   totp: createTotpBridge(ipcRenderer),
 };
 

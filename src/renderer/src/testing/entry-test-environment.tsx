@@ -1,6 +1,8 @@
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import type { EntryDetail } from "@shared/entries/entry-types";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
+import type { FolderBridge } from "@shared/folders/folder-bridge";
+import type { FolderSummary } from "@shared/folders/folder-types";
 import type { ReactNode } from "react";
 
 import {
@@ -8,9 +10,15 @@ import {
   type EntryStore,
 } from "@renderer/stores/entry-store";
 import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
+import {
+  createFolderStore,
+  type FolderStore,
+} from "@renderer/stores/folder-store";
+import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
 
 import { createFakeEntryBridge } from "./fake-entry-bridge";
+import { createFakeFolderBridge } from "./fake-folder-bridge";
 import { createFakeTotpBridge } from "./fake-totp-bridge";
 import {
   createVaultTestEnvironment,
@@ -34,6 +42,14 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    * 覆盖假 TOTP 桥上的方法, 例如让取码失败.
    */
   readonly totpBridgeOverrides?: Partial<TotpBridge>;
+  /**
+   * 假文件夹桥里的初始文件夹, 按创建先后排列, 默认没有文件夹.
+   */
+  readonly folders?: readonly FolderSummary[];
+  /**
+   * 覆盖假文件夹桥上的方法, 例如让删除失败.
+   */
+  readonly folderBridgeOverrides?: Partial<FolderBridge>;
 }
 
 /**
@@ -47,7 +63,8 @@ interface EntryTestProvidersProps {
 }
 
 /**
- * 组件测试用的条目环境: 在保险库环境之上增加假的条目桥, 真实的条目 store 与假的 TOTP 桥.
+ * 组件测试用的条目环境: 在保险库环境之上增加假的条目桥, 真实的条目 store, 假的文件夹桥, 真实的
+ * 文件夹 store 与假的 TOTP 桥.
  */
 export interface EntryTestEnvironment extends VaultTestEnvironment {
   /**
@@ -62,12 +79,20 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
    * 被测的条目 store.
    */
   readonly entryStore: EntryStore;
+  /**
+   * 带间谍方法的假文件夹桥.
+   */
+  readonly folderBridge: FolderBridge;
+  /**
+   * 被测的文件夹 store.
+   */
+  readonly folderStore: FolderStore;
 }
 
 /**
  * 创建组件测试用的条目环境, 保险库默认已解锁.
- * @param options 保险库初始状态, 初始条目与桥方法的覆盖.
- * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目三个 store 与 TOTP 桥.
+ * @param options 保险库初始状态, 初始条目与文件夹, 桥方法的覆盖.
+ * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目, 文件夹四个 store 与 TOTP 桥.
  */
 export async function createEntryTestEnvironment(
   options: EntryTestEnvironmentOptions = {},
@@ -81,15 +106,30 @@ export async function createEntryTestEnvironment(
     options.entryBridgeOverrides,
   );
   const totpBridge = createFakeTotpBridge(options.totpBridgeOverrides);
+  const folderBridge = createFakeFolderBridge(
+    options.folders,
+    options.folderBridgeOverrides,
+  );
   const entryStore = createEntryStore({ bridge: entryBridge });
+  const folderStore = createFolderStore({ bridge: folderBridge });
   const Providers = (props: EntryTestProvidersProps): React.JSX.Element => (
     <vault.Providers>
       <EntryStoreProvider store={entryStore}>
-        <TotpBridgeProvider bridge={totpBridge}>
-          {props.children}
-        </TotpBridgeProvider>
+        <FolderStoreProvider store={folderStore}>
+          <TotpBridgeProvider bridge={totpBridge}>
+            {props.children}
+          </TotpBridgeProvider>
+        </FolderStoreProvider>
       </EntryStoreProvider>
     </vault.Providers>
   );
-  return { ...vault, entryBridge, totpBridge, entryStore, Providers };
+  return {
+    ...vault,
+    entryBridge,
+    totpBridge,
+    entryStore,
+    folderBridge,
+    folderStore,
+    Providers,
+  };
 }

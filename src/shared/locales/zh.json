@@ -13,13 +13,67 @@
     "foldersHeading": "文件夹",
     "tagsHeading": "标签",
     "emptyFolders": "还没有文件夹",
-    "emptyTags": "还没有标签"
+    "emptyTags": "还没有标签",
+    "allEntries": "全部条目",
+    "uncategorized": "未分类",
+    "loadFailed": "无法读取文件夹. 请关闭应用后重试.",
+    "actions": "{name} 的更多操作"
+  },
+  "folderName": {
+    "label": "名称",
+    "cancel": "取消",
+    "error": {
+      "nameRequired": "请填写名称.",
+      "nameTooLong": "名称最多 {maxLength} 个字符.",
+      "nameTaken": "已有同名文件夹, 请换一个名称.",
+      "invalid": "名称不符合要求. 请检查后重试.",
+      "notFound": "这个文件夹已不存在.",
+      "unexpected": "操作失败. 请关闭应用后重试."
+    }
+  },
+  "folderCreate": {
+    "open": "新建文件夹",
+    "title": "新建文件夹",
+    "description": "名称最多 {maxLength} 个字符, 不能与已有文件夹重名.",
+    "submit": "创建",
+    "submitting": "正在创建..."
+  },
+  "folderRename": {
+    "open": "重命名",
+    "title": "重命名文件夹",
+    "description": "名称最多 {maxLength} 个字符, 不能与别的文件夹重名.",
+    "submit": "保存",
+    "submitting": "正在保存..."
+  },
+  "folderDelete": {
+    "open": "删除",
+    "title": "删除这个文件夹?",
+    "descriptionEmpty": "\"{name}\" 将被删除.",
+    "descriptionWithEntries": "\"{name}\" 将被删除, 其中的 {count} 个条目会移到未分类, 条目本身不会删除.",
+    "cancel": "取消",
+    "confirm": "删除",
+    "deleting": "正在删除...",
+    "error": {
+      "notFound": "这个文件夹已不存在.",
+      "unexpected": "删除失败. 请关闭应用后重试."
+    }
+  },
+  "dragDrop": {
+    "roleDescription": "可拖动的条目",
+    "instructions": "按 M 键拿起条目, 用方向键移到左侧的文件夹上, 按回车放下, 按 Esc 取消. 也可以在编辑条目时选择所属文件夹.",
+    "pickedUp": "已拿起条目 {name}.",
+    "movedOver": "条目 {name} 在 {target} 上方.",
+    "movedOverNothing": "条目 {name} 不在任何文件夹上方.",
+    "dropped": "已把条目 {name} 放入 {target}.",
+    "droppedNowhere": "条目 {name} 没有放入任何文件夹.",
+    "cancelled": "已取消移动条目 {name}."
   },
   "entryListPane": {
     "heading": "条目",
     "count": "共 {count} 个条目",
     "empty": "还没有条目",
     "noMatches": "没有匹配的条目",
+    "emptyView": "这里还没有条目",
     "loadFailed": "无法读取条目. 请关闭应用后重试."
   },
   "entryDetailPane": {
@@ -34,7 +88,9 @@
     "showField": "显示 {label}",
     "hideField": "隐藏 {label}",
     "fieldHidden": "{label} 已隐藏",
-    "copied": "已复制"
+    "copied": "已复制",
+    "folder": "文件夹: {name}",
+    "uncategorized": "未分类"
   },
   "entryTotp": {
     "codeLabel": "验证码",
@@ -101,6 +157,8 @@
   },
   "entryForm": {
     "nameLabel": "名称",
+    "folderLabel": "所属文件夹",
+    "folderNone": "未分类",
     "notesLabel": "备注",
     "customFields": {
       "legend": "自定义字段",
@@ -147,6 +205,7 @@
     "submitting": "正在保存...",
     "error": {
       "invalid": "内容不符合要求. 请检查后重试.",
+      "folderNotFound": "所选文件夹已不存在. 请重新选择.",
       "unexpected": "保存失败. 请关闭应用后重试."
     }
   },
@@ -170,6 +229,7 @@
     "error": {
       "invalid": "内容不符合要求. 请检查后重试.",
       "notFound": "这个条目已不存在.",
+      "folderNotFound": "所选文件夹已不存在. 请重新选择.",
       "unexpected": "保存失败. 请关闭应用后重试."
     }
   },

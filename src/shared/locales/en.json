@@ -13,13 +13,67 @@
     "foldersHeading": "Folders",
     "tagsHeading": "Tags",
     "emptyFolders": "No folders yet",
-    "emptyTags": "No tags yet"
+    "emptyTags": "No tags yet",
+    "allEntries": "All entries",
+    "uncategorized": "Uncategorized",
+    "loadFailed": "Unable to load folders. Close the app and try again.",
+    "actions": "More actions for {name}"
+  },
+  "folderName": {
+    "label": "Name",
+    "cancel": "Cancel",
+    "error": {
+      "nameRequired": "Enter a name.",
+      "nameTooLong": "The name can have at most {maxLength} characters.",
+      "nameTaken": "A folder with this name already exists. Choose another name.",
+      "invalid": "The name is not valid. Check it and try again.",
+      "notFound": "This folder no longer exists.",
+      "unexpected": "The action failed. Close the app and try again."
+    }
+  },
+  "folderCreate": {
+    "open": "New folder",
+    "title": "New folder",
+    "description": "The name can have at most {maxLength} characters and must differ from your other folders.",
+    "submit": "Create",
+    "submitting": "Creating..."
+  },
+  "folderRename": {
+    "open": "Rename",
+    "title": "Rename folder",
+    "description": "The name can have at most {maxLength} characters and must differ from your other folders.",
+    "submit": "Save",
+    "submitting": "Saving..."
+  },
+  "folderDelete": {
+    "open": "Delete",
+    "title": "Delete this folder?",
+    "descriptionEmpty": "\"{name}\" will be deleted.",
+    "descriptionWithEntries": "\"{name}\" will be deleted. {count, plural, one {Its # entry moves} other {Its # entries move}} to Uncategorized and {count, plural, one {is} other {are}} not deleted.",
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "deleting": "Deleting...",
+    "error": {
+      "notFound": "This folder no longer exists.",
+      "unexpected": "Deleting failed. Close the app and try again."
+    }
+  },
+  "dragDrop": {
+    "roleDescription": "Draggable entry",
+    "instructions": "Press M to pick up the entry, use the arrow keys to move it onto a folder on the left, press Enter to drop it and Escape to cancel. You can also choose the folder when you edit the entry.",
+    "pickedUp": "Picked up entry {name}.",
+    "movedOver": "Entry {name} is over {target}.",
+    "movedOverNothing": "Entry {name} is not over any folder.",
+    "dropped": "Moved entry {name} to {target}.",
+    "droppedNowhere": "Entry {name} was not moved to any folder.",
+    "cancelled": "Cancelled moving entry {name}."
   },
   "entryListPane": {
     "heading": "Entries",
     "count": "{count, plural, one {# entry} other {# entries}}",
     "empty": "No entries yet",
     "noMatches": "No matching entries",
+    "emptyView": "No entries here yet",
     "loadFailed": "Unable to load entries. Close the app and try again."
   },
   "entryDetailPane": {
@@ -34,7 +88,9 @@
     "showField": "Show {label}",
     "hideField": "Hide {label}",
     "fieldHidden": "{label} hidden",
-    "copied": "Copied"
+    "copied": "Copied",
+    "folder": "Folder: {name}",
+    "uncategorized": "Uncategorized"
   },
   "entryTotp": {
     "codeLabel": "Verification code",
@@ -101,6 +157,8 @@
   },
   "entryForm": {
     "nameLabel": "Name",
+    "folderLabel": "Folder",
+    "folderNone": "Uncategorized",
     "notesLabel": "Notes",
     "customFields": {
       "legend": "Custom fields",
@@ -147,6 +205,7 @@
     "submitting": "Saving...",
     "error": {
       "invalid": "The content is not valid. Check it and try again.",
+      "folderNotFound": "The selected folder no longer exists. Choose another one.",
       "unexpected": "Saving failed. Close the app and try again."
     }
   },
@@ -170,6 +229,7 @@
     "error": {
       "invalid": "The content is not valid. Check it and try again.",
       "notFound": "This entry no longer exists.",
+      "folderNotFound": "The selected folder no longer exists. Choose another one.",
       "unexpected": "Saving failed. Close the app and try again."
     }
   },

@@ -27,7 +27,7 @@ export function insertEntry(orm: VaultOrm, record: EntryRecord): void {
 
 /**
  * 读取全部条目的摘要, 最新创建的在最前, 创建时间相同时后插入的在前. 账号取自类型字段里键为
- * `account` 的值, 类型没有这个字段或没有填写时为空串.
+ * `account` 的值, 类型没有这个字段或没有填写时为空串; 未分类的条目没有所属文件夹编号.
  * @param orm 已解锁数据库的查询入口.
  * @returns 摘要列表.
  */
@@ -38,14 +38,16 @@ export function listEntrySummaries(orm: VaultOrm): EntrySummary[] {
       name: entries.name,
       type: entries.type,
       account: sql<string>`coalesce(json_extract(${entries.fields}, ${ACCOUNT_JSON_PATH}), '')`,
+      folderId: entries.folderId,
     })
     .from(entries)
     .orderBy(desc(entries.createdAt), sql`rowid desc`)
-    .all();
+    .all()
+    .map((row) => ({ ...row, folderId: row.folderId ?? undefined }));
 }
 
 /**
- * 更新一个条目的内容: 名称, 类型字段, 备注, 自定义字段与 TOTP. 编号, 类型与创建时间不变.
+ * 更新一个条目的内容: 名称, 类型字段, 备注, 自定义字段, TOTP 与所属文件夹. 编号, 类型与创建时间不变.
  * @param orm 已解锁数据库的查询入口.
  * @param record 更新后的行, 编号指明要更新的条目.
  * @returns 条目存在并已更新时为 true, 没有这个编号时为 false.
@@ -59,6 +61,7 @@ export function updateEntry(orm: VaultOrm, record: EntryRecord): boolean {
       notes: record.notes,
       customFields: record.customFields,
       totp: record.totp,
+      folderId: record.folderId,
     })
     .where(eq(entries.id, record.id))
     .returning({ id: entries.id })

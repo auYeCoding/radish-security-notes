@@ -35,6 +35,24 @@ export function readString(source: object, key: string): string {
 }
 
 /**
+ * 取出对象上的一个可省略的字符串属性.
+ * @param source 对象.
+ * @param key 属性名.
+ * @returns 属性值, 省略 (没有这个属性或值为 undefined) 时为 undefined.
+ * @throws Error 当属性存在却不是字符串时.
+ */
+export function readOptionalString(
+  source: object,
+  key: string,
+): string | undefined {
+  const value: unknown = Reflect.get(source, key);
+  if (value !== undefined && typeof value !== "string") {
+    throw new Error(INVALID_ENTRY_INPUT_MESSAGE);
+  }
+  return value;
+}
+
+/**
  * 取出对象上的一个布尔属性.
  * @param source 对象.
  * @param key 属性名.

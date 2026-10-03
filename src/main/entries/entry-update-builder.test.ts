@@ -27,6 +27,7 @@ const EXISTING_RECORD: EntryRecord = {
   notes: "旧备注",
   customFields: [{ id: "old-field", label: "旧", value: "v", isHidden: true }],
   totp: EXISTING_TOTP,
+  folderId: null,
   createdAt: 42,
 };
 
@@ -87,6 +88,7 @@ describe("buildUpdatedRecord 内容", () => {
       notes: "新备注",
       customFields: [{ id: "new-1", label: "新", value: "n", isHidden: false }],
       totp: EXISTING_TOTP,
+      folderId: null,
       createdAt: 42,
     });
   });

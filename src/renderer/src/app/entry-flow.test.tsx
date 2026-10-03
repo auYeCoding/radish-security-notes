@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { TEST_ENTRIES } from "@renderer/testing/entry-fixtures";
+import { getEntryListItems } from "@renderer/testing/entry-list-queries";
 import {
   createEntryTestEnvironment,
   type EntryTestEnvironment,
@@ -41,7 +42,7 @@ describe("解锁后的工作区", () => {
   it("挂载时读取条目并列出, 搜索框已聚焦", async () => {
     await renderWorkspace();
 
-    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(getEntryListItems()).toHaveLength(3);
     expect(document.activeElement).toBe(
       screen.getByRole("searchbox", { name: "搜索" }),
     );
@@ -52,7 +53,7 @@ describe("解锁后的工作区", () => {
     const user = userEvent.setup();
 
     await user.keyboard("bank");
-    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(getEntryListItems()).toHaveLength(1);
     await user.click(screen.getByRole("button", { name: /银行/ }));
     await user.click(await screen.findByRole("button", { name: "复制 密码" }));
 
@@ -70,7 +71,7 @@ describe("解锁后的工作区", () => {
 
     await user.clear(screen.getByRole("searchbox", { name: "搜索" }));
 
-    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(getEntryListItems()).toHaveLength(3);
   });
 });
 
@@ -85,8 +86,8 @@ describe("工作区新建条目", () => {
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(screen.getAllByRole("listitem")).toHaveLength(4);
-    expect(screen.getAllByRole("listitem")[0]?.textContent).toContain(
+    expect(getEntryListItems()).toHaveLength(4);
+    expect(getEntryListItems()[0]?.textContent).toContain(
       "通用登录 · new-account",
     );
     expect(screen.getByRole("heading", { name: "新条目" })).toBeDefined();
@@ -104,7 +105,7 @@ describe("工作区搜索中新建条目", () => {
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
-    expect(screen.getAllByRole("listitem")).toHaveLength(4);
+    expect(getEntryListItems()).toHaveLength(4);
   });
 });
 

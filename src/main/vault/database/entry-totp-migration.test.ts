@@ -40,6 +40,36 @@ interface ColumnInfo {
   readonly notnull: number;
 }
 
+/**
+ * 旧库升级到最新结构后读出的两行: 内容不变, TOTP 与所属文件夹都为空.
+ */
+const UPGRADED_ROWS = [
+  {
+    id: "old-1",
+    name: "旧论坛",
+    type: "forum",
+    fields: { account: "a", password: "p", email: "", url: "" },
+    notes: "备注第一行\n备注第二行",
+    customFields: [
+      { id: "f-1", label: "助记词", value: "a b", isHidden: true },
+    ],
+    totp: null,
+    folderId: null,
+    createdAt: 5,
+  },
+  {
+    id: "old-2",
+    name: "只有名称",
+    type: "login",
+    fields: {},
+    notes: "",
+    customFields: [],
+    totp: null,
+    folderId: null,
+    createdAt: 6,
+  },
+];
+
 describe("条目表迁移: 0005 加入 TOTP 列", () => {
   const getDirectory = useTemporaryDirectory("entry-totp-migration");
 
@@ -66,30 +96,7 @@ describe("条目表迁移: 0005 加入 TOTP 列", () => {
     const rows = upgraded.orm.select().from(entries).all();
     upgraded.close();
 
-    expect(rows).toEqual([
-      {
-        id: "old-1",
-        name: "旧论坛",
-        type: "forum",
-        fields: { account: "a", password: "p", email: "", url: "" },
-        notes: "备注第一行\n备注第二行",
-        customFields: [
-          { id: "f-1", label: "助记词", value: "a b", isHidden: true },
-        ],
-        totp: null,
-        createdAt: 5,
-      },
-      {
-        id: "old-2",
-        name: "只有名称",
-        type: "login",
-        fields: {},
-        notes: "",
-        customFields: [],
-        totp: null,
-        createdAt: 6,
-      },
-    ]);
+    expect(rows).toEqual(UPGRADED_ROWS);
   });
 });
 

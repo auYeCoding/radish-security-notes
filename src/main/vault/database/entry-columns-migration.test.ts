@@ -51,6 +51,7 @@ describe("条目表迁移: 骨架阶段的旧条目升级", () => {
         notes: "",
         customFields: [],
         totp: null,
+        folderId: null,
         createdAt: 7,
       },
     ]);
@@ -85,6 +86,7 @@ describe("条目表迁移: 类型字段, 备注与自定义字段读写", () => 
         { id: "field-2", label: "编号", value: "", isHidden: false },
       ],
       totp: null,
+      folderId: null,
       createdAt: 9,
     };
 

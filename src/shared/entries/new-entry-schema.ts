@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { isWithinLength } from "../text/is-within-length";
 import { customFieldInputSchema } from "./custom-field-schema";
 import type { NewCustomFieldInput } from "./custom-field-types";
 import type { EntryFieldDefinition } from "./entry-field-types";
@@ -36,6 +37,10 @@ export interface NewEntryFormValues {
    * TOTP 输入: Base32 密钥或 otpauth 链接, 空串表示不带 TOTP.
    */
   totp: string;
+  /**
+   * 条目所属文件夹的编号, 未分类时省略. 文件夹是否存在由主进程的条目服务判定.
+   */
+  folderId?: string;
 }
 
 /**
@@ -47,16 +52,6 @@ export const NEW_ENTRY_ERROR_CODES = {
   nameTooLong: "nameTooLong",
   fieldTooLong: "fieldTooLong",
 } as const;
-
-/**
- * 判断文本是否没有超过最多字符数. 按 Unicode 码点计数, 一个汉字或表情只算一个字符.
- * @param value 待判断的文本.
- * @param maxLength 允许的最多字符数.
- * @returns 没有超过时返回 true.
- */
-function isWithinLength(value: string, maxLength: number): boolean {
-  return Array.from(value).length <= maxLength;
-}
 
 /**
  * TOTP 输入的校验方案: 是字符串, 空串表示不带 TOTP, 非空时必须能解析成受支持的 TOTP 配置,
@@ -118,6 +113,10 @@ export interface EntryContentShape {
    * TOTP 输入的校验规则.
    */
   readonly totp: z.ZodType<string, string>;
+  /**
+   * 所属文件夹编号的校验规则.
+   */
+  readonly folderId: z.ZodType<string | undefined, string | undefined>;
 }
 
 /**
@@ -150,6 +149,7 @@ export function createEntryContentShape(
     notes: z.string(),
     customFields: z.array(customFieldInputSchema),
     totp: createTotpSchema(),
+    folderId: z.string().optional(),
   };
 }
 

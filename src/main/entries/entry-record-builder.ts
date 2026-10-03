@@ -67,6 +67,7 @@ export function buildEntryRecord(source: EntryRecordSource): EntryRecord {
       createIdentifier,
     ),
     totp: resolveTotpConfig(values.totp),
+    folderId: values.folderId ?? null,
     createdAt: source.createdAt,
   };
 }

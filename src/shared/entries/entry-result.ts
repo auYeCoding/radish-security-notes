@@ -2,7 +2,11 @@
  * 条目操作失败的原因.
  */
 export type EntryFailureReason =
-  "vault-locked" | "invalid-input" | "not-found" | "unexpected-error";
+  | "vault-locked"
+  | "invalid-input"
+  | "not-found"
+  | "folder-not-found"
+  | "unexpected-error";
 
 /**
  * 条目操作成功的结果.

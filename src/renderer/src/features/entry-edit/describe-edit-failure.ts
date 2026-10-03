@@ -16,6 +16,8 @@ export function describeEditFailure(
       return translate("entryEdit.error.invalid");
     case "not-found":
       return translate("entryEdit.error.notFound");
+    case "folder-not-found":
+      return translate("entryEdit.error.folderNotFound");
     default:
       return translate("entryEdit.error.unexpected");
   }

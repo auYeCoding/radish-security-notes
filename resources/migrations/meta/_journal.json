@@ -43,6 +43,13 @@
       "when": 1790927316365,
       "tag": "0005_add-entry-totp",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1791039772929,
+      "tag": "0006_add-folders",
+      "breakpoints": true
     }
   ]
 }

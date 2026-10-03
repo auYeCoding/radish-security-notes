@@ -43,6 +43,7 @@ function detailFromCreate(id: string, input: NewEntryInput): EntryDetail {
     notes: input.notes,
     customFields: withFieldIdentifiers("created-field", input.customFields),
     hasTotp: input.totp.trim() !== "",
+    folderId: input.folderId,
   };
 }
 
@@ -70,6 +71,7 @@ function detailFromUpdate(
       input.customFields,
     ),
     hasTotp,
+    folderId: input.folderId,
   };
 }
 

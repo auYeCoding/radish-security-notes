@@ -1,4 +1,5 @@
 import type { EntryDetail, EntrySummary } from "@shared/entries/entry-types";
+import { ALL_ENTRIES_VIEW, type FolderView } from "@shared/folders/folder-view";
 
 /**
  * 条目列表的读取状态.
@@ -87,19 +88,25 @@ export interface EntryState {
    */
   readonly query: string;
   /**
+   * 左侧栏当前选中的入口: 全部条目, 未分类或某个文件夹, 列表只显示属于它的条目, 搜索也只在其中
+   * 进行. 只在内存里, 不持久化.
+   */
+  readonly view: FolderView;
+  /**
    * 条目被编辑保存的次数. 详情视图把它放进 key, 让验证码与已显示的密钥在保存后回到最新.
    */
   readonly detailRevision: number;
 }
 
 /**
- * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空, 还没有编辑过.
+ * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空, 入口是全部条目, 还没有编辑过.
  */
 export const INITIAL_ENTRY_STATE: EntryState = {
   entries: [],
   loadStatus: "loading",
   selection: { status: "none" },
   query: "",
+  view: ALL_ENTRIES_VIEW,
   detailRevision: 0,
 };
 

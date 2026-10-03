@@ -19,7 +19,27 @@ interface EntryListBodyProps {
 }
 
 /**
- * 列表主体: 读取失败时说明原因, 读取中不显示内容, 没有条目或没有匹配时显示空状态,
+ * 选出列表为空时的说明文案键: 一个条目都没有时是 "还没有条目"; 有搜索关键字时是 "没有匹配的条目";
+ * 否则是当前入口 (某个文件夹或未分类) 里没有条目.
+ * @param hasAnyEntry 全部条目里是否至少有一个条目.
+ * @param hasQuery 搜索框里是否有关键字.
+ * @returns 文案键.
+ */
+function emptyMessageKey(
+  hasAnyEntry: boolean,
+  hasQuery: boolean,
+):
+  | "entryListPane.empty"
+  | "entryListPane.noMatches"
+  | "entryListPane.emptyView" {
+  if (!hasAnyEntry) {
+    return "entryListPane.empty";
+  }
+  return hasQuery ? "entryListPane.noMatches" : "entryListPane.emptyView";
+}
+
+/**
+ * 列表主体: 读取失败时说明原因, 读取中不显示内容, 没有条目, 没有匹配或当前入口里没有条目时显示空状态,
  * 否则逐项列出条目并标出选中项.
  * @param props 组件属性.
  * @returns 列表主体元素, 读取中时为 null.
@@ -32,6 +52,7 @@ export function EntryListBody(
   const hasAnyEntry = useEntryStore((state) => state.entries.length > 0);
   const selectedId = useEntryStore((state) => selectedIdOf(state.selection));
   const select = useEntryStore((state) => state.select);
+  const hasQuery = useEntryStore((state) => state.query.trim() !== "");
   if (loadStatus === "failed") {
     return <EmptyState message={t("entryListPane.loadFailed")} />;
   }
@@ -39,13 +60,7 @@ export function EntryListBody(
     return null;
   }
   if (props.entries.length === 0) {
-    return (
-      <EmptyState
-        message={
-          hasAnyEntry ? t("entryListPane.noMatches") : t("entryListPane.empty")
-        }
-      />
-    );
+    return <EmptyState message={t(emptyMessageKey(hasAnyEntry, hasQuery))} />;
   }
   return (
     <ul>

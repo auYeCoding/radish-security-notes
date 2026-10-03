@@ -5,6 +5,7 @@ import type {
   NewEntryInput,
   UpdateEntryInput,
 } from "@shared/entries/entry-types";
+import type { FolderView } from "@shared/folders/folder-view";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 import {
@@ -14,11 +15,16 @@ import {
   loadEntries,
   selectEntry,
 } from "./entry-store-actions";
+import {
+  applyEntryFolder,
+  releaseFolder,
+  selectView,
+} from "./entry-store-folder-mutations";
 import { removeEntry, updateEntry } from "./entry-store-mutations";
 import { INITIAL_ENTRY_STATE, type EntryState } from "./entry-state";
 
 /**
- * 条目动作: 经主进程读取, 新建, 更新, 删除与复制条目字段, 并维护选中与搜索关键字.
+ * 条目动作: 经主进程读取, 新建, 更新, 删除与复制条目字段, 并维护选中, 搜索关键字与左侧栏入口.
  */
 export interface EntryActions {
   /**
@@ -73,6 +79,27 @@ export interface EntryActions {
    * @returns 复制成功时为 true.
    */
   copyCustomField: (id: string, customFieldId: string) => Promise<boolean>;
+  /**
+   * 切换左侧栏入口, 列表据此即时过滤; 选中的条目不属于新入口时回到没有选中的状态.
+   * @param view 要切换到的入口.
+   */
+  selectView: (view: FolderView) => void;
+  /**
+   * 在内存里把一个条目放进文件夹或移回未分类, 入口保持不动, 选中随之调整. 主进程里的归属须先
+   * 经文件夹接口写入.
+   * @param entryId 条目编号.
+   * @param folderId 目标文件夹编号, 未分类时为 undefined.
+   * @returns 选中相邻条目时, 它的详情读取完成后兑现.
+   */
+  applyEntryFolder: (
+    entryId: string,
+    folderId: string | undefined,
+  ) => Promise<void>;
+  /**
+   * 在内存里释放一个已被删除的文件夹: 其中条目回到未分类, 入口正是它时回到全部条目.
+   * @param folderId 被删除的文件夹编号.
+   */
+  releaseFolder: (folderId: string) => void;
 }
 
 /**
@@ -112,6 +139,10 @@ export function createEntryStore(
       copyField: (id, field) => copyEntryField(bridge, id, field),
       copyCustomField: (id, customFieldId) =>
         copyEntryCustomField(bridge, id, customFieldId),
+      selectView: (view) => selectView(access, view),
+      applyEntryFolder: (entryId, folderId) =>
+        applyEntryFolder(access, entryId, folderId),
+      releaseFolder: (folderId) => releaseFolder(access, folderId),
     };
   });
 }

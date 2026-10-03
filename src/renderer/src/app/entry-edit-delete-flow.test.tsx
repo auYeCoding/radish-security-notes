@@ -8,6 +8,10 @@ import {
   WALLET_ENTRY,
 } from "@renderer/testing/entry-fixtures";
 import {
+  getEntryList,
+  getEntryListItems,
+} from "@renderer/testing/entry-list-queries";
+import {
   createEntryTestEnvironment,
   type EntryTestEnvironment,
 } from "@renderer/testing/entry-test-environment";
@@ -35,7 +39,7 @@ async function renderWorkspace(
  * @param name 条目名称.
  */
 async function selectByName(name: string): Promise<void> {
-  const listItem = within(screen.getByRole("list")).getByRole("button", {
+  const listItem = within(getEntryList()).getByRole("button", {
     name: new RegExp(name),
   });
   await userEvent.setup().click(listItem);
@@ -47,7 +51,7 @@ async function selectByName(name: string): Promise<void> {
  * @returns 每个条目项的文字.
  */
 function listItemTexts(): string[] {
-  return screen.getAllByRole("listitem").map((item) => item.textContent ?? "");
+  return getEntryListItems().map((item) => item.textContent ?? "");
 }
 
 describe("工作区编辑条目", () => {
@@ -161,9 +165,7 @@ describe("工作区删除条目", () => {
       }),
     );
 
-    await waitFor(() =>
-      expect(screen.getAllByRole("listitem")).toHaveLength(2),
-    );
+    await waitFor(() => expect(getEntryListItems()).toHaveLength(2));
     expect(await screen.findByRole("heading", { name: "维基" })).toBeDefined();
     expect(screen.queryByText("银行")).toBeNull();
   });
@@ -200,7 +202,7 @@ describe("工作区取消删除与搜索中删除", () => {
 
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
     expect(entryBridge.remove).not.toHaveBeenCalled();
-    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    expect(getEntryListItems()).toHaveLength(3);
   });
 
   it("删除后搜索结果里不再有该条目", async () => {
