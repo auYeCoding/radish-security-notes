@@ -138,7 +138,7 @@ describe("点文件夹筛选条目", () => {
     expect(screen.getByText("这里还没有条目")).toBeDefined();
     await user.click(navButton("全部条目", 3));
 
-    expect(listedNames()).toEqual(["论坛", "银行", "维基"]);
+    expect(listedNames()).toEqual(["论坛", "维基", "银行"]);
   });
 
   it("搜索只在当前文件夹里进行, 回到全部条目后搜得到别处的条目", async () => {
@@ -157,7 +157,7 @@ describe("点文件夹筛选条目", () => {
     await renderWorkspace();
     const user = userEvent.setup();
     await user.click(
-      within(getEntryListItems()[2] as HTMLElement).getByRole("button"),
+      within(getEntryListItems()[1] as HTMLElement).getByRole("button"),
     );
     await screen.findByRole("heading", { name: "维基" });
 
@@ -176,7 +176,7 @@ describe("点文件夹筛选条目", () => {
     );
     expect(await screen.findByText("文件夹: 工作")).toBeDefined();
     await user.click(
-      within(getEntryListItems()[2] as HTMLElement).getByRole("button"),
+      within(getEntryListItems()[1] as HTMLElement).getByRole("button"),
     );
 
     expect(await screen.findByRole("heading", { name: "维基" })).toBeDefined();

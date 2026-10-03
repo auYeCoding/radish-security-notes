@@ -160,6 +160,20 @@ describe("条目 store 删除", () => {
   });
 });
 
+describe("条目 store 删除后的选中", () => {
+  it("按显示顺序 (名称排序) 选中相邻条目, 不按创建顺序", async () => {
+    const store = await createLoadedStore();
+    await store.getState().select("forum");
+
+    await store.getState().remove("forum");
+
+    expect(store.getState().selection).toMatchObject({
+      status: "ready",
+      detail: { id: "wiki" },
+    });
+  });
+});
+
 describe("条目 store 删除的边界", () => {
   it("搜索过滤时按当前可见的列表选中相邻条目", async () => {
     const store = await createLoadedStore();

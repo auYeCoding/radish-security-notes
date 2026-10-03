@@ -11,8 +11,8 @@ import { FolderSelectField } from "@renderer/components/entry-form/folder-select
 import { TagSelectField } from "@renderer/components/entry-form/tag-select-field";
 import { EntryTypeLabel } from "@renderer/components/entry-type-label";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
-import { useFolderStore } from "@renderer/stores/use-folder-store";
-import { useTagStore } from "@renderer/stores/use-tag-store";
+import { useSortedFolders } from "@renderer/stores/use-sorted-folders";
+import { useSortedTags } from "@renderer/stores/use-sorted-tags";
 
 import { EditTotpField } from "./edit-totp-field";
 import { useEditEntry } from "./use-edit-entry";
@@ -44,8 +44,8 @@ export function EditEntryForm(props: EditEntryFormProps): React.JSX.Element {
   const type = requireEntryType(detail.type);
   const { failureMessage, submit } = useEditEntry(detail.id, props.onSaved);
   const form = useFormContext<EditEntryFormValues>();
-  const folders = useFolderStore((state) => state.folders);
-  const tags = useTagStore((state) => state.tags);
+  const folders = useSortedFolders();
+  const tags = useSortedTags();
   return (
     <form
       noValidate

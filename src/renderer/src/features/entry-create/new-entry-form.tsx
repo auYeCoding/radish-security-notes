@@ -16,8 +16,8 @@ import { FolderSelectField } from "@renderer/components/entry-form/folder-select
 import { TagSelectField } from "@renderer/components/entry-form/tag-select-field";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { useEntryStore } from "@renderer/stores/use-entry-store";
-import { useFolderStore } from "@renderer/stores/use-folder-store";
-import { useTagStore } from "@renderer/stores/use-tag-store";
+import { useSortedFolders } from "@renderer/stores/use-sorted-folders";
+import { useSortedTags } from "@renderer/stores/use-sorted-tags";
 
 import { createDefaultFormValues } from "./new-entry-defaults";
 import { NewEntryTotpField } from "./new-entry-totp-field";
@@ -55,8 +55,8 @@ export function NewEntryForm(props: NewEntryFormProps): React.JSX.Element {
   const { type } = props;
   const { failureMessage, submit } = useCreateEntry(type.key, props.onCreated);
   const schema = useMemo(() => createNewEntrySchema(type), [type]);
-  const folders = useFolderStore((state) => state.folders);
-  const tags = useTagStore((state) => state.tags);
+  const folders = useSortedFolders();
+  const tags = useSortedTags();
   const defaultFolderId = useEntryStore((state) => folderIdOfView(state.view));
   const defaultTagIds = useEntryStore((state) => state.selectedTagIds);
   const form = useForm<NewEntryFormValues>({

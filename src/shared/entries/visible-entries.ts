@@ -1,4 +1,5 @@
 import { entriesInView, type FolderView } from "../folders/folder-view";
+import { sortByName } from "../name-sorting/sort-by-name";
 import { entriesWithAllTags } from "../tags/tag-filter";
 import type { EntrySummary } from "./entry-types";
 import { filterEntries } from "./filter-entries";
@@ -26,15 +27,16 @@ export interface EntryVisibility {
 }
 
 /**
- * 取出当前可见的条目: 先取属于所选文件夹入口的条目, 再留下带全部已选标签的, 最后在其中按关键字
- * 过滤, 保持原有顺序.
+ * 取出当前可见的条目: 先取属于所选文件夹入口的条目, 再留下带全部已选标签的, 然后在其中按关键字
+ * 过滤, 最后按名称排序规则排序. 名称排序键相同的条目保持传入数组里的先后, 所以传入的数组应是
+ * 创建顺序 (新的在前).
  * @param visibility 条目与筛选条件.
- * @returns 可见的条目摘要.
+ * @returns 可见的条目摘要, 已按名称排序.
  */
 export function selectVisibleEntries(
   visibility: EntryVisibility,
 ): readonly EntrySummary[] {
   const inView = entriesInView(visibility.entries, visibility.view);
   const tagged = entriesWithAllTags(inView, visibility.tagIds);
-  return filterEntries(tagged, visibility.query);
+  return sortByName(filterEntries(tagged, visibility.query));
 }

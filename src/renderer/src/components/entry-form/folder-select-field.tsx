@@ -34,7 +34,7 @@ interface FolderItem {
  */
 interface FolderSelectFieldProps {
   /**
-   * 可选的全部文件夹, 先创建的在前.
+   * 可选的全部文件夹, 按传入的顺序显示, 由调用方按名称排序规则排好.
    */
   readonly folders: readonly FolderSummary[];
 }

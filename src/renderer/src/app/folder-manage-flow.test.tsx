@@ -86,7 +86,7 @@ async function chooseFolderAction(
 }
 
 describe("新建文件夹与校验", () => {
-  it("填写名称后创建, 新文件夹出现在列表末尾, 条目数为 0", async () => {
+  it("填写名称后创建, 新文件夹出现在侧栏并追加到 store 列表末尾, 条目数为 0", async () => {
     const environment = await renderWorkspace();
     const user = userEvent.setup();
 

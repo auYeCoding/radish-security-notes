@@ -174,7 +174,7 @@ describe("标签筛选与选中的条目", () => {
     await renderWorkspace();
     const user = userEvent.setup();
     await user.click(
-      getEntryListItems()[2]?.querySelector("button") as Element,
+      getEntryListItems()[1]?.querySelector("button") as Element,
     );
     expect(await screen.findByRole("heading", { name: "维基" })).toBeDefined();
 

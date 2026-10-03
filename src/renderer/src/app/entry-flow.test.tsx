@@ -76,7 +76,7 @@ describe("解锁后的工作区", () => {
 });
 
 describe("工作区新建条目", () => {
-  it("选通用登录并保存后, 列表最前出现新条目, 右侧详情展示它并标明类型", async () => {
+  it("选通用登录并保存后, 新条目按名称排序规则出现在列表里, 右侧详情展示它并标明类型", async () => {
     await renderWorkspace();
     const user = userEvent.setup();
 
@@ -87,7 +87,7 @@ describe("工作区新建条目", () => {
 
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(getEntryListItems()).toHaveLength(4);
-    expect(getEntryListItems()[0]?.textContent).toContain(
+    expect(getEntryListItems()[3]?.textContent).toContain(
       "通用登录 · new-account",
     );
     expect(screen.getByRole("heading", { name: "新条目" })).toBeDefined();

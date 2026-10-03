@@ -78,7 +78,7 @@ async function chooseTagAction(
 }
 
 describe("侧栏标签分区", () => {
-  it("每个标签一行, 先创建的在前, 显示带这个标签的条目总数", async () => {
+  it("每个标签一行, 显示带这个标签的条目总数", async () => {
     await renderWorkspace();
 
     expect(navButton("重要", 1)).toBeDefined();
@@ -107,7 +107,7 @@ describe("侧栏标签分区", () => {
 });
 
 describe("新建标签", () => {
-  it("填写名称后创建, 默认第一种颜色, 新标签出现在列表末尾, 条目数为 0", async () => {
+  it("填写名称后创建, 默认第一种颜色, 新标签出现在侧栏并追加到 store 列表末尾, 条目数为 0", async () => {
     const environment = await renderWorkspace();
     const user = userEvent.setup();
 

@@ -8,6 +8,7 @@ import { EmptyState } from "@renderer/components/empty-state";
 import { SidebarNavItem } from "@renderer/components/sidebar-nav-item";
 import { TagColorDot } from "@renderer/components/tag-color-dot";
 import { useEntryStore } from "@renderer/stores/use-entry-store";
+import { useSortedTags } from "@renderer/stores/use-sorted-tags";
 import { useTagStore } from "@renderer/stores/use-tag-store";
 
 /**
@@ -21,14 +22,14 @@ interface TagListProps {
 }
 
 /**
- * 侧栏的标签列表: 每个标签一行, 显示颜色点, 名称与带这个标签的条目总数, 点一行切换它的选中状态,
+ * 侧栏的标签列表: 每个标签一行 (按名称排序规则排列), 显示颜色点, 名称与带这个标签的条目总数, 点一行切换它的选中状态,
  * 可以同时选中多个, 中间列表只显示带全部已选标签的条目. 读取失败或没有标签时在列表下方说明.
  * @param props 组件属性.
  * @returns 标签列表元素.
  */
 export function TagList(props: TagListProps): React.JSX.Element {
   const { t } = useTranslation();
-  const tags = useTagStore((state) => state.tags);
+  const tags = useSortedTags();
   const loadStatus = useTagStore((state) => state.loadStatus);
   const entries = useEntryStore((state) => state.entries);
   const selectedTagIds = useEntryStore((state) => state.selectedTagIds);

@@ -71,8 +71,8 @@ describe("工作区编辑条目", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(screen.getByRole("heading", { name: "新银行" })).toBeDefined();
     expect(screen.getByText("new-bank-account")).toBeDefined();
-    expect(listItemTexts()[1]).toContain("新银行");
-    expect(listItemTexts()[1]).toContain("new-bank-account");
+    expect(listItemTexts()[2]).toContain("新银行");
+    expect(listItemTexts()[2]).toContain("new-bank-account");
   });
 
   it("编辑后复制的是新值", async () => {

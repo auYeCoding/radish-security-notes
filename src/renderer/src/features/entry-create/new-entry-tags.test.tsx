@@ -53,9 +53,9 @@ describe("新建条目表单里的标签", () => {
 
     const options = await screen.findAllByRole("option");
     expect(options.map((option) => option.textContent)).toEqual([
-      "重要",
       "工作",
       "个人",
+      "重要",
     ]);
   });
 

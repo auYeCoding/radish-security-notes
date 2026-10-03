@@ -32,7 +32,7 @@ import { describeEntryFormError } from "./entry-form-errors";
  */
 interface TagSelectFieldProps {
   /**
-   * 可选的全部标签, 先创建的在前.
+   * 可选的全部标签, 按传入的顺序显示, 由调用方按名称排序规则排好.
    */
   readonly tags: readonly TagSummary[];
 }
