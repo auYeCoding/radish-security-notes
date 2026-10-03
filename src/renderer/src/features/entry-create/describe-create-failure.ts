@@ -16,6 +16,8 @@ export function describeCreateFailure(
       return translate("entryCreate.error.invalid");
     case "folder-not-found":
       return translate("entryCreate.error.folderNotFound");
+    case "tag-not-found":
+      return translate("entryCreate.error.tagNotFound");
     default:
       return translate("entryCreate.error.unexpected");
   }

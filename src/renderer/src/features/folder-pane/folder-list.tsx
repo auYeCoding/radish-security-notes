@@ -13,7 +13,7 @@ import {
 import { UNCATEGORIZED_KEY } from "@shared/folders/uncategorized-key";
 
 import { EmptyState } from "@renderer/components/empty-state";
-import { FolderNavItem } from "@renderer/components/folder-nav-item";
+import { SidebarNavItem } from "@renderer/components/sidebar-nav-item";
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 import { useFolderStore } from "@renderer/stores/use-folder-store";
 
@@ -44,14 +44,14 @@ export function FolderList(props: FolderListProps): React.JSX.Element {
   return (
     <>
       <ul>
-        <FolderNavItem
+        <SidebarNavItem
           label={t("folderPane.allEntries")}
           icon={<ListIcon aria-hidden="true" />}
           count={entries.length}
           isSelected={isSameView(view, ALL_ENTRIES_VIEW)}
           onSelect={() => selectView(ALL_ENTRIES_VIEW)}
         />
-        <FolderNavItem
+        <SidebarNavItem
           label={t("folderPane.uncategorized")}
           icon={<InboxIcon aria-hidden="true" />}
           count={countEntriesInView(entries, UNCATEGORIZED_VIEW)}
@@ -60,7 +60,7 @@ export function FolderList(props: FolderListProps): React.JSX.Element {
           dropTargetId={UNCATEGORIZED_KEY}
         />
         {folders.map((folder) => (
-          <FolderNavItem
+          <SidebarNavItem
             key={folder.id}
             label={folder.name}
             icon={<FolderIcon aria-hidden="true" />}

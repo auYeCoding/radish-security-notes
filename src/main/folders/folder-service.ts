@@ -7,11 +7,11 @@ import {
 } from "@shared/folders/folder-result";
 import type { FolderSummary } from "@shared/folders/folder-types";
 
-import type { VaultOrm } from "../vault/database/drizzle-adapter";
 import {
-  runWithFolderDatabase,
-  type FolderDatabaseAccess,
-} from "./folder-database-access";
+  runWithDatabase,
+  type DatabaseAccess,
+} from "../vault/database/database-access";
+import type { VaultOrm } from "../vault/database/drizzle-adapter";
 import {
   deleteFolderKeepingEntries,
   findFolder,
@@ -25,7 +25,7 @@ import {
 /**
  * 文件夹服务的依赖.
  */
-export interface FolderServiceDependencies extends FolderDatabaseAccess {
+export interface FolderServiceDependencies extends DatabaseAccess {
   /**
    * 生成新文件夹的唯一编号.
    */
@@ -175,13 +175,13 @@ export class FolderService {
   }
 
   /**
-   * 在已解锁的数据库上执行一个操作, 未解锁与意外失败的处理见 `runWithFolderDatabase`.
+   * 在已解锁的数据库上执行一个操作, 未解锁与意外失败的处理见 `runWithDatabase`.
    * @param operation 要执行的操作.
    * @returns 操作结果.
    */
   private withDatabase<Value>(
     operation: (orm: VaultOrm) => FolderResult<Value>,
   ): FolderResult<Value> {
-    return runWithFolderDatabase(this.dependencies, operation);
+    return runWithDatabase(this.dependencies, operation);
   }
 }

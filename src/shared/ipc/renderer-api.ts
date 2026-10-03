@@ -2,6 +2,7 @@ import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
 import type { FolderBridge } from "../folders/folder-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
+import type { TagBridge } from "../tags/tag-bridge";
 import type { RecoveryBridge } from "../vault/recovery-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
 
@@ -29,6 +30,10 @@ export interface RendererApi {
    * 文件夹接口: 读取, 新建, 重命名与删除文件夹, 把条目放进文件夹.
    */
   readonly folders: FolderBridge;
+  /**
+   * 标签接口: 读取, 新建, 编辑与删除标签.
+   */
+  readonly tags: TagBridge;
   /**
    * TOTP 接口: 读取验证码与密钥, 复制验证码与密钥, 解码二维码图片.
    */

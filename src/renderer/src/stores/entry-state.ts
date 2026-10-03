@@ -93,13 +93,19 @@ export interface EntryState {
    */
   readonly view: FolderView;
   /**
+   * 左侧栏当前选中的标签编号, 按选中的先后排列. 列表只显示带全部这些标签的条目, 与文件夹入口
+   * 叠加取交集, 搜索也只在其中进行. 只在内存里, 不持久化.
+   */
+  readonly selectedTagIds: readonly string[];
+  /**
    * 条目被编辑保存的次数. 详情视图把它放进 key, 让验证码与已显示的密钥在保存后回到最新.
    */
   readonly detailRevision: number;
 }
 
 /**
- * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空, 入口是全部条目, 还没有编辑过.
+ * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空, 入口是全部条目, 没有选中标签,
+ * 还没有编辑过.
  */
 export const INITIAL_ENTRY_STATE: EntryState = {
   entries: [],
@@ -107,6 +113,7 @@ export const INITIAL_ENTRY_STATE: EntryState = {
   selection: { status: "none" },
   query: "",
   view: ALL_ENTRIES_VIEW,
+  selectedTagIds: [],
   detailRevision: 0,
 };
 

@@ -25,13 +25,17 @@ interface EntryFormFieldsProps {
    */
   readonly folderField: ReactNode;
   /**
+   * 所属文件夹之后的标签选择, 新建与编辑各自给出.
+   */
+  readonly tagField: ReactNode;
+  /**
    * 字段区末尾的 TOTP 区, 新建与编辑各自给出.
    */
   readonly totpField: ReactNode;
 }
 
 /**
- * 条目表单的字段区, 新建与编辑共用: 依次是名称, 调用方给出的所属文件夹选择, 该类型的字段,
+ * 条目表单的字段区, 新建与编辑共用: 依次是名称, 调用方给出的所属文件夹与标签选择, 该类型的字段,
  * 自定义字段, 备注与调用方给出的 TOTP 区. 超过限定高度时在区域内滚动. 必须在 `FormProvider` 里使用.
  * @param props 组件属性.
  * @returns 字段区元素.
@@ -46,6 +50,7 @@ export function EntryFormFields(
       <FieldGroup>
         <EntryNameField />
         {props.folderField}
+        {props.tagField}
         <TypeFieldsEditor type={props.type} />
         <CustomFieldsEditor />
         <TextareaField

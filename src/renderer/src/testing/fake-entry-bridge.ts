@@ -44,6 +44,7 @@ function detailFromCreate(id: string, input: NewEntryInput): EntryDetail {
     customFields: withFieldIdentifiers("created-field", input.customFields),
     hasTotp: input.totp.trim() !== "",
     folderId: input.folderId,
+    tagIds: input.tagIds,
   };
 }
 
@@ -72,6 +73,7 @@ function detailFromUpdate(
     ),
     hasTotp,
     folderId: input.folderId,
+    tagIds: input.tagIds,
   };
 }
 

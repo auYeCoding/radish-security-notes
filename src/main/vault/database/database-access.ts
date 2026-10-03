@@ -1,11 +1,15 @@
-import { entryFailed, type EntryResult } from "@shared/entries/entry-result";
+import type { DatabaseFailureReason } from "@shared/result/database-failure-reason";
+import {
+  operationFailed,
+  type OperationResult,
+} from "@shared/result/operation-result";
 
-import type { VaultOrm } from "../vault/database/drizzle-adapter";
+import type { VaultOrm } from "./drizzle-adapter";
 
 /**
- * 在已解锁的数据库上执行条目操作需要的依赖.
+ * 在已解锁的数据库上执行操作需要的依赖.
  */
-export interface EntryDatabaseAccess {
+export interface DatabaseAccess {
   /**
    * 取已解锁数据库的查询入口, 未解锁时返回 undefined.
    */
@@ -23,18 +27,18 @@ export interface EntryDatabaseAccess {
  * @param operation 要执行的操作.
  * @returns 操作结果.
  */
-export function runWithEntryDatabase<Value>(
-  access: EntryDatabaseAccess,
-  operation: (orm: VaultOrm) => EntryResult<Value>,
-): EntryResult<Value> {
+export function runWithDatabase<Value, Reason extends string>(
+  access: DatabaseAccess,
+  operation: (orm: VaultOrm) => OperationResult<Value, Reason>,
+): OperationResult<Value, Reason | DatabaseFailureReason> {
   const orm = access.getOrm();
   if (orm === undefined) {
-    return entryFailed("vault-locked");
+    return operationFailed("vault-locked");
   }
   try {
     return operation(orm);
   } catch (error) {
     access.onFailure(error);
-    return entryFailed("unexpected-error");
+    return operationFailed("unexpected-error");
   }
 }

@@ -5,12 +5,13 @@ import {
   NEW_ENTRY_ERROR_CODES,
 } from "@shared/entries/new-entry-schema";
 import type { EntryFieldKey } from "@shared/entries/preset-entry-types";
+import { MAX_TAGS_PER_ENTRY } from "@shared/tags/tag-limits";
 import { MAX_TOTP_PERIOD_SECONDS } from "@shared/entries/totp-config";
 import { TOTP_INPUT_ERROR_CODES } from "@shared/entries/totp-input-parser";
 import type { TFunction } from "i18next";
 
 /**
- * 把条目表单里名称, 自定义字段与 TOTP 的校验错误代码换成当前语言的文案.
+ * 把条目表单里名称, 自定义字段, TOTP 与标签的校验错误代码换成当前语言的文案.
  * @param code 校验消息, 由条目内容的校验方案, 自定义字段的校验方案与 TOTP 解析产生.
  * @param translate 翻译函数.
  * @returns 文案, 不认识的代码返回 undefined.
@@ -26,6 +27,12 @@ export function describeEntryFormError(
       return translate("entryForm.error.nameTooLong", {
         maxLength: ENTRY_NAME_MAX_LENGTH,
       });
+    case NEW_ENTRY_ERROR_CODES.tooManyTags:
+      return translate("entryForm.error.tooManyTags", {
+        maxCount: MAX_TAGS_PER_ENTRY,
+      });
+    case NEW_ENTRY_ERROR_CODES.duplicateTags:
+      return translate("entryForm.error.duplicateTags");
     case CUSTOM_FIELD_ERROR_CODES.labelRequired:
       return translate("entryForm.error.customFieldLabelRequired");
     case TOTP_INPUT_ERROR_CODES.invalid:

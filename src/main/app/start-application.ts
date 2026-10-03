@@ -6,6 +6,7 @@ import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
 import { registerRecoveryIpc } from "../ipc/recovery-ipc";
+import { registerTagIpc } from "../ipc/tag-ipc";
 import { registerTotpIpc } from "../ipc/totp-ipc";
 import { registerVaultIpc } from "../ipc/vault-ipc";
 import { resolveWindowBackground } from "../theme/window-background";
@@ -18,6 +19,7 @@ import {
 import { createEntryRuntime } from "./entry-runtime";
 import { createFolderService } from "./folder-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
+import { createTagService } from "./tag-runtime";
 import { createVaultRuntime } from "./vault-runtime";
 
 /**
@@ -77,6 +79,7 @@ export async function startApplication(): Promise<void> {
   const entries = createEntryRuntime(vault.service);
   registerEntryIpc(ipcMain, entries.service);
   registerFolderIpc(ipcMain, createFolderService(vault.service));
+  registerTagIpc(ipcMain, createTagService(vault.service));
   registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
   app.on("will-quit", () => vault.service.close());
   keepWindowsInSync(runtime);

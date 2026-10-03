@@ -16,17 +16,25 @@ import {
   findEntryType,
   requireEntryType,
 } from "@shared/entries/preset-entry-types";
+import { tagIdsOrOmitted } from "@shared/tags/tag-filter";
 
 import { isFolderChoiceValid } from "../folders/folder-repository";
+import {
+  areAllTagsExisting,
+  listTagIdsByEntry,
+  listTagIdsOfEntry,
+  replaceEntryTags,
+} from "../tags/entry-tag-repository";
+import {
+  runWithDatabase,
+  type DatabaseAccess,
+} from "../vault/database/database-access";
 import type { VaultOrm } from "../vault/database/drizzle-adapter";
 import type { ClipboardPort } from "./clipboard-port";
 import { findCustomField } from "./custom-field-records";
-import {
-  runWithEntryDatabase,
-  type EntryDatabaseAccess,
-} from "./entry-database-access";
 import { findCopyValue, normalizeFieldValues } from "./entry-field-values";
 import { buildEntryRecord } from "./entry-record-builder";
+import { attachTagIds } from "./entry-tag-attachment";
 import {
   deleteEntry,
   findEntry,
@@ -40,7 +48,7 @@ import { buildUpdatedRecord } from "./entry-update-builder";
 /**
  * 条目服务的依赖.
  */
-export interface EntryServiceDependencies extends EntryDatabaseAccess {
+export interface EntryServiceDependencies extends DatabaseAccess {
   /**
    * 系统剪贴板.
    */
@@ -58,10 +66,11 @@ export interface EntryServiceDependencies extends EntryDatabaseAccess {
 /**
  * 把表里的一行转成条目详情, 类型字段按类型补全.
  * @param record 条目所在的行.
+ * @param tagIds 条目带的标签编号, 按选择顺序排列.
  * @returns 条目详情.
  * @throws Error 当行里的类型不是预设类型时.
  */
-function toDetail(record: EntryRecord): EntryDetail {
+function toDetail(record: EntryRecord, tagIds: readonly string[]): EntryDetail {
   const type = requireEntryType(record.type);
   const fields = normalizeFieldValues(type, record.fields);
   return {
@@ -74,6 +83,7 @@ function toDetail(record: EntryRecord): EntryDetail {
     customFields: record.customFields,
     hasTotp: record.totp !== null,
     folderId: record.folderId ?? undefined,
+    tagIds: tagIdsOrOmitted(tagIds),
   };
 }
 
@@ -89,11 +99,15 @@ export class EntryService {
   constructor(private readonly dependencies: EntryServiceDependencies) {}
 
   /**
-   * 读取全部条目的摘要, 最新创建的在最前.
+   * 读取全部条目的摘要, 最新创建的在最前, 带标签的条目摘要里有标签编号.
    * @returns 摘要列表, 未解锁时为失败结果.
    */
   list(): EntryResult<readonly EntrySummary[]> {
-    return this.withDatabase((orm) => entrySucceeded(listEntrySummaries(orm)));
+    return this.withDatabase((orm) =>
+      entrySucceeded(
+        attachTagIds(listEntrySummaries(orm), listTagIdsByEntry(orm)),
+      ),
+    );
   }
 
   /**
@@ -106,15 +120,16 @@ export class EntryService {
       const record = findEntry(orm, id);
       return record === undefined
         ? entryFailed("not-found")
-        : entrySucceeded(toDetail(record));
+        : entrySucceeded(toDetail(record, listTagIdsOfEntry(orm, id)));
     });
   }
 
   /**
    * 新建一个条目: 按类型校验输入, 名称与自定义字段的字段名去首尾空格, 生成条目编号, 自定义
-   * 字段编号与创建时间后写入数据库. 选了所属文件夹时, 文件夹必须存在.
-   * @param input 用户选的类型, 填写的名称, 类型字段, 备注, 自定义字段与所属文件夹.
-   * @returns 新建的条目详情, 未解锁, 输入不合规 (含未知类型) 或所选文件夹不存在时为失败结果.
+   * 字段编号与创建时间后写入数据库. 选了所属文件夹与标签时, 它们必须存在; 条目与标签关联
+   * 在同一个事务里写入.
+   * @param input 用户选的类型, 填写的名称, 类型字段, 备注, 自定义字段, 所属文件夹与标签.
+   * @returns 新建的条目详情, 未解锁, 输入不合规 (含未知类型), 所选文件夹或标签不存在时为失败结果.
    */
   create(input: NewEntryInput): EntryResult<EntryDetail> {
     return this.withDatabase((orm) => {
@@ -129,24 +144,32 @@ export class EntryService {
       if (!isFolderChoiceValid(orm, parsed.data.folderId)) {
         return entryFailed("folder-not-found");
       }
+      const tagIds = parsed.data.tagIds ?? [];
+      if (!areAllTagsExisting(orm, tagIds)) {
+        return entryFailed("tag-not-found");
+      }
       const record = buildEntryRecord({
         type,
         values: parsed.data,
         createIdentifier: this.dependencies.createIdentifier,
         createdAt: this.dependencies.now(),
       });
-      insertEntry(orm, record);
-      return entrySucceeded(toDetail(record));
+      orm.transaction((transaction) => {
+        insertEntry(transaction, record);
+        replaceEntryTags(transaction, record.id, tagIds);
+      });
+      return entrySucceeded(toDetail(record, tagIds));
     });
   }
 
   /**
    * 更新一个条目: 按条目已保存的类型校验输入, 名称与自定义字段的字段名去首尾空格, 自定义字段
    * 重新分配编号后写回数据库. 条目的编号, 类型与创建时间不变, 所属文件夹以输入为准, 省略表示
-   * 未分类, 选了文件夹时文件夹必须存在.
+   * 未分类, 选了文件夹时文件夹必须存在; 标签也以输入为准, 省略表示摘掉全部标签, 选了标签时
+   * 标签必须存在, 条目与标签关联在同一个事务里改写.
    * @param id 条目编号.
-   * @param input 用户填写的名称, 类型字段, 备注, 自定义字段, TOTP 的处理方式与所属文件夹.
-   * @returns 更新后的条目详情, 未解锁, 没有这个编号, 输入不合规或所选文件夹不存在时为失败结果.
+   * @param input 用户填写的名称, 类型字段, 备注, 自定义字段, TOTP 的处理方式, 所属文件夹与标签.
+   * @returns 更新后的条目详情, 未解锁, 没有这个编号, 输入不合规, 所选文件夹或标签不存在时为失败结果.
    */
   update(id: string, input: UpdateEntryInput): EntryResult<EntryDetail> {
     return this.withDatabase((orm) => {
@@ -165,13 +188,20 @@ export class EntryService {
       if (!isFolderChoiceValid(orm, parsed.data.folderId)) {
         return entryFailed("folder-not-found");
       }
+      const tagIds = parsed.data.tagIds ?? [];
+      if (!areAllTagsExisting(orm, tagIds)) {
+        return entryFailed("tag-not-found");
+      }
       const record = buildUpdatedRecord({
         existing,
         values: parsed.data,
         createIdentifier: this.dependencies.createIdentifier,
       });
-      updateEntry(orm, record);
-      return entrySucceeded(toDetail(record));
+      orm.transaction((transaction) => {
+        updateEntry(transaction, record);
+        replaceEntryTags(transaction, record.id, tagIds);
+      });
+      return entrySucceeded(toDetail(record, tagIds));
     });
   }
 
@@ -229,13 +259,13 @@ export class EntryService {
   }
 
   /**
-   * 在已解锁的数据库上执行一个操作, 未解锁与意外失败的处理见 `runWithEntryDatabase`.
+   * 在已解锁的数据库上执行一个操作, 未解锁与意外失败的处理见 `runWithDatabase`.
    * @param operation 要执行的操作.
    * @returns 操作结果.
    */
   private withDatabase<Value>(
     operation: (orm: VaultOrm) => EntryResult<Value>,
   ): EntryResult<Value> {
-    return runWithEntryDatabase(this.dependencies, operation);
+    return runWithDatabase(this.dependencies, operation);
   }
 }

@@ -5,8 +5,8 @@ import type {
 } from "@shared/entries/entry-types";
 
 /**
- * 把条目详情转成编辑表单的初始取值: 名称, 类型字段, 备注, 自定义字段与所属文件夹预填现值, TOTP
- * 输入留空表示保持不变, 不移除 TOTP. 自定义字段的编号不进表单, 保存时由主进程重新分配.
+ * 把条目详情转成编辑表单的初始取值: 名称, 类型字段, 备注, 自定义字段, 所属文件夹与标签预填现值,
+ * TOTP 输入留空表示保持不变, 不移除 TOTP. 自定义字段的编号不进表单, 保存时由主进程重新分配.
  * @param detail 要编辑的条目详情.
  * @returns 表单初始取值.
  */
@@ -23,6 +23,7 @@ export function createEditFormValues(detail: EntryDetail): EditEntryFormValues {
     totp: "",
     removeTotp: false,
     folderId: detail.folderId,
+    tagIds: detail.tagIds === undefined ? undefined : [...detail.tagIds],
   };
 }
 
@@ -42,5 +43,6 @@ export function toUpdateEntryInput(
     totp: values.totp,
     removeTotp: values.removeTotp,
     folderId: values.folderId,
+    tagIds: values.tagIds,
   };
 }

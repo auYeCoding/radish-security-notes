@@ -28,6 +28,15 @@
   --sidebar-foreground: var(--slate-900);
   --sidebar-border: var(--slate-200);
 
+  --tag-slate: var(--slate-500);
+  --tag-red: var(--red-600);
+  --tag-orange: var(--orange-600);
+  --tag-amber: var(--amber-600);
+  --tag-green: var(--green-600);
+  --tag-blue: var(--blue-600);
+  --tag-violet: var(--violet-600);
+  --tag-pink: var(--pink-600);
+
   --radius: var(--radius-6);
   --radius-container: var(--radius-8);
   --space-base: var(--space-unit);
@@ -68,6 +77,15 @@
   --sidebar: var(--slate-925);
   --sidebar-foreground: var(--slate-50);
   --sidebar-border: var(--slate-800);
+
+  --tag-slate: var(--slate-400);
+  --tag-red: var(--red-400);
+  --tag-orange: var(--orange-400);
+  --tag-amber: var(--amber-400);
+  --tag-green: var(--green-400);
+  --tag-blue: var(--blue-400);
+  --tag-violet: var(--violet-400);
+  --tag-pink: var(--pink-400);
 }
 
 @media (prefers-reduced-motion: reduce) {

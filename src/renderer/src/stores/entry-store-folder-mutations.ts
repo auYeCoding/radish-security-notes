@@ -1,8 +1,7 @@
 import type { EntrySummary } from "@shared/entries/entry-types";
-import { filterEntries } from "@shared/entries/filter-entries";
+import { selectVisibleEntries } from "@shared/entries/visible-entries";
 import {
   ALL_ENTRIES_VIEW,
-  entriesInView,
   isEntryInView,
   type FolderView,
 } from "@shared/folders/folder-view";
@@ -46,7 +45,7 @@ export function selectView(access: EntryStoreAccess, view: FolderView): void {
 
 /**
  * 在内存里把一个条目放进文件夹或移回未分类, 入口保持不动. 条目因此不再属于当前入口且正被选中时,
- * 按当前可见列表选中相邻条目并读取它的详情, 没有别的条目时回到没有选中的状态; 入口是全部条目
+ * 按当前可见列表 (入口, 已选标签与搜索关键字) 选中相邻条目并读取它的详情, 没有别的条目时回到没有选中的状态; 入口是全部条目
  * 时条目仍留在列表里. 主进程里的归属由文件夹接口另行写入.
  * @param access store 动作能用到的东西.
  * @param entryId 条目编号.
@@ -58,7 +57,7 @@ export async function applyEntryFolder(
   entryId: string,
   folderId: string | undefined,
 ): Promise<void> {
-  const { entries, query, selection, view } = access.get();
+  const { entries, query, selection, selectedTagIds, view } = access.get();
   const moved = entries.map((entry) =>
     entry.id === entryId ? { ...entry, folderId } : entry,
   );
@@ -74,7 +73,12 @@ export async function applyEntryFolder(
     });
     return;
   }
-  const visible = filterEntries(entriesInView(entries, view), query);
+  const visible = selectVisibleEntries({
+    entries,
+    view,
+    tagIds: selectedTagIds,
+    query,
+  });
   const neighbour: EntrySummary | undefined = findNeighbour(visible, entryId);
   access.set({
     entries: moved,

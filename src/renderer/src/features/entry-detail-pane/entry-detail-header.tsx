@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { EntryDetail } from "@shared/entries/entry-types";
 
 import { DetailFolderLabel } from "./detail-folder-label";
+import { DetailTagBadges } from "./detail-tag-badges";
 import { DetailTypeLabel } from "./detail-type-label";
 
 /**
@@ -20,7 +21,7 @@ interface EntryDetailHeaderProps {
 }
 
 /**
- * 详情的标题行: 左侧上方标明类型, 其下是名称与所属文件夹, 右侧是调用方给出的操作.
+ * 详情的标题行: 左侧上方标明类型, 其下是名称, 所属文件夹与带的标签, 右侧是调用方给出的操作.
  * @param props 组件属性.
  * @returns 标题行元素.
  */
@@ -35,6 +36,7 @@ export function EntryDetailHeader(
           {props.detail.name}
         </h2>
         <DetailFolderLabel folderId={props.detail.folderId} />
+        <DetailTagBadges tagIds={props.detail.tagIds} />
       </div>
       {props.actions !== undefined && (
         <div className="flex shrink-0 items-center gap-1">{props.actions}</div>

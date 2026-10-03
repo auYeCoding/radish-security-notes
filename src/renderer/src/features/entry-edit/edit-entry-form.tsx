@@ -8,9 +8,11 @@ import { requireEntryType } from "@shared/entries/preset-entry-types";
 import { EntryFormActions } from "@renderer/components/entry-form/entry-form-actions";
 import { EntryFormFields } from "@renderer/components/entry-form/entry-form-fields";
 import { FolderSelectField } from "@renderer/components/entry-form/folder-select-field";
+import { TagSelectField } from "@renderer/components/entry-form/tag-select-field";
 import { EntryTypeLabel } from "@renderer/components/entry-type-label";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { useFolderStore } from "@renderer/stores/use-folder-store";
+import { useTagStore } from "@renderer/stores/use-tag-store";
 
 import { EditTotpField } from "./edit-totp-field";
 import { useEditEntry } from "./use-edit-entry";
@@ -30,7 +32,7 @@ interface EditEntryFormProps {
 }
 
 /**
- * 编辑条目的表单: 顶部标明条目类型 (不能更换), 之后依次是名称, 所属文件夹, 该类型的字段, 自定义
+ * 编辑条目的表单: 顶部标明条目类型 (不能更换), 之后依次是名称, 所属文件夹, 标签, 该类型的字段, 自定义
  * 字段, 备注与 TOTP, 最后是取消, 保存按钮. 保存失败的原因显示在字段区域上方的提示条里, 校验错误显示在对应
  * 字段下方. 必须在 `FormProvider` 里使用, 表单的初始取值与校验方案由外层的对话框给出.
  * @param props 组件属性.
@@ -43,6 +45,7 @@ export function EditEntryForm(props: EditEntryFormProps): React.JSX.Element {
   const { failureMessage, submit } = useEditEntry(detail.id, props.onSaved);
   const form = useFormContext<EditEntryFormValues>();
   const folders = useFolderStore((state) => state.folders);
+  const tags = useTagStore((state) => state.tags);
   return (
     <form
       noValidate
@@ -58,6 +61,7 @@ export function EditEntryForm(props: EditEntryFormProps): React.JSX.Element {
       <EntryFormFields
         type={type}
         folderField={<FolderSelectField folders={folders} />}
+        tagField={<TagSelectField tags={tags} />}
         totpField={<EditTotpField hasTotp={detail.hasTotp} />}
       />
       <EntryFormActions

@@ -6,6 +6,7 @@ import {
   type NewEntryInput,
 } from "@shared/entries/entry-types";
 import { followEntryView } from "@shared/folders/folder-view";
+import { followEntryTags } from "@shared/tags/tag-filter";
 
 import { selectedIdOf, type EntryState } from "./entry-state";
 
@@ -92,9 +93,10 @@ export async function selectEntry(
 
 /**
  * 新建一个条目. 成功后条目放到列表最前, 被选中并展示详情, 搜索关键字清空, 入口跟随条目 (新条目
- * 不属于当前入口时切到它所属的文件夹), 让新条目一定出现在列表里.
+ * 不属于当前入口时切到它所属的文件夹), 已选标签跟随条目 (取消新条目不带的已选标签), 让新条目
+ * 一定出现在列表里.
  * @param access store 动作能用到的东西.
- * @param input 用户选的类型, 填写的名称, 类型字段, 备注与自定义字段.
+ * @param input 用户选的类型, 填写的名称, 类型字段, 备注, 自定义字段, 所属文件夹与标签.
  * @returns 新建结果, 接口调用抛出错误时为意外错误.
  */
 export async function createEntry(
@@ -110,6 +112,10 @@ export async function createEntry(
         selection: { status: "ready", detail: result.value },
         query: "",
         view: followEntryView(get().view, result.value.folderId),
+        selectedTagIds: followEntryTags(
+          get().selectedTagIds,
+          result.value.tagIds,
+        ),
       });
     }
     return result;

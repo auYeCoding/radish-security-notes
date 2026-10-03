@@ -21,10 +21,12 @@ import {
   selectView,
 } from "./entry-store-folder-mutations";
 import { removeEntry, updateEntry } from "./entry-store-mutations";
+import { releaseTag, toggleTag } from "./entry-store-tag-mutations";
 import { INITIAL_ENTRY_STATE, type EntryState } from "./entry-state";
 
 /**
- * 条目动作: 经主进程读取, 新建, 更新, 删除与复制条目字段, 并维护选中, 搜索关键字与左侧栏入口.
+ * 条目动作: 经主进程读取, 新建, 更新, 删除与复制条目字段, 并维护选中, 搜索关键字, 左侧栏入口与
+ * 已选标签.
  */
 export interface EntryActions {
   /**
@@ -100,6 +102,17 @@ export interface EntryActions {
    * @param folderId 被删除的文件夹编号.
    */
   releaseFolder: (folderId: string) => void;
+  /**
+   * 切换左侧栏里一个标签的选中状态, 列表据此即时过滤; 选中的条目不再带全部已选标签时回到没有
+   * 选中的状态.
+   * @param tagId 被点击的标签编号.
+   */
+  toggleTag: (tagId: string) => void;
+  /**
+   * 在内存里释放一个已被删除的标签: 条目上带的它被摘掉, 已选标签里的它被去掉.
+   * @param tagId 被删除的标签编号.
+   */
+  releaseTag: (tagId: string) => void;
 }
 
 /**
@@ -143,6 +156,8 @@ export function createEntryStore(
       applyEntryFolder: (entryId, folderId) =>
         applyEntryFolder(access, entryId, folderId),
       releaseFolder: (folderId) => releaseFolder(access, folderId),
+      toggleTag: (tagId) => toggleTag(access, tagId),
+      releaseTag: (tagId) => releaseTag(access, tagId),
     };
   });
 }

@@ -17,6 +17,7 @@
     "allEntries": "All entries",
     "uncategorized": "Uncategorized",
     "loadFailed": "Unable to load folders. Close the app and try again.",
+    "tagsLoadFailed": "Unable to load tags. Close the app and try again.",
     "actions": "More actions for {name}"
   },
   "folderName": {
@@ -58,6 +59,56 @@
       "unexpected": "Deleting failed. Close the app and try again."
     }
   },
+  "tagName": {
+    "label": "Name",
+    "colorLabel": "Color",
+    "cancel": "Cancel",
+    "error": {
+      "nameRequired": "Enter a name.",
+      "nameTooLong": "The name can have at most {maxLength} characters.",
+      "nameTaken": "A tag with this name already exists. Choose another name.",
+      "invalid": "The name or color is not valid. Check it and try again.",
+      "notFound": "This tag no longer exists.",
+      "unexpected": "The action failed. Close the app and try again."
+    }
+  },
+  "tagColors": {
+    "slate": "Gray",
+    "red": "Red",
+    "orange": "Orange",
+    "amber": "Amber",
+    "green": "Green",
+    "blue": "Blue",
+    "violet": "Violet",
+    "pink": "Pink"
+  },
+  "tagCreate": {
+    "open": "New tag",
+    "title": "New tag",
+    "description": "The name can have at most {maxLength} characters and must differ from your other tags. You can change the color at any time.",
+    "submit": "Create",
+    "submitting": "Creating..."
+  },
+  "tagEdit": {
+    "open": "Edit",
+    "title": "Edit tag",
+    "description": "You can change the name and the color. The name can have at most {maxLength} characters and must differ from your other tags.",
+    "submit": "Save",
+    "submitting": "Saving..."
+  },
+  "tagDelete": {
+    "open": "Delete",
+    "title": "Delete this tag?",
+    "descriptionEmpty": "\"{name}\" will be deleted.",
+    "descriptionWithEntries": "\"{name}\" will be deleted. {count, plural, one {# entry loses} other {# entries lose}} this tag and {count, plural, one {is} other {are}} not deleted.",
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "deleting": "Deleting...",
+    "error": {
+      "notFound": "This tag no longer exists.",
+      "unexpected": "Deleting failed. Close the app and try again."
+    }
+  },
   "dragDrop": {
     "roleDescription": "Draggable entry",
     "instructions": "Press M to pick up the entry, use the arrow keys to move it onto a folder on the left, press Enter to drop it and Escape to cancel. You can also choose the folder when you edit the entry.",
@@ -90,7 +141,8 @@
     "fieldHidden": "{label} hidden",
     "copied": "Copied",
     "folder": "Folder: {name}",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "tags": "Tags"
   },
   "entryTotp": {
     "codeLabel": "Verification code",
@@ -159,6 +211,11 @@
     "nameLabel": "Name",
     "folderLabel": "Folder",
     "folderNone": "Uncategorized",
+    "tagsLabel": "Tags",
+    "tagsPlaceholder": "Choose tags",
+    "tagsEmpty": "No tags yet. Create one in the sidebar first.",
+    "tagsNoMatches": "No matching tags",
+    "tagRemove": "Remove tag {name}",
     "notesLabel": "Notes",
     "customFields": {
       "legend": "Custom fields",
@@ -188,7 +245,9 @@
       "customFieldLabelRequired": "Enter a field name.",
       "nameRequired": "Enter a name.",
       "nameTooLong": "The name can have at most {maxLength} characters.",
-      "fieldTooLong": "{label} can have at most {maxLength} characters."
+      "fieldTooLong": "{label} can have at most {maxLength} characters.",
+      "tooManyTags": "An entry can have at most {maxCount} tags.",
+      "duplicateTags": "The tag selection has duplicates. Choose again."
     }
   },
   "entryCreate": {
@@ -206,6 +265,7 @@
     "error": {
       "invalid": "The content is not valid. Check it and try again.",
       "folderNotFound": "The selected folder no longer exists. Choose another one.",
+      "tagNotFound": "A selected tag no longer exists. Choose again.",
       "unexpected": "Saving failed. Close the app and try again."
     }
   },
@@ -230,6 +290,7 @@
       "invalid": "The content is not valid. Check it and try again.",
       "notFound": "This entry no longer exists.",
       "folderNotFound": "The selected folder no longer exists. Choose another one.",
+      "tagNotFound": "A selected tag no longer exists. Choose again.",
       "unexpected": "Saving failed. Close the app and try again."
     }
   },

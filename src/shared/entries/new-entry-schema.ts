@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { MAX_TAGS_PER_ENTRY } from "../tags/tag-limits";
 import { isWithinLength } from "../text/is-within-length";
 import { customFieldInputSchema } from "./custom-field-schema";
 import type { NewCustomFieldInput } from "./custom-field-types";
@@ -41,6 +42,11 @@ export interface NewEntryFormValues {
    * 条目所属文件夹的编号, 未分类时省略. 文件夹是否存在由主进程的条目服务判定.
    */
   folderId?: string;
+  /**
+   * 条目带的标签编号, 没有标签时省略, 不超过 `MAX_TAGS_PER_ENTRY` 个且不重复. 标签是否存在由
+   * 主进程的条目服务判定.
+   */
+  tagIds?: string[];
 }
 
 /**
@@ -51,7 +57,22 @@ export const NEW_ENTRY_ERROR_CODES = {
   nameRequired: "nameRequired",
   nameTooLong: "nameTooLong",
   fieldTooLong: "fieldTooLong",
+  tooManyTags: "tooManyTags",
+  duplicateTags: "duplicateTags",
 } as const;
+
+/**
+ * 条目带的标签编号的校验方案: 是字符串数组, 不超过每条目最多标签数, 且没有重复的编号.
+ * @returns 标签编号的校验方案.
+ */
+function createTagIdsSchema(): z.ZodArray<z.ZodString> {
+  return z
+    .array(z.string())
+    .max(MAX_TAGS_PER_ENTRY, { message: NEW_ENTRY_ERROR_CODES.tooManyTags })
+    .refine((tagIds) => new Set(tagIds).size === tagIds.length, {
+      message: NEW_ENTRY_ERROR_CODES.duplicateTags,
+    });
+}
 
 /**
  * TOTP 输入的校验方案: 是字符串, 空串表示不带 TOTP, 非空时必须能解析成受支持的 TOTP 配置,
@@ -117,12 +138,17 @@ export interface EntryContentShape {
    * 所属文件夹编号的校验规则.
    */
   readonly folderId: z.ZodType<string | undefined, string | undefined>;
+  /**
+   * 标签编号的校验规则.
+   */
+  readonly tagIds: z.ZodType<string[] | undefined, string[] | undefined>;
 }
 
 /**
  * 按类型生成条目内容的校验规则, 新建与编辑共用: 名称去首尾空格后不能为空且不超过最多字符数,
  * 类型的每个字段都必须是字符串并满足字段定义里的长度上限, 类型之外的字段被丢弃, 备注与自定义
- * 字段不设长度与数量上限, TOTP 输入为空或能解析成受支持的配置. 校验消息是
+ * 字段不设长度与数量上限, TOTP 输入为空或能解析成受支持的配置, 标签编号不超过每条目最多标签数
+ * 且不重复. 校验消息是
  * `NEW_ENTRY_ERROR_CODES`, `CUSTOM_FIELD_ERROR_CODES` 或 `TOTP_INPUT_ERROR_CODES` 里的错误
  * 代码.
  * @param type 条目类型定义.
@@ -150,6 +176,7 @@ export function createEntryContentShape(
     customFields: z.array(customFieldInputSchema),
     totp: createTotpSchema(),
     folderId: z.string().optional(),
+    tagIds: createTagIdsSchema().optional(),
   };
 }
 

@@ -6,6 +6,7 @@ import { createEntryBridge } from "./create-entry-bridge";
 import { createFolderBridge } from "./create-folder-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
 import { createRecoveryBridge } from "./create-recovery-bridge";
+import { createTagBridge } from "./create-tag-bridge";
 import { createTotpBridge } from "./create-totp-bridge";
 import { createVaultBridge } from "./create-vault-bridge";
 
@@ -18,6 +19,7 @@ const api: RendererApi = {
   recovery: createRecoveryBridge(ipcRenderer),
   entries: createEntryBridge(ipcRenderer),
   folders: createFolderBridge(ipcRenderer),
+  tags: createTagBridge(ipcRenderer),
   totp: createTotpBridge(ipcRenderer),
 };
 

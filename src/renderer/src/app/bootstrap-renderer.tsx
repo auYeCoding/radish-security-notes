@@ -11,6 +11,8 @@ import { createFolderStore } from "@renderer/stores/folder-store";
 import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { createPreferencesStore } from "@renderer/stores/preferences-store";
 import { PreferencesStoreProvider } from "@renderer/stores/preferences-store-provider";
+import { createTagStore } from "@renderer/stores/tag-store";
+import { TagStoreProvider } from "@renderer/stores/tag-store-provider";
 import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
 import { createVaultStore } from "@renderer/stores/vault-store";
 import { VaultStoreProvider } from "@renderer/stores/vault-store-provider";
@@ -21,8 +23,8 @@ import {
 import { forceLightThemeWhilePrinting } from "@renderer/theme/print-theme";
 
 /**
- * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store, 条目 store 与
- * 文件夹 store, 让深色类名跟随系统外观 (打印时强制浅色), 最后把根组件挂到容器上.
+ * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store, 条目 store,
+ * 文件夹 store 与标签 store, 让深色类名跟随系统外观 (打印时强制浅色), 最后把根组件挂到容器上.
  * @param container 挂载根组件的容器元素.
  * @returns 挂载完成后兑现.
  */
@@ -37,6 +39,7 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
   });
   const entryStore = createEntryStore({ bridge: window.api.entries });
   const folderStore = createFolderStore({ bridge: window.api.folders });
+  const tagStore = createTagStore({ bridge: window.api.tags });
   const i18n = await createI18nInstance({
     language: snapshot.language,
     isPseudoLocalizationEnabled: snapshot.isPseudoLocalizationEnabled,
@@ -55,9 +58,11 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
           <VaultStoreProvider store={vaultStore}>
             <EntryStoreProvider store={entryStore}>
               <FolderStoreProvider store={folderStore}>
-                <TotpBridgeProvider bridge={window.api.totp}>
-                  <App />
-                </TotpBridgeProvider>
+                <TagStoreProvider store={tagStore}>
+                  <TotpBridgeProvider bridge={window.api.totp}>
+                    <App />
+                  </TotpBridgeProvider>
+                </TagStoreProvider>
               </FolderStoreProvider>
             </EntryStoreProvider>
           </VaultStoreProvider>

@@ -3,6 +3,8 @@ import type { EntryDetail } from "@shared/entries/entry-types";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
 import type { FolderBridge } from "@shared/folders/folder-bridge";
 import type { FolderSummary } from "@shared/folders/folder-types";
+import type { TagBridge } from "@shared/tags/tag-bridge";
+import type { TagSummary } from "@shared/tags/tag-types";
 import type { ReactNode } from "react";
 
 import {
@@ -15,10 +17,13 @@ import {
   type FolderStore,
 } from "@renderer/stores/folder-store";
 import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
+import { createTagStore, type TagStore } from "@renderer/stores/tag-store";
+import { TagStoreProvider } from "@renderer/stores/tag-store-provider";
 import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
 
 import { createFakeEntryBridge } from "./fake-entry-bridge";
 import { createFakeFolderBridge } from "./fake-folder-bridge";
+import { createFakeTagBridge } from "./fake-tag-bridge";
 import { createFakeTotpBridge } from "./fake-totp-bridge";
 import {
   createVaultTestEnvironment,
@@ -50,6 +55,14 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    * 覆盖假文件夹桥上的方法, 例如让删除失败.
    */
   readonly folderBridgeOverrides?: Partial<FolderBridge>;
+  /**
+   * 假标签桥里的初始标签, 按创建先后排列, 默认没有标签.
+   */
+  readonly tags?: readonly TagSummary[];
+  /**
+   * 覆盖假标签桥上的方法, 例如让删除失败.
+   */
+  readonly tagBridgeOverrides?: Partial<TagBridge>;
 }
 
 /**
@@ -64,7 +77,7 @@ interface EntryTestProvidersProps {
 
 /**
  * 组件测试用的条目环境: 在保险库环境之上增加假的条目桥, 真实的条目 store, 假的文件夹桥, 真实的
- * 文件夹 store 与假的 TOTP 桥.
+ * 文件夹 store, 假的标签桥, 真实的标签 store 与假的 TOTP 桥.
  */
 export interface EntryTestEnvironment extends VaultTestEnvironment {
   /**
@@ -87,12 +100,20 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
    * 被测的文件夹 store.
    */
   readonly folderStore: FolderStore;
+  /**
+   * 带间谍方法的假标签桥.
+   */
+  readonly tagBridge: TagBridge;
+  /**
+   * 被测的标签 store.
+   */
+  readonly tagStore: TagStore;
 }
 
 /**
  * 创建组件测试用的条目环境, 保险库默认已解锁.
- * @param options 保险库初始状态, 初始条目与文件夹, 桥方法的覆盖.
- * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目, 文件夹四个 store 与 TOTP 桥.
+ * @param options 保险库初始状态, 初始条目, 文件夹与标签, 桥方法的覆盖.
+ * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目, 文件夹, 标签五个 store 与 TOTP 桥.
  */
 export async function createEntryTestEnvironment(
   options: EntryTestEnvironmentOptions = {},
@@ -110,15 +131,22 @@ export async function createEntryTestEnvironment(
     options.folders,
     options.folderBridgeOverrides,
   );
+  const tagBridge = createFakeTagBridge(
+    options.tags,
+    options.tagBridgeOverrides,
+  );
   const entryStore = createEntryStore({ bridge: entryBridge });
   const folderStore = createFolderStore({ bridge: folderBridge });
+  const tagStore = createTagStore({ bridge: tagBridge });
   const Providers = (props: EntryTestProvidersProps): React.JSX.Element => (
     <vault.Providers>
       <EntryStoreProvider store={entryStore}>
         <FolderStoreProvider store={folderStore}>
-          <TotpBridgeProvider bridge={totpBridge}>
-            {props.children}
-          </TotpBridgeProvider>
+          <TagStoreProvider store={tagStore}>
+            <TotpBridgeProvider bridge={totpBridge}>
+              {props.children}
+            </TotpBridgeProvider>
+          </TagStoreProvider>
         </FolderStoreProvider>
       </EntryStoreProvider>
     </vault.Providers>
@@ -130,6 +158,8 @@ export async function createEntryTestEnvironment(
     entryStore,
     folderBridge,
     folderStore,
+    tagBridge,
+    tagStore,
     Providers,
   };
 }

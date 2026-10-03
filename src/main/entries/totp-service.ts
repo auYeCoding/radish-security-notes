@@ -5,18 +5,18 @@ import {
 } from "@shared/entries/entry-result";
 import type { TotpCode, TotpConfig } from "@shared/entries/totp-config";
 
-import type { ClipboardPort } from "./clipboard-port";
 import {
-  runWithEntryDatabase,
-  type EntryDatabaseAccess,
-} from "./entry-database-access";
+  runWithDatabase,
+  type DatabaseAccess,
+} from "../vault/database/database-access";
+import type { ClipboardPort } from "./clipboard-port";
 import { findEntry } from "./entry-repository";
 import { generateTotpCode } from "./totp-code-generator";
 
 /**
  * TOTP 服务的依赖.
  */
-export interface TotpServiceDependencies extends EntryDatabaseAccess {
+export interface TotpServiceDependencies extends DatabaseAccess {
   /**
    * 系统剪贴板.
    */
@@ -94,7 +94,7 @@ export class TotpService {
     id: string,
     operation: (config: TotpConfig) => EntryResult<Value>,
   ): EntryResult<Value> {
-    return runWithEntryDatabase(this.dependencies, (orm) => {
+    return runWithDatabase(this.dependencies, (orm) => {
       const config = findEntry(orm, id)?.totp ?? undefined;
       return config === undefined
         ? entryFailed("not-found")

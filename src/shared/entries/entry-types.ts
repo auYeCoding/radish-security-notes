@@ -39,6 +39,10 @@ export interface EntrySummary {
    * 条目所属文件夹的编号, 条目未分类时没有这一项.
    */
   readonly folderId?: string;
+  /**
+   * 条目带的标签编号, 按条目上的选择顺序排列, 条目没有标签时没有这一项.
+   */
+  readonly tagIds?: readonly string[];
 }
 
 /**
@@ -84,6 +88,7 @@ export function toEntrySummary(detail: EntryDetail): EntrySummary {
     type: detail.type,
     account: readAccount(detail.fields),
     folderId: detail.folderId,
+    tagIds: detail.tagIds,
   };
 }
 
@@ -119,6 +124,10 @@ export interface NewEntryInput {
    * 条目所属文件夹的编号, 未分类时省略. 编辑时省略表示移出文件夹, 不表示保持原来的归属.
    */
   readonly folderId?: string;
+  /**
+   * 条目带的标签编号, 没有标签时省略. 编辑时省略表示摘掉全部标签, 不表示保持原来的标签.
+   */
+  readonly tagIds?: readonly string[];
 }
 
 /**

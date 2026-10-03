@@ -18,6 +18,8 @@ export function describeEditFailure(
       return translate("entryEdit.error.notFound");
     case "folder-not-found":
       return translate("entryEdit.error.folderNotFound");
+    case "tag-not-found":
+      return translate("entryEdit.error.tagNotFound");
     default:
       return translate("entryEdit.error.unexpected");
   }

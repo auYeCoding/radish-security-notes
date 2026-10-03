@@ -17,6 +17,7 @@
     "allEntries": "全部条目",
     "uncategorized": "未分类",
     "loadFailed": "无法读取文件夹. 请关闭应用后重试.",
+    "tagsLoadFailed": "无法读取标签. 请关闭应用后重试.",
     "actions": "{name} 的更多操作"
   },
   "folderName": {
@@ -58,6 +59,56 @@
       "unexpected": "删除失败. 请关闭应用后重试."
     }
   },
+  "tagName": {
+    "label": "名称",
+    "colorLabel": "颜色",
+    "cancel": "取消",
+    "error": {
+      "nameRequired": "请填写名称.",
+      "nameTooLong": "名称最多 {maxLength} 个字符.",
+      "nameTaken": "已有同名标签, 请换一个名称.",
+      "invalid": "名称或颜色不符合要求. 请检查后重试.",
+      "notFound": "这个标签已不存在.",
+      "unexpected": "操作失败. 请关闭应用后重试."
+    }
+  },
+  "tagColors": {
+    "slate": "灰色",
+    "red": "红色",
+    "orange": "橙色",
+    "amber": "琥珀色",
+    "green": "绿色",
+    "blue": "蓝色",
+    "violet": "紫色",
+    "pink": "粉色"
+  },
+  "tagCreate": {
+    "open": "新建标签",
+    "title": "新建标签",
+    "description": "名称最多 {maxLength} 个字符, 不能与已有标签重名. 颜色可以随时修改.",
+    "submit": "创建",
+    "submitting": "正在创建..."
+  },
+  "tagEdit": {
+    "open": "编辑",
+    "title": "编辑标签",
+    "description": "可以修改名称与颜色. 名称最多 {maxLength} 个字符, 不能与别的标签重名.",
+    "submit": "保存",
+    "submitting": "正在保存..."
+  },
+  "tagDelete": {
+    "open": "删除",
+    "title": "删除这个标签?",
+    "descriptionEmpty": "\"{name}\" 将被删除.",
+    "descriptionWithEntries": "\"{name}\" 将被删除, {count} 个条目会摘掉这个标签, 条目本身不会删除.",
+    "cancel": "取消",
+    "confirm": "删除",
+    "deleting": "正在删除...",
+    "error": {
+      "notFound": "这个标签已不存在.",
+      "unexpected": "删除失败. 请关闭应用后重试."
+    }
+  },
   "dragDrop": {
     "roleDescription": "可拖动的条目",
     "instructions": "按 M 键拿起条目, 用方向键移到左侧的文件夹上, 按回车放下, 按 Esc 取消. 也可以在编辑条目时选择所属文件夹.",
@@ -90,7 +141,8 @@
     "fieldHidden": "{label} 已隐藏",
     "copied": "已复制",
     "folder": "文件夹: {name}",
-    "uncategorized": "未分类"
+    "uncategorized": "未分类",
+    "tags": "标签"
   },
   "entryTotp": {
     "codeLabel": "验证码",
@@ -159,6 +211,11 @@
     "nameLabel": "名称",
     "folderLabel": "所属文件夹",
     "folderNone": "未分类",
+    "tagsLabel": "标签",
+    "tagsPlaceholder": "选择标签",
+    "tagsEmpty": "还没有标签. 可以先在左侧栏新建.",
+    "tagsNoMatches": "没有匹配的标签",
+    "tagRemove": "移除标签 {name}",
     "notesLabel": "备注",
     "customFields": {
       "legend": "自定义字段",
@@ -188,7 +245,9 @@
       "customFieldLabelRequired": "请填写字段名.",
       "nameRequired": "请填写名称.",
       "nameTooLong": "名称最多 {maxLength} 个字符.",
-      "fieldTooLong": "{label}最多 {maxLength} 个字符."
+      "fieldTooLong": "{label}最多 {maxLength} 个字符.",
+      "tooManyTags": "一个条目最多带 {maxCount} 个标签.",
+      "duplicateTags": "标签选择有重复. 请重新选择."
     }
   },
   "entryCreate": {
@@ -206,6 +265,7 @@
     "error": {
       "invalid": "内容不符合要求. 请检查后重试.",
       "folderNotFound": "所选文件夹已不存在. 请重新选择.",
+      "tagNotFound": "所选标签已不存在. 请重新选择.",
       "unexpected": "保存失败. 请关闭应用后重试."
     }
   },
@@ -230,6 +290,7 @@
       "invalid": "内容不符合要求. 请检查后重试.",
       "notFound": "这个条目已不存在.",
       "folderNotFound": "所选文件夹已不存在. 请重新选择.",
+      "tagNotFound": "所选标签已不存在. 请重新选择.",
       "unexpected": "保存失败. 请关闭应用后重试."
     }
   },

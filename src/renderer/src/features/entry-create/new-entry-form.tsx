@@ -13,9 +13,11 @@ import { folderIdOfView } from "@shared/folders/folder-view";
 import { EntryFormActions } from "@renderer/components/entry-form/entry-form-actions";
 import { EntryFormFields } from "@renderer/components/entry-form/entry-form-fields";
 import { FolderSelectField } from "@renderer/components/entry-form/folder-select-field";
+import { TagSelectField } from "@renderer/components/entry-form/tag-select-field";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 import { useFolderStore } from "@renderer/stores/use-folder-store";
+import { useTagStore } from "@renderer/stores/use-tag-store";
 
 import { createDefaultFormValues } from "./new-entry-defaults";
 import { NewEntryTotpField } from "./new-entry-totp-field";
@@ -42,7 +44,8 @@ interface NewEntryFormProps {
 
 /**
  * 新建条目的表单: 顶部是类型栏, 之后依次是名称, 所属文件夹 (默认是侧栏当前选中的文件夹, 选中
- * 全部条目或未分类时是未分类), 该类型的字段, 自定义字段, 备注与 TOTP, 最后是取消, 保存按钮. 字段区域超过限定高度时在区域内滚动, 保存失败的原因显示在字段区域上方的提示条里,
+ * 全部条目或未分类时是未分类), 标签 (默认是侧栏当前选中的标签), 该类型的字段, 自定义字段, 备注与 TOTP,
+ * 最后是取消, 保存按钮. 字段区域超过限定高度时在区域内滚动, 保存失败的原因显示在字段区域上方的提示条里,
  * 校验错误显示在对应字段下方.
  * @param props 组件属性.
  * @returns 表单元素.
@@ -53,10 +56,16 @@ export function NewEntryForm(props: NewEntryFormProps): React.JSX.Element {
   const { failureMessage, submit } = useCreateEntry(type.key, props.onCreated);
   const schema = useMemo(() => createNewEntrySchema(type), [type]);
   const folders = useFolderStore((state) => state.folders);
+  const tags = useTagStore((state) => state.tags);
   const defaultFolderId = useEntryStore((state) => folderIdOfView(state.view));
+  const defaultTagIds = useEntryStore((state) => state.selectedTagIds);
   const form = useForm<NewEntryFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: createDefaultFormValues(type, defaultFolderId),
+    defaultValues: createDefaultFormValues(
+      type,
+      defaultFolderId,
+      defaultTagIds,
+    ),
   });
   return (
     <FormProvider {...form}>
@@ -78,6 +87,7 @@ export function NewEntryForm(props: NewEntryFormProps): React.JSX.Element {
         <EntryFormFields
           type={type}
           folderField={<FolderSelectField folders={folders} />}
+          tagField={<TagSelectField tags={tags} />}
           totpField={<NewEntryTotpField />}
         />
         <EntryFormActions
