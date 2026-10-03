@@ -99,15 +99,7 @@
     "documentNumber": "证件号码",
     "address": "地址"
   },
-  "entryCreate": {
-    "open": "新建条目",
-    "title": "新建条目",
-    "description": "名称必填, 其余可以留空. 添加了自定义字段时, 字段名必填.",
-    "typeStep": {
-      "title": "选择条目类型",
-      "description": "先选一个类型, 表单会显示该类型的字段.",
-      "back": "返回"
-    },
+  "entryForm": {
     "nameLabel": "名称",
     "notesLabel": "备注",
     "customFields": {
@@ -132,18 +124,65 @@
         "failed": "读取二维码失败. 请重试."
       }
     },
-    "cancel": "取消",
-    "submit": "保存",
-    "submitting": "正在保存...",
     "error": {
       "totpInvalid": "TOTP 密钥或链接不合法. 请检查后重试.",
       "totpUnsupported": "暂不支持这个链接. 支持 TOTP 类型, 算法 SHA1, SHA256, SHA512, 位数 6 或 8, 周期 1 至 {maxPeriod} 秒.",
       "customFieldLabelRequired": "请填写字段名.",
       "nameRequired": "请填写名称.",
       "nameTooLong": "名称最多 {maxLength} 个字符.",
-      "fieldTooLong": "{label}最多 {maxLength} 个字符.",
+      "fieldTooLong": "{label}最多 {maxLength} 个字符."
+    }
+  },
+  "entryCreate": {
+    "open": "新建条目",
+    "title": "新建条目",
+    "description": "名称必填, 其余可以留空. 添加了自定义字段时, 字段名必填.",
+    "typeStep": {
+      "title": "选择条目类型",
+      "description": "先选一个类型, 表单会显示该类型的字段.",
+      "back": "返回"
+    },
+    "cancel": "取消",
+    "submit": "保存",
+    "submitting": "正在保存...",
+    "error": {
       "invalid": "内容不符合要求. 请检查后重试.",
       "unexpected": "保存失败. 请关闭应用后重试."
+    }
+  },
+  "entryEdit": {
+    "open": "编辑条目",
+    "title": "编辑条目",
+    "description": "修改后点保存, 取消则不改动. 条目类型不能更换.",
+    "totp": {
+      "keepDescription": "这个条目已设置 TOTP. 留空则保持不变, 填入新的密钥或链接则替换.",
+      "removeLabel": "移除 TOTP"
+    },
+    "cancel": "取消",
+    "submit": "保存",
+    "submitting": "正在保存...",
+    "discard": {
+      "title": "放弃未保存的修改?",
+      "description": "关闭后, 你对这个条目做的修改不会保存.",
+      "keepEditing": "继续编辑",
+      "confirm": "放弃修改"
+    },
+    "error": {
+      "invalid": "内容不符合要求. 请检查后重试.",
+      "notFound": "这个条目已不存在.",
+      "unexpected": "保存失败. 请关闭应用后重试."
+    }
+  },
+  "entryDelete": {
+    "open": "删除条目",
+    "title": "删除这个条目?",
+    "description": "\"{name}\" 将被永久删除, 无法恢复.",
+    "cancel": "取消",
+    "confirm": "删除",
+    "deleting": "正在删除...",
+    "error": {
+      "notFound": "这个条目已不存在.",
+      "unexpected": "删除失败. 请关闭应用后重试."
     }
   },
   "settings": {

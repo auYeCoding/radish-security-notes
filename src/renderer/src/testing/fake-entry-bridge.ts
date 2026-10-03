@@ -4,8 +4,74 @@ import {
   readAccount,
   toEntrySummary,
   type EntryDetail,
+  type NewEntryInput,
+  type UpdateEntryInput,
 } from "@shared/entries/entry-types";
 import { vi } from "vitest";
+
+/**
+ * 假桥给自定义字段编号时的写法: 前缀加从 1 开始的位置.
+ * @param prefix 编号前缀.
+ * @param fields 用户填写的自定义字段.
+ * @returns 带编号的自定义字段.
+ */
+function withFieldIdentifiers(
+  prefix: string,
+  fields: NewEntryInput["customFields"],
+): EntryDetail["customFields"] {
+  return fields.map((field, index) => ({
+    id: `${prefix}-${index + 1}`,
+    label: field.label.trim(),
+    value: field.value,
+    isHidden: field.isHidden,
+  }));
+}
+
+/**
+ * 由新建输入生成假桥里的条目详情.
+ * @param id 条目编号.
+ * @param input 新建输入.
+ * @returns 条目详情.
+ */
+function detailFromCreate(id: string, input: NewEntryInput): EntryDetail {
+  return {
+    id,
+    name: input.name.trim(),
+    type: input.type,
+    account: readAccount(input.fields),
+    fields: input.fields,
+    notes: input.notes,
+    customFields: withFieldIdentifiers("created-field", input.customFields),
+    hasTotp: input.totp.trim() !== "",
+  };
+}
+
+/**
+ * 由更新输入生成更新后的条目详情: 类型与编号不变, TOTP 按保持, 替换, 移除处理.
+ * @param existing 更新前的条目详情.
+ * @param input 更新输入.
+ * @returns 更新后的条目详情.
+ */
+function detailFromUpdate(
+  existing: EntryDetail,
+  input: UpdateEntryInput,
+): EntryDetail {
+  const hasTotp = input.removeTotp
+    ? false
+    : existing.hasTotp || input.totp.trim() !== "";
+  return {
+    ...existing,
+    name: input.name.trim(),
+    account: readAccount(input.fields),
+    fields: input.fields,
+    notes: input.notes,
+    customFields: withFieldIdentifiers(
+      `${existing.id}-updated-field`,
+      input.customFields,
+    ),
+    hasTotp,
+  };
+}
 
 /**
  * 创建组件测试用的假条目桥: 条目存在内存里, 最新创建的在最前, 每个方法都是间谍.
@@ -29,23 +95,27 @@ export function createFakeEntryBridge(
       );
     }),
     create: vi.fn((input) => {
-      const detail: EntryDetail = {
-        id: `created-${details.length + 1}`,
-        name: input.name.trim(),
-        type: input.type,
-        account: readAccount(input.fields),
-        fields: input.fields,
-        notes: input.notes,
-        customFields: input.customFields.map((field, index) => ({
-          id: `created-field-${index + 1}`,
-          label: field.label.trim(),
-          value: field.value,
-          isHidden: field.isHidden,
-        })),
-        hasTotp: input.totp.trim() !== "",
-      };
+      const detail = detailFromCreate(`created-${details.length + 1}`, input);
       details.unshift(detail);
       return Promise.resolve(entrySucceeded(detail));
+    }),
+    update: vi.fn((id: string, input) => {
+      const index = details.findIndex((detail) => detail.id === id);
+      const existing = details[index];
+      if (existing === undefined) {
+        return Promise.resolve(entryFailed("not-found"));
+      }
+      const detail = detailFromUpdate(existing, input);
+      details[index] = detail;
+      return Promise.resolve(entrySucceeded(detail));
+    }),
+    remove: vi.fn((id: string) => {
+      const index = details.findIndex((detail) => detail.id === id);
+      if (index < 0) {
+        return Promise.resolve(entryFailed("not-found"));
+      }
+      details.splice(index, 1);
+      return Promise.resolve(entrySucceeded(undefined));
     }),
     copyField: vi.fn(() => Promise.resolve(entrySucceeded(undefined))),
     copyCustomField: vi.fn(() => Promise.resolve(entrySucceeded(undefined))),

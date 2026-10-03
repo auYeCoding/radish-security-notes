@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import { NOTES_FIELD_KEY, type EntryDetail } from "@shared/entries/entry-types";
@@ -8,8 +9,8 @@ import { useEntryStore } from "@renderer/stores/use-entry-store";
 import { DetailCustomFieldRow } from "./detail-custom-field-row";
 import { DetailTotpCodeRow } from "./detail-totp-code-row";
 import { DetailTotpSecretRow } from "./detail-totp-secret-row";
-import { DetailTypeLabel } from "./detail-type-label";
 import { DetailValueRow } from "./detail-value-row";
+import { EntryDetailHeader } from "./entry-detail-header";
 
 /**
  * 条目详情视图的属性.
@@ -19,13 +20,17 @@ interface EntryDetailViewProps {
    * 要展示的条目详情.
    */
   readonly detail: EntryDetail;
+  /**
+   * 标题行右侧的操作, 例如编辑与删除按钮.
+   */
+  readonly actions?: ReactNode;
 }
 
 /**
- * 已选中条目的详情: 标题上方标明类型, 标题是名称, 下方依次是该类型的字段, 带 TOTP 时的验证码
- * 与 TOTP 密钥, 自定义字段与备注, 敏感字段默认遮罩, 每项带复制按钮. 复制由主进程写入剪贴板.
- * 调用方用条目编号作 key, 切换条目时遮罩字段的显示状态随之恢复为遮罩, 验证码与已显示的密钥
- * 随组件卸载而丢弃.
+ * 已选中条目的详情: 标题上方标明类型, 标题是名称, 标题行右侧是调用方给出的操作, 下方依次是该
+ * 类型的字段, 带 TOTP 时的验证码与 TOTP 密钥, 自定义字段与备注, 敏感字段默认遮罩, 每项带复制
+ * 按钮. 复制由主进程写入剪贴板. 调用方用条目编号与编辑次数作 key, 切换条目或保存编辑后遮罩字段
+ * 的显示状态随之恢复为遮罩, 验证码与已显示的密钥随组件卸载而丢弃.
  * @param props 组件属性.
  * @returns 详情视图元素.
  */
@@ -38,10 +43,7 @@ export function EntryDetailView(
   const type = requireEntryType(detail.type);
   return (
     <div className="flex flex-col gap-6 p-8">
-      <div className="flex flex-col gap-1">
-        <DetailTypeLabel typeKey={type.key} />
-        <h2 className="text-xl font-semibold break-words">{detail.name}</h2>
-      </div>
+      <EntryDetailHeader detail={detail} actions={props.actions} />
       <dl className="flex max-w-xl flex-col gap-4">
         {type.fields.map((field) => (
           <DetailValueRow

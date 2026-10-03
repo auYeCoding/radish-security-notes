@@ -20,8 +20,8 @@ const EMPTY_CUSTOM_FIELD: NewCustomFieldInput = {
 };
 
 /**
- * 新建表单里的自定义字段区: 标题, 任意数量的字段行与 "添加字段" 按钮. 默认没有字段行. 必须在
- * `FormProvider` 里使用.
+ * 条目表单里的自定义字段区: 标题, 任意数量的字段行与 "添加字段" 按钮, 新建与编辑共用. 默认
+ * 没有字段行, 编辑时由表单默认值给出已有的字段. 必须在 `FormProvider` 里使用.
  * @returns 自定义字段区元素.
  */
 export function CustomFieldsEditor(): React.JSX.Element {
@@ -34,7 +34,7 @@ export function CustomFieldsEditor(): React.JSX.Element {
   return (
     <FieldSet>
       <FieldLegend variant="label">
-        {t("entryCreate.customFields.legend")}
+        {t("entryForm.customFields.legend")}
       </FieldLegend>
       {fields.map((field, index) => (
         <CustomFieldRow
@@ -50,7 +50,7 @@ export function CustomFieldsEditor(): React.JSX.Element {
         onClick={() => append(EMPTY_CUSTOM_FIELD)}
       >
         <PlusIcon aria-hidden="true" />
-        {t("entryCreate.customFields.add")}
+        {t("entryForm.customFields.add")}
       </Button>
     </FieldSet>
   );

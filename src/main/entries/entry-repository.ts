@@ -45,6 +45,43 @@ export function listEntrySummaries(orm: VaultOrm): EntrySummary[] {
 }
 
 /**
+ * 更新一个条目的内容: 名称, 类型字段, 备注, 自定义字段与 TOTP. 编号, 类型与创建时间不变.
+ * @param orm 已解锁数据库的查询入口.
+ * @param record 更新后的行, 编号指明要更新的条目.
+ * @returns 条目存在并已更新时为 true, 没有这个编号时为 false.
+ */
+export function updateEntry(orm: VaultOrm, record: EntryRecord): boolean {
+  const updated = orm
+    .update(entries)
+    .set({
+      name: record.name,
+      fields: record.fields,
+      notes: record.notes,
+      customFields: record.customFields,
+      totp: record.totp,
+    })
+    .where(eq(entries.id, record.id))
+    .returning({ id: entries.id })
+    .all();
+  return updated.length > 0;
+}
+
+/**
+ * 删除一个条目, 记录从表里移除.
+ * @param orm 已解锁数据库的查询入口.
+ * @param id 条目编号.
+ * @returns 条目存在并已删除时为 true, 没有这个编号时为 false.
+ */
+export function deleteEntry(orm: VaultOrm, id: string): boolean {
+  const deleted = orm
+    .delete(entries)
+    .where(eq(entries.id, id))
+    .returning({ id: entries.id })
+    .all();
+  return deleted.length > 0;
+}
+
+/**
  * 按编号读取一个条目.
  * @param orm 已解锁数据库的查询入口.
  * @param id 条目编号.

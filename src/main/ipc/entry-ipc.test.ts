@@ -45,6 +45,8 @@ function createFakeService(): EntryService {
     list: vi.fn(() => ({ ok: true, value: [] })),
     get: vi.fn(() => ({ ok: false, reason: "not-found" })),
     create: vi.fn(() => ({ ok: true, value: { id: "id-1" } })),
+    update: vi.fn(() => ({ ok: true, value: { id: "id-1" } })),
+    remove: vi.fn(() => ({ ok: true, value: undefined })),
     copyField: vi.fn(() => ({ ok: true, value: undefined })),
     copyCustomField: vi.fn(() => ({ ok: true, value: undefined })),
   } as unknown as EntryService;
@@ -172,6 +174,79 @@ describe("registerEntryIpc 参数校验", () => {
       ipcMain.invoke(IPC_CHANNELS.entriesCopyCustomField, "id-1", undefined),
     ).toThrow("无效的字段编号");
     expect(service.copyCustomField).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * 内容类型都正确的更新输入.
+ */
+const validUpdate = {
+  name: "n",
+  fields: { account: "a", password: "p", url: "" },
+  notes: "第一行\n第二行",
+  customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
+  totp: "",
+  removeTotp: true,
+};
+
+describe("registerEntryIpc 更新与删除", () => {
+  it("更新通道把编号与更新内容交给服务, 多余的属性被丢弃", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    const result = ipcMain.invoke(IPC_CHANNELS.entriesUpdate, "id-1", {
+      ...validUpdate,
+      type: "bankCard",
+      extra: "ignored",
+    });
+
+    expect(service.update).toHaveBeenCalledWith("id-1", validUpdate);
+    expect(result).toEqual({ ok: true, value: { id: "id-1" } });
+  });
+
+  it("删除通道把编号交给服务", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    const result = ipcMain.invoke(IPC_CHANNELS.entriesRemove, "id-3");
+
+    expect(service.remove).toHaveBeenCalledWith("id-3");
+    expect(result).toEqual({ ok: true, value: undefined });
+  });
+});
+
+describe("registerEntryIpc 更新与删除参数校验", () => {
+  it("更新与删除的编号不是字符串时被拒绝且不触达服务", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    expect(() =>
+      ipcMain.invoke(IPC_CHANNELS.entriesUpdate, 1, validUpdate),
+    ).toThrow("无效的条目编号");
+    expect(() => ipcMain.invoke(IPC_CHANNELS.entriesRemove, {})).toThrow(
+      "无效的条目编号",
+    );
+    expect(service.update).not.toHaveBeenCalled();
+    expect(service.remove).not.toHaveBeenCalled();
+  });
+
+  it("更新内容类型不对时被拒绝且不触达服务", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    for (const input of [
+      undefined,
+      null,
+      "text",
+      { name: "n" },
+      { ...validUpdate, fields: { account: 1 } },
+      { ...validUpdate, fields: undefined },
+      { ...validUpdate, customFields: undefined },
+      { ...validUpdate, totp: undefined },
+      { ...validUpdate, removeTotp: "yes" },
+      { ...validUpdate, removeTotp: undefined },
+    ]) {
+      expect(() =>
+        ipcMain.invoke(IPC_CHANNELS.entriesUpdate, "id-1", input),
+      ).toThrow("无效的条目内容");
+    }
+    expect(service.update).not.toHaveBeenCalled();
   });
 });
 

@@ -5,22 +5,22 @@ import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
 
 import { TextField } from "@renderer/components/text-field";
 
-import { describeNewEntryError } from "./new-entry-errors";
+import { describeEntryFormError } from "./entry-form-errors";
 
 /**
- * 新建表单的名称输入, 所有类型共有, 必填. 必须在 `FormProvider` 里使用, 校验错误显示在
- * 输入框下方.
+ * 条目表单的名称输入, 所有类型共有, 必填, 新建与编辑共用. 必须在 `FormProvider` 里使用, 校验
+ * 错误显示在输入框下方.
  * @returns 名称字段元素.
  */
-export function NewEntryNameField(): React.JSX.Element {
+export function EntryNameField(): React.JSX.Element {
   const { t } = useTranslation();
   const { register, formState } = useFormContext<NewEntryFormValues>();
   return (
     <TextField
       {...register("name")}
-      label={t("entryCreate.nameLabel")}
+      label={t("entryForm.nameLabel")}
       autoComplete="off"
-      error={describeNewEntryError(formState.errors.name?.message, t)}
+      error={describeEntryFormError(formState.errors.name?.message, t)}
     />
   );
 }

@@ -9,17 +9,13 @@ import {
 } from "@shared/entries/new-entry-schema";
 import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 
-import { TextareaField } from "@renderer/components/textarea-field";
+import { EntryFormActions } from "@renderer/components/entry-form/entry-form-actions";
+import { EntryFormFields } from "@renderer/components/entry-form/entry-form-fields";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
-import { FieldGroup } from "@renderer/components/ui/field";
 
-import { CustomFieldsEditor } from "./custom-fields-editor";
 import { createDefaultFormValues } from "./new-entry-defaults";
-import { NewEntryActions } from "./new-entry-actions";
-import { NewEntryNameField } from "./new-entry-name-field";
+import { NewEntryTotpField } from "./new-entry-totp-field";
 import { NewEntryTypeBar } from "./new-entry-type-bar";
-import { TotpInputField } from "./totp-input-field";
-import { TypeFieldsEditor } from "./type-fields-editor";
 import { useCreateEntry } from "./use-create-entry";
 
 /**
@@ -73,20 +69,13 @@ export function NewEntryForm(props: NewEntryFormProps): React.JSX.Element {
             <AlertDescription>{failureMessage}</AlertDescription>
           </Alert>
         )}
-        <div className="-m-1 max-h-96 overflow-y-auto p-1">
-          <FieldGroup>
-            <NewEntryNameField />
-            <TypeFieldsEditor type={type} />
-            <CustomFieldsEditor />
-            <TextareaField
-              {...form.register("notes")}
-              label={t("entryCreate.notesLabel")}
-              autoComplete="off"
-            />
-            <TotpInputField />
-          </FieldGroup>
-        </div>
-        <NewEntryActions isSubmitting={form.formState.isSubmitting} />
+        <EntryFormFields type={type} totpField={<NewEntryTotpField />} />
+        <EntryFormActions
+          cancelLabel={t("entryCreate.cancel")}
+          submitLabel={t("entryCreate.submit")}
+          submittingLabel={t("entryCreate.submitting")}
+          isSubmitting={form.formState.isSubmitting}
+        />
       </form>
     </FormProvider>
   );

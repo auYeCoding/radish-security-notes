@@ -27,6 +27,18 @@ export function createEntryBridge(ipcRenderer: IpcRendererPort): EntryBridge {
       );
       return result as EntryResult<EntryDetail>;
     },
+    update: async (id, input) => {
+      const result = await ipcRenderer.invoke(
+        IPC_CHANNELS.entriesUpdate,
+        id,
+        input,
+      );
+      return result as EntryResult<EntryDetail>;
+    },
+    remove: async (id) => {
+      const result = await ipcRenderer.invoke(IPC_CHANNELS.entriesRemove, id);
+      return result as EntryResult<undefined>;
+    },
     copyField: async (id, field) => {
       const result = await ipcRenderer.invoke(
         IPC_CHANNELS.entriesCopyField,

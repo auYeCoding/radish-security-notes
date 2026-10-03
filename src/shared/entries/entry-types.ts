@@ -111,3 +111,14 @@ export interface NewEntryInput {
    */
   readonly totp: string;
 }
+
+/**
+ * 编辑条目时用户填写的内容. 条目的类型保持不变, 所以不含类型.
+ */
+export interface UpdateEntryInput extends Omit<NewEntryInput, "type"> {
+  /**
+   * 是否移除条目原有的 TOTP, 为真时优先于 `totp`. `totp` 为空串且不移除时保持原来的 TOTP
+   * 配置, 不为空时用新的 Base32 密钥或 otpauth 链接替换.
+   */
+  readonly removeTotp: boolean;
+}

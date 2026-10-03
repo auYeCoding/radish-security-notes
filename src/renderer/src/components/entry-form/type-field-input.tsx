@@ -9,7 +9,7 @@ import { PasswordField } from "@renderer/components/password-field";
 import { TextareaField } from "@renderer/components/textarea-field";
 import { TextField } from "@renderer/components/text-field";
 
-import { describeFieldError } from "./new-entry-errors";
+import { describeFieldError } from "./entry-form-errors";
 
 /**
  * 类型字段输入的属性.
@@ -22,8 +22,9 @@ interface TypeFieldInputProps {
 }
 
 /**
- * 新建表单里类型的一个字段: 多行字段用多行输入框, 敏感的单行字段用带显示与隐藏切换的输入框,
- * 其余用普通输入框, 标签是字段名, 超长的错误显示在输入框下方. 必须在 `FormProvider` 里使用.
+ * 条目表单里类型的一个字段, 新建与编辑共用: 多行字段用多行输入框, 敏感的单行字段用带显示与
+ * 隐藏切换的输入框, 其余用普通输入框, 标签是字段名, 超长的错误显示在输入框下方. 必须在
+ * `FormProvider` 里使用.
  * @param props 组件属性.
  * @returns 字段输入元素.
  */

@@ -19,6 +19,7 @@ interface CustomFieldHiddenCheckboxProps {
 
 /**
  * 自定义字段行里的 "隐藏" 勾选框: 勾选后字段在详情里默认遮罩. 必须在 `FormProvider` 里使用.
+ * 新建与编辑条目的表单共用.
  * @param props 组件属性.
  * @returns 勾选框字段元素.
  */
@@ -40,7 +41,7 @@ export function CustomFieldHiddenCheckbox(
             onCheckedChange={field.onChange}
           />
           <FieldLabel htmlFor={identifier}>
-            {t("entryCreate.customFields.hiddenLabel")}
+            {t("entryForm.customFields.hiddenLabel")}
           </FieldLabel>
         </Field>
       )}

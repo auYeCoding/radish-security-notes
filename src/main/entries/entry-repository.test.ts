@@ -10,9 +10,11 @@ import {
   type VaultDatabase,
 } from "../vault/database/open-vault-database";
 import {
+  deleteEntry,
   findEntry,
   insertEntry,
   listEntrySummaries,
+  updateEntry,
   type EntryRecord,
 } from "./entry-repository";
 
@@ -87,6 +89,89 @@ describe("条目仓库: 读写", () => {
 
     expect(findEntry(getDatabase().orm, "with")?.totp).toEqual(totp);
     expect(findEntry(getDatabase().orm, "without")?.totp).toBeNull();
+  });
+});
+
+/**
+ * 更新测试里用的 TOTP 配置, 默认算法, 位数与周期.
+ */
+const SAMPLE_TOTP = {
+  secret: "JBSWY3DPEHPK3PXP",
+  algorithm: "SHA1",
+  digits: 6,
+  periodSeconds: 30,
+} as const;
+
+describe("条目仓库: 更新", () => {
+  const getDatabase = useRepositoryDatabase("entry-repository-update");
+
+  it("更新只改名称, 类型字段, 备注, 自定义字段与 TOTP, 编号, 类型与创建时间不变", () => {
+    const { orm } = getDatabase();
+    insertEntry(orm, recordOf("a", 7));
+    const totp = SAMPLE_TOTP;
+
+    const isUpdated = updateEntry(orm, {
+      ...recordOf("a", 999),
+      type: "bankCard",
+      name: "new-name",
+      fields: { account: "new-account" },
+      notes: "new-notes",
+      customFields: [{ id: "f", label: "l", value: "v", isHidden: false }],
+      totp,
+    });
+
+    expect(isUpdated).toBe(true);
+    expect(findEntry(orm, "a")).toEqual({
+      id: "a",
+      name: "new-name",
+      type: "login",
+      fields: { account: "new-account" },
+      notes: "new-notes",
+      customFields: [{ id: "f", label: "l", value: "v", isHidden: false }],
+      totp,
+      createdAt: 7,
+    });
+  });
+
+  it("更新可以把 TOTP 清成 null", () => {
+    const { orm } = getDatabase();
+    insertEntry(orm, { ...recordOf("a", 1), totp: SAMPLE_TOTP });
+
+    updateEntry(orm, recordOf("a", 1));
+
+    expect(findEntry(orm, "a")?.totp).toBeNull();
+  });
+
+  it("更新不存在的编号返回 false 且不新增行", () => {
+    const { orm } = getDatabase();
+
+    expect(updateEntry(orm, recordOf("missing", 1))).toBe(false);
+    expect(listEntrySummaries(orm)).toEqual([]);
+  });
+});
+
+describe("条目仓库: 删除", () => {
+  const getDatabase = useRepositoryDatabase("entry-repository-delete");
+
+  it("删除后读不到该条目, 其它条目不受影响", () => {
+    const { orm } = getDatabase();
+    insertEntry(orm, recordOf("a", 1));
+    insertEntry(orm, recordOf("b", 2));
+
+    const isDeleted = deleteEntry(orm, "a");
+
+    expect(isDeleted).toBe(true);
+    expect(findEntry(orm, "a")).toBeUndefined();
+    expect(findEntry(orm, "b")).toEqual(recordOf("b", 2));
+  });
+
+  it("删除不存在的编号或重复删除返回 false", () => {
+    const { orm } = getDatabase();
+    insertEntry(orm, recordOf("a", 1));
+
+    expect(deleteEntry(orm, "missing")).toBe(false);
+    expect(deleteEntry(orm, "a")).toBe(true);
+    expect(deleteEntry(orm, "a")).toBe(false);
   });
 });
 

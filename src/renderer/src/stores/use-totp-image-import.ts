@@ -2,15 +2,10 @@ import { useCallback, useState } from "react";
 
 import type { TotpBridge } from "@shared/entries/totp-bridge";
 import { MAX_QR_IMAGE_BYTES } from "@shared/entries/totp-config";
+import type { TotpImageImportStatus } from "@shared/entries/totp-image-import-status";
 import { parseTotpInput } from "@shared/entries/totp-input-parser";
 
-import { useTotpBridge } from "@renderer/stores/use-totp-bridge";
-
-/**
- * 读取二维码图片的结果, 显示时再换成当前语言的文案.
- */
-export type TotpImageImportStatus =
-  "reading" | "read" | "unreadable" | "notTotp" | "tooLarge" | "failed";
+import { useTotpBridge } from "./use-totp-bridge";
 
 /**
  * 读取二维码图片的状态与方法.

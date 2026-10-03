@@ -1,6 +1,10 @@
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import type { EntryResult } from "@shared/entries/entry-result";
-import type { EntryDetail, NewEntryInput } from "@shared/entries/entry-types";
+import type {
+  EntryDetail,
+  NewEntryInput,
+  UpdateEntryInput,
+} from "@shared/entries/entry-types";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 import {
@@ -10,10 +14,11 @@ import {
   loadEntries,
   selectEntry,
 } from "./entry-store-actions";
+import { removeEntry, updateEntry } from "./entry-store-mutations";
 import { INITIAL_ENTRY_STATE, type EntryState } from "./entry-state";
 
 /**
- * 条目动作: 经主进程读取, 新建与复制条目字段, 并维护选中与搜索关键字.
+ * 条目动作: 经主进程读取, 新建, 更新, 删除与复制条目字段, 并维护选中与搜索关键字.
  */
 export interface EntryActions {
   /**
@@ -38,6 +43,22 @@ export interface EntryActions {
    * @returns 新建结果.
    */
   create: (input: NewEntryInput) => Promise<EntryResult<EntryDetail>>;
+  /**
+   * 更新一个条目, 成功后列表与详情立即换成新值.
+   * @param id 条目编号.
+   * @param input 用户填写的名称, 类型字段, 备注, 自定义字段与 TOTP 的处理方式.
+   * @returns 更新结果.
+   */
+  update: (
+    id: string,
+    input: UpdateEntryInput,
+  ) => Promise<EntryResult<EntryDetail>>;
+  /**
+   * 删除一个条目, 成功后条目从列表移除并选中相邻条目.
+   * @param id 条目编号.
+   * @returns 删除结果.
+   */
+  remove: (id: string) => Promise<EntryResult<undefined>>;
   /**
    * 把条目的一个字段复制到系统剪贴板.
    * @param id 条目编号.
@@ -86,6 +107,8 @@ export function createEntryStore(
       select: (id) => selectEntry(access, id),
       setQuery: (query) => set({ query }),
       create: (input) => createEntry(access, input),
+      update: (id, input) => updateEntry(access, id, input),
+      remove: (id) => removeEntry(access, id),
       copyField: (id, field) => copyEntryField(bridge, id, field),
       copyCustomField: (id, customFieldId) =>
         copyEntryCustomField(bridge, id, customFieldId),

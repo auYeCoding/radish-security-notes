@@ -1,6 +1,10 @@
 import { vi } from "vitest";
 
-import type { EntryDetail, NewEntryInput } from "@shared/entries/entry-types";
+import type {
+  EntryDetail,
+  NewEntryInput,
+  UpdateEntryInput,
+} from "@shared/entries/entry-types";
 import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 import { LOGIN_TYPE } from "@shared/entries/preset-types/login-type";
 
@@ -111,6 +115,25 @@ export function newEntryInputOf(
     notes: "",
     customFields: [],
     totp: "",
+    ...overrides,
+  };
+}
+
+/**
+ * 构造更新输入, 没有给出的字段取通用登录的空值, 不改动也不移除 TOTP.
+ * @param overrides 要覆盖的字段.
+ * @returns 更新输入.
+ */
+export function updateEntryInputOf(
+  overrides: Partial<UpdateEntryInput> = {},
+): UpdateEntryInput {
+  return {
+    name: "条目",
+    fields: emptyFieldValuesOf(LOGIN_TYPE),
+    notes: "",
+    customFields: [],
+    totp: "",
+    removeTotp: false,
     ...overrides,
   };
 }

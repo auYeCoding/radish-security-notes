@@ -21,7 +21,7 @@ export interface RendererApi {
    */
   readonly recovery: RecoveryBridge;
   /**
-   * 条目接口: 读取列表与详情, 新建条目, 复制字段.
+   * 条目接口: 读取列表与详情, 新建, 更新与删除条目, 复制字段.
    */
   readonly entries: EntryBridge;
   /**

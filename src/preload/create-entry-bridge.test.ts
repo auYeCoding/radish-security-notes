@@ -42,6 +42,38 @@ describe("createEntryBridge 读取与新建", () => {
   });
 });
 
+describe("createEntryBridge 更新与删除", () => {
+  it("update 调用更新通道并带上编号与输入", async () => {
+    const invoke = vi.fn(() => Promise.resolve({ ok: true }));
+    const input = {
+      name: "n",
+      fields: { cardNumber: "6222" },
+      notes: "备注",
+      customFields: [{ label: "助记词", value: "a b", isHidden: true }],
+      totp: "",
+      removeTotp: false,
+    };
+
+    const result = await createEntryBridge({ invoke }).update("id-1", input);
+
+    expect(invoke).toHaveBeenCalledWith(
+      IPC_CHANNELS.entriesUpdate,
+      "id-1",
+      input,
+    );
+    expect(result).toEqual({ ok: true });
+  });
+
+  it("remove 调用删除通道并带上编号", async () => {
+    const invoke = vi.fn(() => Promise.resolve({ ok: true }));
+
+    const result = await createEntryBridge({ invoke }).remove("id-1");
+
+    expect(invoke).toHaveBeenCalledWith(IPC_CHANNELS.entriesRemove, "id-1");
+    expect(result).toEqual({ ok: true });
+  });
+});
+
 describe("createEntryBridge 复制", () => {
   it("copyField 调用复制通道并带上编号与字段名", async () => {
     const invoke = vi.fn(() => Promise.resolve({ ok: true }));

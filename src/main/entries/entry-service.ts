@@ -1,3 +1,4 @@
+import { createEditEntrySchema } from "@shared/entries/edit-entry-schema";
 import {
   entryFailed,
   entrySucceeded,
@@ -8,6 +9,7 @@ import {
   type EntryDetail,
   type EntrySummary,
   type NewEntryInput,
+  type UpdateEntryInput,
 } from "@shared/entries/entry-types";
 import { createNewEntrySchema } from "@shared/entries/new-entry-schema";
 import {
@@ -25,11 +27,14 @@ import {
 import { findCopyValue, normalizeFieldValues } from "./entry-field-values";
 import { buildEntryRecord } from "./entry-record-builder";
 import {
+  deleteEntry,
   findEntry,
   insertEntry,
   listEntrySummaries,
+  updateEntry,
   type EntryRecord,
 } from "./entry-repository";
+import { buildUpdatedRecord } from "./entry-update-builder";
 
 /**
  * 条目服务的依赖.
@@ -71,8 +76,8 @@ function toDetail(record: EntryRecord): EntryDetail {
 }
 
 /**
- * 条目服务: 在已解锁的加密数据库里新建与读取条目, 并把条目字段复制到剪贴板. 类型字段,
- * 备注与自定义字段只在方法执行期间经过内存, 不写入日志.
+ * 条目服务: 在已解锁的加密数据库里新建, 读取, 更新与删除条目, 并把条目字段复制到剪贴板.
+ * 类型字段, 备注与自定义字段只在方法执行期间经过内存, 不写入日志.
  */
 export class EntryService {
   /**
@@ -128,6 +133,50 @@ export class EntryService {
       insertEntry(orm, record);
       return entrySucceeded(toDetail(record));
     });
+  }
+
+  /**
+   * 更新一个条目: 按条目已保存的类型校验输入, 名称与自定义字段的字段名去首尾空格, 自定义字段
+   * 重新分配编号后写回数据库. 条目的编号, 类型与创建时间不变.
+   * @param id 条目编号.
+   * @param input 用户填写的名称, 类型字段, 备注, 自定义字段与 TOTP 的处理方式.
+   * @returns 更新后的条目详情, 未解锁, 没有这个编号或输入不合规时为失败结果.
+   */
+  update(id: string, input: UpdateEntryInput): EntryResult<EntryDetail> {
+    return this.withDatabase((orm) => {
+      const existing = findEntry(orm, id);
+      if (existing === undefined) {
+        return entryFailed("not-found");
+      }
+      const type = findEntryType(existing.type);
+      const parsed =
+        type === undefined
+          ? undefined
+          : createEditEntrySchema(type).safeParse(input);
+      if (!parsed?.success) {
+        return entryFailed("invalid-input");
+      }
+      const record = buildUpdatedRecord({
+        existing,
+        values: parsed.data,
+        createIdentifier: this.dependencies.createIdentifier,
+      });
+      updateEntry(orm, record);
+      return entrySucceeded(toDetail(record));
+    });
+  }
+
+  /**
+   * 删除一个条目, 记录从加密数据库里移除.
+   * @param id 条目编号.
+   * @returns 删除结果, 未解锁或没有这个编号时为失败结果.
+   */
+  remove(id: string): EntryResult<undefined> {
+    return this.withDatabase((orm) =>
+      deleteEntry(orm, id)
+        ? entrySucceeded(undefined)
+        : entryFailed("not-found"),
+    );
   }
 
   /**

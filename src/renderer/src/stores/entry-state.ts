@@ -86,16 +86,21 @@ export interface EntryState {
    * 搜索框里的关键字.
    */
   readonly query: string;
+  /**
+   * 条目被编辑保存的次数. 详情视图把它放进 key, 让验证码与已显示的密钥在保存后回到最新.
+   */
+  readonly detailRevision: number;
 }
 
 /**
- * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空.
+ * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空, 还没有编辑过.
  */
 export const INITIAL_ENTRY_STATE: EntryState = {
   entries: [],
   loadStatus: "loading",
   selection: { status: "none" },
   query: "",
+  detailRevision: 0,
 };
 
 /**

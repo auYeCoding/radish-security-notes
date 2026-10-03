@@ -13,8 +13,8 @@ interface TypeFieldsEditorProps {
 }
 
 /**
- * 新建表单里按类型定义排列的字段区: 按类型的字段顺序逐项给出输入. 必须在 `FormProvider`
- * 里使用.
+ * 条目表单里按类型定义排列的字段区, 新建与编辑共用: 按类型的字段顺序逐项给出输入. 必须在
+ * `FormProvider` 里使用.
  * @param props 组件属性.
  * @returns 字段区元素.
  */

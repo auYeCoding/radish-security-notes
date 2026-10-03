@@ -15,6 +15,12 @@ const SQLCIPHER_CIPHER_NAME = "sqlcipher";
 const TEMPORARY_STORE_MEMORY = "MEMORY";
 
 /**
+ * 删除时覆写被删内容的开关. SQLite 默认只把被删记录所在的页标记为空闲, 内容 (仍是密文) 留在
+ * 文件里直到被新数据覆盖, 持有数据密钥的人可从空闲页读回; 打开后删除的内容会在页内写成零.
+ */
+const SECURE_DELETE_ON = "ON";
+
+/**
  * 底层 SQLite 连接的类型.
  */
 export type SqliteClient = Database.Database;
@@ -51,6 +57,7 @@ export function openEncryptedDatabase(
     client.pragma(`cipher='${SQLCIPHER_CIPHER_NAME}'`);
     client.pragma(`key="x'${dataKeyToHexadecimal(dataKey)}'"`);
     client.pragma(`temp_store = ${TEMPORARY_STORE_MEMORY}`);
+    client.pragma(`secure_delete = ${SECURE_DELETE_ON}`);
     client.prepare("select count(*) from sqlite_master").get();
     return client;
   } catch (error) {

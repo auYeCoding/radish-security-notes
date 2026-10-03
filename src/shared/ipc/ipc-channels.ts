@@ -17,6 +17,8 @@ export const IPC_CHANNELS = {
   entriesList: "entries:list",
   entriesGet: "entries:get",
   entriesCreate: "entries:create",
+  entriesUpdate: "entries:update",
+  entriesRemove: "entries:remove",
   entriesCopyField: "entries:copy-field",
   entriesCopyCustomField: "entries:copy-custom-field",
   totpGetCode: "totp:get-code",

@@ -92,18 +92,47 @@ function createFieldSchema(field: EntryFieldDefinition): z.ZodString {
 }
 
 /**
- * 按类型生成新建条目的校验方案, 渲染端表单与主进程共用: 名称去首尾空格后不能为空且不超过
- * 最多字符数, 类型的每个字段都必须是字符串并满足字段定义里的长度上限, 类型之外的字段被丢弃,
- * 备注与自定义字段不设长度与数量上限, TOTP 输入为空或能解析成受支持的配置. 校验消息是
+ * 条目内容各部分的校验规则, 新建与编辑的校验方案都由它组成.
+ */
+export interface EntryContentShape {
+  /**
+   * 名称的校验规则.
+   */
+  readonly name: z.ZodType<string, string>;
+  /**
+   * 类型字段的校验规则.
+   */
+  readonly fields: z.ZodType<Record<string, string>, Record<string, string>>;
+  /**
+   * 备注的校验规则.
+   */
+  readonly notes: z.ZodType<string, string>;
+  /**
+   * 自定义字段的校验规则.
+   */
+  readonly customFields: z.ZodType<
+    NewCustomFieldInput[],
+    NewCustomFieldInput[]
+  >;
+  /**
+   * TOTP 输入的校验规则.
+   */
+  readonly totp: z.ZodType<string, string>;
+}
+
+/**
+ * 按类型生成条目内容的校验规则, 新建与编辑共用: 名称去首尾空格后不能为空且不超过最多字符数,
+ * 类型的每个字段都必须是字符串并满足字段定义里的长度上限, 类型之外的字段被丢弃, 备注与自定义
+ * 字段不设长度与数量上限, TOTP 输入为空或能解析成受支持的配置. 校验消息是
  * `NEW_ENTRY_ERROR_CODES`, `CUSTOM_FIELD_ERROR_CODES` 或 `TOTP_INPUT_ERROR_CODES` 里的错误
  * 代码.
  * @param type 条目类型定义.
- * @returns 该类型的新建条目校验方案.
+ * @returns 名称, 类型字段, 备注, 自定义字段与 TOTP 输入各自的校验规则.
  */
-export function createNewEntrySchema(
+export function createEntryContentShape(
   type: PresetEntryTypeDefinition,
-): z.ZodType<NewEntryFormValues, NewEntryFormValues> {
-  return z.object({
+): EntryContentShape {
+  return {
     name: z
       .string()
       .trim()
@@ -121,5 +150,16 @@ export function createNewEntrySchema(
     notes: z.string(),
     customFields: z.array(customFieldInputSchema),
     totp: createTotpSchema(),
-  });
+  };
+}
+
+/**
+ * 按类型生成新建条目的校验方案, 渲染端表单与主进程共用, 规则见 `createEntryContentShape`.
+ * @param type 条目类型定义.
+ * @returns 该类型的新建条目校验方案.
+ */
+export function createNewEntrySchema(
+  type: PresetEntryTypeDefinition,
+): z.ZodType<NewEntryFormValues, NewEntryFormValues> {
+  return z.object(createEntryContentShape(type));
 }

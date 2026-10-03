@@ -6,7 +6,7 @@ import type { EntryTypeKey } from "@shared/entries/preset-entry-types";
 
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 
-import { describeCreateFailure } from "./new-entry-errors";
+import { describeCreateFailure } from "./describe-create-failure";
 
 /**
  * 新建条目的提交状态与方法.

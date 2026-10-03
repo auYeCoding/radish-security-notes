@@ -99,15 +99,7 @@
     "documentNumber": "Document number",
     "address": "Address"
   },
-  "entryCreate": {
-    "open": "New entry",
-    "title": "New entry",
-    "description": "The name is required. Everything else can stay empty. A custom field you add needs a field name.",
-    "typeStep": {
-      "title": "Choose an entry type",
-      "description": "Pick a type first. The form shows the fields of that type.",
-      "back": "Back"
-    },
+  "entryForm": {
     "nameLabel": "Name",
     "notesLabel": "Notes",
     "customFields": {
@@ -132,18 +124,65 @@
         "failed": "Reading the QR code failed. Try again."
       }
     },
-    "cancel": "Cancel",
-    "submit": "Save",
-    "submitting": "Saving...",
     "error": {
       "totpInvalid": "The TOTP secret or link is not valid. Check it and try again.",
       "totpUnsupported": "This link is not supported. Supported: TOTP type, SHA1, SHA256 or SHA512, 6 or 8 digits, a period of 1 to {maxPeriod} seconds.",
       "customFieldLabelRequired": "Enter a field name.",
       "nameRequired": "Enter a name.",
       "nameTooLong": "The name can have at most {maxLength} characters.",
-      "fieldTooLong": "{label} can have at most {maxLength} characters.",
+      "fieldTooLong": "{label} can have at most {maxLength} characters."
+    }
+  },
+  "entryCreate": {
+    "open": "New entry",
+    "title": "New entry",
+    "description": "The name is required. Everything else can stay empty. A custom field you add needs a field name.",
+    "typeStep": {
+      "title": "Choose an entry type",
+      "description": "Pick a type first. The form shows the fields of that type.",
+      "back": "Back"
+    },
+    "cancel": "Cancel",
+    "submit": "Save",
+    "submitting": "Saving...",
+    "error": {
       "invalid": "The content is not valid. Check it and try again.",
       "unexpected": "Saving failed. Close the app and try again."
+    }
+  },
+  "entryEdit": {
+    "open": "Edit entry",
+    "title": "Edit entry",
+    "description": "Save to apply your changes, or cancel to leave the entry as it is. The entry type cannot be changed.",
+    "totp": {
+      "keepDescription": "This entry already has TOTP. Leave this empty to keep it, or enter a new secret or link to replace it.",
+      "removeLabel": "Remove TOTP"
+    },
+    "cancel": "Cancel",
+    "submit": "Save",
+    "submitting": "Saving...",
+    "discard": {
+      "title": "Discard unsaved changes?",
+      "description": "If you close now, the changes you made to this entry will not be saved.",
+      "keepEditing": "Keep editing",
+      "confirm": "Discard changes"
+    },
+    "error": {
+      "invalid": "The content is not valid. Check it and try again.",
+      "notFound": "This entry no longer exists.",
+      "unexpected": "Saving failed. Close the app and try again."
+    }
+  },
+  "entryDelete": {
+    "open": "Delete entry",
+    "title": "Delete this entry?",
+    "description": "\"{name}\" will be deleted permanently. This cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete",
+    "deleting": "Deleting...",
+    "error": {
+      "notFound": "This entry no longer exists.",
+      "unexpected": "Deleting failed. Close the app and try again."
     }
   },
   "settings": {

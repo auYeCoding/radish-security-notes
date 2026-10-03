@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 
-import { EntryTypeIcon } from "@renderer/components/entry-type-icon";
+import { EntryTypeLabel } from "@renderer/components/entry-type-label";
 import { Button } from "@renderer/components/ui/button";
 
 /**
@@ -45,10 +45,7 @@ export function NewEntryTypeBar(
         <ArrowLeftIcon aria-hidden="true" />
         {t("entryCreate.typeStep.back")}
       </Button>
-      <p className="flex items-center gap-2 text-sm font-medium">
-        <EntryTypeIcon typeKey={props.type.key} className="size-4" />
-        {t(`entryTypes.${props.type.key}`)}
-      </p>
+      <EntryTypeLabel typeKey={props.type.key} />
     </div>
   );
 }

@@ -37,7 +37,7 @@ export interface EntryRecordSource {
  * @returns TOTP 配置, 输入为空表示不带 TOTP 时为 null.
  * @throws Error 当输入没有经过校验而不能解析时.
  */
-function resolveTotpConfig(input: string): TotpConfig | null {
+export function resolveTotpConfig(input: string): TotpConfig | null {
   if (isTotpInputBlank(input)) {
     return null;
   }

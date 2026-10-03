@@ -3,6 +3,7 @@ import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 import type { EntryService } from "../entries/entry-service";
 import { requireNewEntryInput } from "./new-entry-input-guard";
 import type { IpcMainPort } from "./preferences-ipc";
+import { requireUpdateEntryInput } from "./update-entry-input-guard";
 
 /**
  * 校验渲染进程传来的条目编号是字符串.
@@ -58,6 +59,12 @@ export function registerEntryIpc(
   );
   ipcMain.handle(IPC_CHANNELS.entriesCreate, (_event, input) =>
     service.create(requireNewEntryInput(input)),
+  );
+  ipcMain.handle(IPC_CHANNELS.entriesUpdate, (_event, id, input) =>
+    service.update(requireEntryIdentifier(id), requireUpdateEntryInput(input)),
+  );
+  ipcMain.handle(IPC_CHANNELS.entriesRemove, (_event, id) =>
+    service.remove(requireEntryIdentifier(id)),
   );
   ipcMain.handle(IPC_CHANNELS.entriesCopyField, (_event, id, field) =>
     service.copyField(requireEntryIdentifier(id), requireCopyField(field)),
