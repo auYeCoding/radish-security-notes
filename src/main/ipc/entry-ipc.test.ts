@@ -43,6 +43,10 @@ function createFakeIpcMain(): FakeIpcMain {
 function createFakeService(): EntryService {
   return {
     list: vi.fn(() => ({ ok: true, value: [] })),
+    search: vi.fn(() => ({
+      ok: true,
+      value: [{ id: "id-1", fields: ["name"] }],
+    })),
     get: vi.fn(() => ({ ok: false, reason: "not-found" })),
     create: vi.fn(() => ({ ok: true, value: { id: "id-1" } })),
     update: vi.fn(() => ({ ok: true, value: { id: "id-1" } })),
@@ -277,5 +281,30 @@ describe("registerEntryIpc 新建参数校验", () => {
       );
     }
     expect(service.create).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerEntryIpc 搜索", () => {
+  it("搜索通道把关键字交给服务并返回命中列表", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    const result = ipcMain.invoke(IPC_CHANNELS.entriesSearch, "github 工作");
+
+    expect(service.search).toHaveBeenCalledWith("github 工作");
+    expect(result).toEqual({
+      ok: true,
+      value: [{ id: "id-1", fields: ["name"] }],
+    });
+  });
+
+  it("关键字不是字符串时被拒绝且不触达服务", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    for (const query of [undefined, null, 1, { text: "a" }]) {
+      expect(() => ipcMain.invoke(IPC_CHANNELS.entriesSearch, query)).toThrow(
+        "无效的搜索关键字",
+      );
+    }
+    expect(service.search).not.toHaveBeenCalled();
   });
 });

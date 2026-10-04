@@ -53,7 +53,7 @@ describe("解锁后的工作区", () => {
     const user = userEvent.setup();
 
     await user.keyboard("bank");
-    expect(getEntryListItems()).toHaveLength(1);
+    await waitFor(() => expect(getEntryListItems()).toHaveLength(1));
     await user.click(screen.getByRole("button", { name: /银行/ }));
     await user.click(await screen.findByRole("button", { name: "复制 密码" }));
 

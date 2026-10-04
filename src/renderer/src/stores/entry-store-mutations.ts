@@ -82,12 +82,12 @@ export async function removeEntry(
     if (!result.ok) {
       return result;
     }
-    const { entries, query, selection, selectedTagIds, view } = get();
+    const { entries, searchMatches, selection, selectedTagIds, view } = get();
     const visible = selectVisibleEntries({
       entries,
       view,
       tagIds: selectedTagIds,
-      query,
+      matches: searchMatches,
     });
     const neighbour = findNeighbour(visible, id);
     const remaining = entries.filter((entry) => entry.id !== id);

@@ -111,6 +111,8 @@ export async function createEntry(
         entries: [toEntrySummary(result.value), ...get().entries],
         selection: { status: "ready", detail: result.value },
         query: "",
+        searchMatches: undefined,
+        searchedQuery: "",
         view: followEntryView(get().view, result.value.folderId),
         selectedTagIds: followEntryTags(
           get().selectedTagIds,

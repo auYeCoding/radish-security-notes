@@ -1,5 +1,6 @@
 import type { EntryDetail, EntrySummary } from "@shared/entries/entry-types";
 import { ALL_ENTRIES_VIEW, type FolderView } from "@shared/folders/folder-view";
+import type { EntrySearchMatches } from "@shared/search/entry-search-types";
 
 /**
  * 条目列表的读取状态.
@@ -88,6 +89,16 @@ export interface EntryState {
    */
   readonly query: string;
   /**
+   * 主进程最近一次完成的搜索的命中表, 只含条目编号与命中字段名. 关键字为空时为 undefined, 关键字
+   * 刚改变而新结果还没返回时仍是上一次的结果. 只在内存里, 不持久化.
+   */
+  readonly searchMatches: EntrySearchMatches | undefined;
+  /**
+   * 命中表对应的关键字, 即最近一次完成的搜索用的关键字. 列表项按它高亮, 这样输入新关键字而新结果
+   * 还没返回时, 高亮不动, 不用为每个列表项重新计算. 没有搜索结果时为空串.
+   */
+  readonly searchedQuery: string;
+  /**
    * 左侧栏当前选中的入口: 全部条目, 未分类或某个文件夹, 列表只显示属于它的条目, 搜索也只在其中
    * 进行. 只在内存里, 不持久化.
    */
@@ -104,14 +115,16 @@ export interface EntryState {
 }
 
 /**
- * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空, 入口是全部条目, 没有选中标签,
- * 还没有编辑过.
+ * 条目 store 的初始状态: 还没有读取, 没有选中, 关键字为空, 没有搜索结果, 入口是全部条目,
+ * 没有选中标签, 还没有编辑过.
  */
 export const INITIAL_ENTRY_STATE: EntryState = {
   entries: [],
   loadStatus: "loading",
   selection: { status: "none" },
   query: "",
+  searchMatches: undefined,
+  searchedQuery: "",
   view: ALL_ENTRIES_VIEW,
   selectedTagIds: [],
   detailRevision: 0,

@@ -5,6 +5,7 @@ import {
   UNCATEGORIZED_VIEW,
   folderViewOf,
 } from "../folders/folder-view";
+import { toSearchMatches } from "../search/search-matches";
 import type { EntrySummary } from "./entry-types";
 import { selectVisibleEntries } from "./visible-entries";
 
@@ -24,6 +25,15 @@ function summaryOf(
 }
 
 /**
+ * 为一组条目编号生成命中表, 命中字段都是名称.
+ * @param ids 命中的条目编号.
+ * @returns 命中表.
+ */
+function matchesOf(...ids: string[]): ReturnType<typeof toSearchMatches> {
+  return toSearchMatches(ids.map((id) => ({ id, fields: ["name"] })));
+}
+
+/**
  * 测试用的条目: 文件夹甲里两个, 一个带工作, 一个带工作与个人; 未分类里一个带工作, 一个没有标签.
  */
 const ENTRIES: readonly EntrySummary[] = [
@@ -34,12 +44,12 @@ const ENTRIES: readonly EntrySummary[] = [
 ];
 
 describe("selectVisibleEntries", () => {
-  it("没有已选标签与关键字时只按入口取条目", () => {
+  it("没有已选标签与搜索命中表时只按入口取条目", () => {
     const all = selectVisibleEntries({
       entries: ENTRIES,
       view: ALL_ENTRIES_VIEW,
       tagIds: [],
-      query: "",
+      matches: undefined,
     });
 
     expect(all).toEqual(ENTRIES);
@@ -50,7 +60,7 @@ describe("selectVisibleEntries", () => {
       entries: ENTRIES,
       view: folderViewOf("folder-a"),
       tagIds: ["work", "home"],
-      query: "",
+      matches: undefined,
     });
 
     expect(result.map((entry) => entry.id)).toEqual(["a-both"]);
@@ -61,13 +71,13 @@ describe("selectVisibleEntries", () => {
       entries: ENTRIES,
       view: ALL_ENTRIES_VIEW,
       tagIds: ["work"],
-      query: "",
+      matches: undefined,
     });
     const loose = selectVisibleEntries({
       entries: ENTRIES,
       view: UNCATEGORIZED_VIEW,
       tagIds: ["work"],
-      query: "",
+      matches: undefined,
     });
 
     expect(everywhere.map((entry) => entry.id)).toEqual([
@@ -77,16 +87,29 @@ describe("selectVisibleEntries", () => {
     ]);
     expect(loose.map((entry) => entry.id)).toEqual(["loose-work"]);
   });
+});
 
+describe("selectVisibleEntries 的搜索命中表", () => {
   it("搜索只在入口与标签筛出的条目里进行", () => {
     const result = selectVisibleEntries({
       entries: ENTRIES,
       view: ALL_ENTRIES_VIEW,
       tagIds: ["work"],
-      query: "loose",
+      matches: matchesOf("loose-work", "loose-none"),
     });
 
     expect(result.map((entry) => entry.id)).toEqual(["loose-work"]);
+  });
+
+  it("命中表为空时没有可见条目", () => {
+    const result = selectVisibleEntries({
+      entries: ENTRIES,
+      view: ALL_ENTRIES_VIEW,
+      tagIds: [],
+      matches: matchesOf(),
+    });
+
+    expect(result).toEqual([]);
   });
 });
 
@@ -102,7 +125,7 @@ describe("selectVisibleEntries 的名称排序", () => {
       ],
       view: ALL_ENTRIES_VIEW,
       tagIds: [],
-      query: "",
+      matches: undefined,
     });
 
     expect(result.map((entry) => entry.id)).toEqual([
@@ -114,7 +137,7 @@ describe("selectVisibleEntries 的名称排序", () => {
     ]);
   });
 
-  it("入口, 标签与关键字筛出的条目也按名称排序", () => {
+  it("入口, 标签与搜索命中筛出的条目也按名称排序", () => {
     const result = selectVisibleEntries({
       entries: [
         summaryOf("beta", "folder-a", ["work"]),
@@ -124,7 +147,7 @@ describe("selectVisibleEntries 的名称排序", () => {
       ],
       view: folderViewOf("folder-a"),
       tagIds: ["work"],
-      query: "a",
+      matches: matchesOf("beta", "alpha1", "ab", "ab-other"),
     });
 
     expect(result.map((entry) => entry.id)).toEqual(["ab", "beta", "alpha1"]);
@@ -137,7 +160,7 @@ describe("selectVisibleEntries 的名称排序", () => {
       entries,
       view: ALL_ENTRIES_VIEW,
       tagIds: [],
-      query: "",
+      matches: undefined,
     });
 
     expect(entries.map((entry) => entry.id)).toEqual(["b", "a"]);

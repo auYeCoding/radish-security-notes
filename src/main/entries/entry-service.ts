@@ -16,6 +16,7 @@ import {
   findEntryType,
   requireEntryType,
 } from "@shared/entries/preset-entry-types";
+import type { EntrySearchHit } from "@shared/search/entry-search-types";
 import { tagIdsOrOmitted } from "@shared/tags/tag-filter";
 
 import { isFolderChoiceValid } from "../folders/folder-repository";
@@ -34,6 +35,7 @@ import type { ClipboardPort } from "./clipboard-port";
 import { findCustomField } from "./custom-field-records";
 import { findCopyValue, normalizeFieldValues } from "./entry-field-values";
 import { buildEntryRecord } from "./entry-record-builder";
+import { searchEntries } from "./entry-search";
 import { attachTagIds } from "./entry-tag-attachment";
 import {
   deleteEntry,
@@ -107,6 +109,17 @@ export class EntryService {
       entrySucceeded(
         attachTagIds(listEntrySummaries(orm), listTagIdsByEntry(orm)),
       ),
+    );
+  }
+
+  /**
+   * 在全部条目里搜索, 只返回命中的条目编号与命中的字段名, 字段内容不离开主进程.
+   * @param query 搜索栏里的关键字.
+   * @returns 命中列表, 未解锁时为失败结果.
+   */
+  search(query: string): EntryResult<readonly EntrySearchHit[]> {
+    return this.withDatabase((orm) =>
+      entrySucceeded(searchEntries(orm, query)),
     );
   }
 

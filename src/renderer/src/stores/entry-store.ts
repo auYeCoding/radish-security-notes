@@ -21,6 +21,7 @@ import {
   selectView,
 } from "./entry-store-folder-mutations";
 import { removeEntry, updateEntry } from "./entry-store-mutations";
+import { applyQuery, runEntrySearch } from "./entry-store-search";
 import { releaseTag, toggleTag } from "./entry-store-tag-mutations";
 import { INITIAL_ENTRY_STATE, type EntryState } from "./entry-state";
 
@@ -41,10 +42,15 @@ export interface EntryActions {
    */
   select: (id: string) => Promise<void>;
   /**
-   * 设置搜索关键字, 列表据此即时过滤.
+   * 设置搜索关键字, 关键字为空时立即恢复列表, 不为空时的过滤由 `search` 取得结果后生效.
    * @param query 搜索框里的关键字.
    */
   setQuery: (query: string) => void;
+  /**
+   * 让主进程按当前关键字搜索条目, 取得命中表后列表据此过滤.
+   * @returns 搜索完成后兑现.
+   */
+  search: () => Promise<void>;
   /**
    * 新建一个条目, 成功后选中它.
    * @param input 用户选的类型, 填写的名称, 类型字段, 备注与自定义字段.
@@ -145,7 +151,8 @@ export function createEntryStore(
       ...INITIAL_ENTRY_STATE,
       load: () => loadEntries(access),
       select: (id) => selectEntry(access, id),
-      setQuery: (query) => set({ query }),
+      setQuery: (query) => applyQuery(access, query),
+      search: () => runEntrySearch(access),
       create: (input) => createEntry(access, input),
       update: (id, input) => updateEntry(access, id, input),
       remove: (id) => removeEntry(access, id),

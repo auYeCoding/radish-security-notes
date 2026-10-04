@@ -172,6 +172,7 @@ describe("条目 store 把条目放进文件夹", () => {
     const store = await createLoadedStore();
     store.getState().selectView(folderViewOf("work"));
     store.getState().setQuery("银行");
+    await store.getState().search();
     await store.getState().select("bank");
 
     await store.getState().applyEntryFolder("bank", "home");

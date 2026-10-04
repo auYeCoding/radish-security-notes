@@ -57,7 +57,8 @@ export async function applyEntryFolder(
   entryId: string,
   folderId: string | undefined,
 ): Promise<void> {
-  const { entries, query, selection, selectedTagIds, view } = access.get();
+  const { entries, searchMatches, selection, selectedTagIds, view } =
+    access.get();
   const moved = entries.map((entry) =>
     entry.id === entryId ? { ...entry, folderId } : entry,
   );
@@ -77,7 +78,7 @@ export async function applyEntryFolder(
     entries,
     view,
     tagIds: selectedTagIds,
-    query,
+    matches: searchMatches,
   });
   const neighbour: EntrySummary | undefined = findNeighbour(visible, entryId);
   access.set({

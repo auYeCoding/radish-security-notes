@@ -3,7 +3,7 @@
     "title": "安全笔记"
   },
   "search": {
-    "placeholder": "搜索名称或账号",
+    "placeholder": "搜索条目",
     "label": "搜索"
   },
   "common": {
@@ -124,6 +124,13 @@
     "count": "共 {count} 个条目",
     "empty": "还没有条目",
     "noMatches": "没有匹配的条目",
+    "noMatchesInFilter": "搜索只在当前筛选结果里进行",
+    "matchedFields": "命中: {fields}",
+    "hit": {
+      "notes": "备注",
+      "customFieldLabel": "自定义字段",
+      "tag": "标签"
+    },
     "emptyView": "这里还没有条目",
     "loadFailed": "无法读取条目. 请关闭应用后重试."
   },

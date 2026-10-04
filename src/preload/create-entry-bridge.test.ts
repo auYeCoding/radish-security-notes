@@ -14,6 +14,23 @@ describe("createEntryBridge 读取与新建", () => {
     expect(result).toEqual({ ok: true, value: [] });
   });
 
+  it("search 调用搜索通道并带上关键字", async () => {
+    const invoke = vi.fn(() =>
+      Promise.resolve({ ok: true, value: [{ id: "id-1", fields: ["name"] }] }),
+    );
+
+    const result = await createEntryBridge({ invoke }).search("github 工作");
+
+    expect(invoke).toHaveBeenCalledWith(
+      IPC_CHANNELS.entriesSearch,
+      "github 工作",
+    );
+    expect(result).toEqual({
+      ok: true,
+      value: [{ id: "id-1", fields: ["name"] }],
+    });
+  });
+
   it("get 调用详情通道并带上编号", async () => {
     const invoke = vi.fn(() =>
       Promise.resolve({ ok: false, reason: "not-found" }),

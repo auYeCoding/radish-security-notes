@@ -71,25 +71,42 @@ describe("EntryListPane 展示", () => {
   });
 });
 
+/**
+ * 设置关键字并等主进程的搜索结果回来.
+ * @param environment 条目环境.
+ * @param query 搜索框里的关键字.
+ * @returns 搜索结果放进 store 后兑现.
+ */
+async function searchFor(
+  environment: EntryTestEnvironment,
+  query: string,
+): Promise<void> {
+  const { entryStore } = environment;
+  await act(async () => {
+    entryStore.getState().setQuery(query);
+    await entryStore.getState().search();
+  });
+}
+
 describe("EntryListPane 过滤", () => {
   it("关键字匹配名称或账号, 数量随之变化, 清空后恢复全部", async () => {
-    const { entryStore } = await renderPane({ entries: TEST_ENTRIES });
+    const environment = await renderPane({ entries: TEST_ENTRIES });
 
-    act(() => entryStore.getState().setQuery("bank"));
+    await searchFor(environment, "bank");
     expect(screen.getAllByRole("listitem")).toHaveLength(1);
     expect(screen.getByText("共 1 个条目")).toBeDefined();
 
-    act(() => entryStore.getState().setQuery("维基"));
+    await searchFor(environment, "维基");
     expect(screen.getByRole("button", { name: /维基/ })).toBeDefined();
 
-    act(() => entryStore.getState().setQuery(""));
+    await searchFor(environment, "");
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
   });
 
   it("没有匹配时显示无匹配的说明, 而不是还没有条目", async () => {
-    const { entryStore } = await renderPane({ entries: TEST_ENTRIES });
+    const environment = await renderPane({ entries: TEST_ENTRIES });
 
-    act(() => entryStore.getState().setQuery("zzz"));
+    await searchFor(environment, "zzz");
 
     expect(screen.getByText("没有匹配的条目")).toBeDefined();
     expect(screen.queryByText("还没有条目")).toBeNull();

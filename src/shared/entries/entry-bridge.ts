@@ -1,3 +1,4 @@
+import type { EntrySearchHit } from "../search/entry-search-types";
 import type { EntryResult } from "./entry-result";
 import type {
   EntryDetail,
@@ -15,6 +16,12 @@ export interface EntryBridge {
    * @returns 摘要列表.
    */
   list: () => Promise<EntryResult<readonly EntrySummary[]>>;
+  /**
+   * 在全部条目里搜索, 字段内容留在主进程, 渲染进程只拿到命中的条目编号与命中的字段名.
+   * @param query 搜索栏里的关键字.
+   * @returns 命中列表.
+   */
+  search: (query: string) => Promise<EntryResult<readonly EntrySearchHit[]>>;
   /**
    * 读取一个条目的详情.
    * @param id 条目编号.

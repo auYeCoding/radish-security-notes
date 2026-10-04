@@ -3,7 +3,7 @@
     "title": "Security Notes"
   },
   "search": {
-    "placeholder": "Search by name or account",
+    "placeholder": "Search entries",
     "label": "Search"
   },
   "common": {
@@ -124,6 +124,13 @@
     "count": "{count, plural, one {# entry} other {# entries}}",
     "empty": "No entries yet",
     "noMatches": "No matching entries",
+    "noMatchesInFilter": "Search only covers the current filter results",
+    "matchedFields": "Matched: {fields}",
+    "hit": {
+      "notes": "Notes",
+      "customFieldLabel": "Custom field",
+      "tag": "Tag"
+    },
     "emptyView": "No entries here yet",
     "loadFailed": "Unable to load entries. Close the app and try again."
   },

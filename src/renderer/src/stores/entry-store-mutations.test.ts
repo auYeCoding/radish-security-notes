@@ -178,8 +178,10 @@ describe("条目 store 删除的边界", () => {
   it("搜索过滤时按当前可见的列表选中相邻条目", async () => {
     const store = await createLoadedStore();
     store.getState().setQuery("account");
+    await store.getState().search();
     await store.getState().select("forum");
     store.getState().setQuery("forum");
+    await store.getState().search();
 
     await store.getState().remove("forum");
 

@@ -7,7 +7,10 @@ import {
   type NewEntryInput,
   type UpdateEntryInput,
 } from "@shared/entries/entry-types";
+import type { TagSummary } from "@shared/tags/tag-types";
 import { vi } from "vitest";
+
+import { searchFakeEntries } from "./fake-entry-search";
 
 /**
  * 假桥给自定义字段编号时的写法: 前缀加从 1 开始的位置.
@@ -81,16 +84,21 @@ function detailFromUpdate(
  * 创建组件测试用的假条目桥: 条目存在内存里, 最新创建的在最前, 每个方法都是间谍.
  * @param initial 初始条目, 按最新创建在前排列.
  * @param overrides 覆盖假桥上的方法, 例如让复制失败.
+ * @param tags 假标签桥里的标签, 搜索时用来把条目的标签编号换成标签名.
  * @returns 假条目桥.
  */
 export function createFakeEntryBridge(
   initial: readonly EntryDetail[] = [],
   overrides: Partial<EntryBridge> = {},
+  tags: readonly TagSummary[] = [],
 ): EntryBridge {
   const details = [...initial];
   return {
     list: vi.fn(() =>
       Promise.resolve(entrySucceeded(details.map(toEntrySummary))),
+    ),
+    search: vi.fn((query: string) =>
+      Promise.resolve(entrySucceeded(searchFakeEntries(details, tags, query))),
     ),
     get: vi.fn((id: string) => {
       const found = details.find((detail) => detail.id === id);

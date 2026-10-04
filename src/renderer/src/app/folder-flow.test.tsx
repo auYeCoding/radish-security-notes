@@ -147,7 +147,8 @@ describe("点文件夹筛选条目", () => {
     await user.click(navButton("工作", 2));
 
     await user.type(screen.getByRole("searchbox", { name: "搜索" }), "维基");
-    expect(screen.getByText("没有匹配的条目")).toBeDefined();
+    expect(await screen.findByText("没有匹配的条目")).toBeDefined();
+    expect(screen.getByText("搜索只在当前筛选结果里进行")).toBeDefined();
     await user.click(navButton("全部条目", 3));
 
     expect(listedNames()).toEqual(["维基"]);

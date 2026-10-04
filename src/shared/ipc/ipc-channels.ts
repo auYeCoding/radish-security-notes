@@ -21,6 +21,7 @@ export const IPC_CHANNELS = {
   entriesRemove: "entries:remove",
   entriesCopyField: "entries:copy-field",
   entriesCopyCustomField: "entries:copy-custom-field",
+  entriesSearch: "entries:search",
   foldersList: "folders:list",
   foldersCreate: "folders:create",
   foldersRename: "folders:rename",

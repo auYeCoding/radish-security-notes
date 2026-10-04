@@ -125,6 +125,7 @@ export async function createEntryTestEnvironment(
   const entryBridge = createFakeEntryBridge(
     options.entries,
     options.entryBridgeOverrides,
+    options.tags,
   );
   const totpBridge = createFakeTotpBridge(options.totpBridgeOverrides);
   const folderBridge = createFakeFolderBridge(

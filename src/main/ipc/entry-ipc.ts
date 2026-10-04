@@ -3,6 +3,7 @@ import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 import type { EntryService } from "../entries/entry-service";
 import { requireNewEntryInput } from "./new-entry-input-guard";
 import type { IpcMainPort } from "./preferences-ipc";
+import { requireSearchQuery } from "./search-query-guard";
 import { requireUpdateEntryInput } from "./update-entry-input-guard";
 
 /**
@@ -54,6 +55,9 @@ export function registerEntryIpc(
   service: EntryService,
 ): void {
   ipcMain.handle(IPC_CHANNELS.entriesList, () => service.list());
+  ipcMain.handle(IPC_CHANNELS.entriesSearch, (_event, query) =>
+    service.search(requireSearchQuery(query)),
+  );
   ipcMain.handle(IPC_CHANNELS.entriesGet, (_event, id) =>
     service.get(requireEntryIdentifier(id)),
   );

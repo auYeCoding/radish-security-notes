@@ -28,10 +28,11 @@ describe("SearchBar 聚焦", () => {
     );
   });
 
-  it("占位文案说明搜索范围是名称或账号", async () => {
+  it("占位文案是搜索条目, 不再限定为名称或账号", async () => {
     await renderBar();
 
-    expect(screen.getByPlaceholderText("搜索名称或账号")).toBeDefined();
+    expect(screen.getByPlaceholderText("搜索条目")).toBeDefined();
+    expect(screen.queryByPlaceholderText("搜索名称或账号")).toBeNull();
   });
 });
 

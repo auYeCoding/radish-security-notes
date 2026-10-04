@@ -157,15 +157,15 @@ describe("标签筛选与文件夹, 搜索的组合", () => {
     const user = userEvent.setup();
 
     await user.click(navButton("工作", 2));
-    await user.type(screen.getByPlaceholderText("搜索名称或账号"), "bank");
+    await user.type(screen.getByPlaceholderText("搜索条目"), "bank");
 
-    const names = listedNames();
-    expect(names).toHaveLength(1);
-    expect(names[0]).toContain("银行");
+    await waitFor(() => expect(listedNames()).toHaveLength(1));
+    expect(listedNames()[0]).toContain("银行");
 
-    await user.clear(screen.getByPlaceholderText("搜索名称或账号"));
-    await user.type(screen.getByPlaceholderText("搜索名称或账号"), "wiki");
-    expect(screen.getByText("没有匹配的条目")).toBeDefined();
+    await user.clear(screen.getByPlaceholderText("搜索条目"));
+    await user.type(screen.getByPlaceholderText("搜索条目"), "wiki");
+    expect(await screen.findByText("没有匹配的条目")).toBeDefined();
+    expect(screen.getByText("搜索只在当前筛选结果里进行")).toBeDefined();
   });
 });
 

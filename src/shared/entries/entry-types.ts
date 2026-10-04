@@ -16,7 +16,7 @@ export type EntryFieldValues = Readonly<Record<string, string>>;
 export const NOTES_FIELD_KEY = "notes";
 
 /**
- * 列表里展示的条目摘要. 不含密码等字段值, 渲染端用它做列表与搜索.
+ * 列表里展示的条目摘要. 不含密码等字段值, 渲染端用它做列表; 搜索在主进程里进行, 渲染端只拿到命中的条目编号.
  */
 export interface EntrySummary {
   /**
