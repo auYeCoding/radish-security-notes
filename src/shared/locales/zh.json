@@ -117,7 +117,14 @@
     "movedOverNothing": "条目 {name} 不在任何文件夹上方.",
     "dropped": "已把条目 {name} 放入 {target}.",
     "droppedNowhere": "条目 {name} 没有放入任何文件夹.",
-    "cancelled": "已取消移动条目 {name}."
+    "cancelled": "已取消移动条目 {name}.",
+    "previewBatch": "{count} 个条目",
+    "pickedUpBatch": "已拿起 {count} 个条目.",
+    "movedOverBatch": "{count} 个条目在 {target} 上方.",
+    "movedOverNothingBatch": "{count} 个条目不在任何文件夹上方.",
+    "droppedBatch": "已把 {count} 个条目放入 {target}.",
+    "droppedNowhereBatch": "{count} 个条目没有放入任何文件夹.",
+    "cancelledBatch": "已取消移动 {count} 个条目."
   },
   "entryListPane": {
     "heading": "条目",
@@ -311,6 +318,28 @@
     "error": {
       "notFound": "这个条目已不存在.",
       "unexpected": "删除失败. 请关闭应用后重试."
+    }
+  },
+  "batch": {
+    "barLabel": "批量操作",
+    "selectAll": "全选",
+    "selectedCount": "已选 {count} 项",
+    "rowCheckboxPrompt": "选择条目",
+    "invert": "反选",
+    "move": "移入文件夹",
+    "addTag": "加标签",
+    "removeTag": "摘标签",
+    "delete": "删除选中的条目",
+    "deleteTitle": "删除选中的条目?",
+    "deleteDescription": "选中的 {count} 个条目将被永久删除, 无法恢复.",
+    "dismiss": "关闭提示",
+    "error": {
+      "notFound": "有条目已不存在, 操作没有执行.",
+      "folderNotFound": "目标文件夹已不存在, 操作没有执行.",
+      "tagNotFound": "这个标签已不存在, 操作没有执行.",
+      "tagLimit": "有条目已带满 {max} 个标签, 操作没有执行.",
+      "invalidInput": "没有选中任何条目, 操作没有执行.",
+      "unexpected": "操作失败, 没有任何改动. 请重试, 仍失败请关闭应用后重试."
     }
   },
   "settings": {

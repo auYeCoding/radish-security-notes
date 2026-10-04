@@ -9,7 +9,8 @@ import { isBlankQuery } from "@renderer/stores/entry-store-search";
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 
 import { EntryListEmptyState } from "./entry-list-empty-state";
-import { EntryListItem } from "./entry-list-item";
+import { EntryListRows } from "./entry-list-rows";
+import { useEntryListChecking } from "./use-entry-list-checking";
 
 /**
  * 列表主体的属性.
@@ -23,7 +24,7 @@ interface EntryListBodyProps {
 
 /**
  * 列表主体: 读取失败时说明原因, 读取中不显示内容, 没有条目, 没有匹配或当前入口里没有条目时显示空状态,
- * 否则逐项列出条目并标出选中项, 搜索时名称与账号里命中的部分高亮.
+ * 否则逐项列出条目并标出选中项与勾选项, 搜索时名称与账号里命中的部分高亮.
  * @param props 组件属性.
  * @returns 列表主体元素, 读取中时为 null.
  */
@@ -31,6 +32,7 @@ export function EntryListBody(
   props: EntryListBodyProps,
 ): React.JSX.Element | null {
   const { t } = useTranslation();
+  const { entries } = props;
   const loadStatus = useEntryStore((state) => state.loadStatus);
   const hasAnyEntry = useEntryStore((state) => state.entries.length > 0);
   const selectedId = useEntryStore((state) => selectedIdOf(state.selection));
@@ -39,19 +41,15 @@ export function EntryListBody(
   const isFiltered = useEntryStore(
     (state) => state.view.kind !== "all" || state.selectedTagIds.length > 0,
   );
-  const handleSelect = useCallback(
-    (id: string) => {
-      void select(id);
-    },
-    [select],
-  );
+  const checking = useEntryListChecking(entries);
+  const handleSelect = useCallback((id: string) => void select(id), [select]);
   if (loadStatus === "failed") {
     return <EmptyState message={t("entryListPane.loadFailed")} />;
   }
   if (loadStatus === "loading") {
     return null;
   }
-  if (props.entries.length === 0) {
+  if (entries.length === 0) {
     return (
       <EntryListEmptyState
         hasAnyEntry={hasAnyEntry}
@@ -61,15 +59,11 @@ export function EntryListBody(
     );
   }
   return (
-    <ul>
-      {props.entries.map((entry) => (
-        <EntryListItem
-          key={entry.id}
-          entry={entry}
-          isSelected={entry.id === selectedId}
-          onSelect={handleSelect}
-        />
-      ))}
-    </ul>
+    <EntryListRows
+      entries={entries}
+      selectedId={selectedId}
+      onSelect={handleSelect}
+      checking={checking}
+    />
   );
 }

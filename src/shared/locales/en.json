@@ -117,7 +117,14 @@
     "movedOverNothing": "Entry {name} is not over any folder.",
     "dropped": "Moved entry {name} to {target}.",
     "droppedNowhere": "Entry {name} was not moved to any folder.",
-    "cancelled": "Cancelled moving entry {name}."
+    "cancelled": "Cancelled moving entry {name}.",
+    "previewBatch": "{count, plural, one {# entry} other {# entries}}",
+    "pickedUpBatch": "Picked up {count, plural, one {# entry} other {# entries}}.",
+    "movedOverBatch": "{count, plural, one {# entry is} other {# entries are}} over {target}.",
+    "movedOverNothingBatch": "{count, plural, one {# entry is} other {# entries are}} not over any folder.",
+    "droppedBatch": "Moved {count, plural, one {# entry} other {# entries}} to {target}.",
+    "droppedNowhereBatch": "{count, plural, one {# entry was} other {# entries were}} not moved to any folder.",
+    "cancelledBatch": "Cancelled moving {count, plural, one {# entry} other {# entries}}."
   },
   "entryListPane": {
     "heading": "Entries",
@@ -311,6 +318,28 @@
     "error": {
       "notFound": "This entry no longer exists.",
       "unexpected": "Deleting failed. Close the app and try again."
+    }
+  },
+  "batch": {
+    "barLabel": "Batch actions",
+    "selectAll": "Select all",
+    "selectedCount": "{count} selected",
+    "rowCheckboxPrompt": "Select entry",
+    "invert": "Invert selection",
+    "move": "Move to folder",
+    "addTag": "Add tag",
+    "removeTag": "Remove tag",
+    "delete": "Delete selected entries",
+    "deleteTitle": "Delete the selected entries?",
+    "deleteDescription": "{count, plural, one {# selected entry will be deleted permanently} other {# selected entries will be deleted permanently}}. This cannot be undone.",
+    "dismiss": "Dismiss message",
+    "error": {
+      "notFound": "Some entries no longer exist. Nothing was changed.",
+      "folderNotFound": "The target folder no longer exists. Nothing was changed.",
+      "tagNotFound": "This tag no longer exists. Nothing was changed.",
+      "tagLimit": "Some entries already have {max} tags. Nothing was changed.",
+      "invalidInput": "No entries are selected. Nothing was changed.",
+      "unexpected": "The action failed and nothing was changed. Try again, and if it still fails close the app and try again."
     }
   },
   "settings": {

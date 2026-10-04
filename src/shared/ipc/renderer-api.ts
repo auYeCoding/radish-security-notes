@@ -1,3 +1,4 @@
+import type { BatchBridge } from "../batch/batch-bridge";
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
 import type { FolderBridge } from "../folders/folder-bridge";
@@ -34,6 +35,10 @@ export interface RendererApi {
    * 标签接口: 读取, 新建, 编辑与删除标签.
    */
   readonly tags: TagBridge;
+  /**
+   * 批量接口: 一次删除, 移入文件夹, 加标签或摘标签多个条目.
+   */
+  readonly batch: BatchBridge;
   /**
    * TOTP 接口: 读取验证码与密钥, 复制验证码与密钥, 解码二维码图片.
    */

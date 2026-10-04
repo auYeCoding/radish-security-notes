@@ -1,3 +1,4 @@
+import type { BatchBridge } from "@shared/batch/batch-bridge";
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import type { EntryDetail } from "@shared/entries/entry-types";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
@@ -5,22 +6,23 @@ import type { FolderBridge } from "@shared/folders/folder-bridge";
 import type { FolderSummary } from "@shared/folders/folder-types";
 import type { TagBridge } from "@shared/tags/tag-bridge";
 import type { TagSummary } from "@shared/tags/tag-types";
-import type { ReactNode } from "react";
 
+import {
+  createBatchSelectionStore,
+  type BatchSelectionStore,
+} from "@renderer/stores/batch-selection-store";
 import {
   createEntryStore,
   type EntryStore,
 } from "@renderer/stores/entry-store";
-import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
 import {
   createFolderStore,
   type FolderStore,
 } from "@renderer/stores/folder-store";
-import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { createTagStore, type TagStore } from "@renderer/stores/tag-store";
-import { TagStoreProvider } from "@renderer/stores/tag-store-provider";
-import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
 
+import { createEntryTestProviders } from "./entry-test-providers";
+import { createFakeBatchBridge } from "./fake-batch-bridge";
 import { createFakeEntryBridge } from "./fake-entry-bridge";
 import { createFakeFolderBridge } from "./fake-folder-bridge";
 import { createFakeTagBridge } from "./fake-tag-bridge";
@@ -44,6 +46,10 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    */
   readonly entryBridgeOverrides?: Partial<EntryBridge>;
   /**
+   * 覆盖假批量桥上的方法, 例如让批量删除失败.
+   */
+  readonly batchBridgeOverrides?: Partial<BatchBridge>;
+  /**
    * 覆盖假 TOTP 桥上的方法, 例如让取码失败.
    */
   readonly totpBridgeOverrides?: Partial<TotpBridge>;
@@ -66,24 +72,22 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
 }
 
 /**
- * 包裹被测组件的 Provider 的属性.
- */
-interface EntryTestProvidersProps {
-  /**
-   * 被测组件.
-   */
-  readonly children: ReactNode;
-}
-
-/**
  * 组件测试用的条目环境: 在保险库环境之上增加假的条目桥, 真实的条目 store, 假的文件夹桥, 真实的
- * 文件夹 store, 假的标签桥, 真实的标签 store 与假的 TOTP 桥.
+ * 文件夹 store, 假的标签桥, 真实的标签 store, 假的批量桥, 真实的批量选中 store 与假的 TOTP 桥.
  */
 export interface EntryTestEnvironment extends VaultTestEnvironment {
   /**
    * 带间谍方法的假条目桥.
    */
   readonly entryBridge: EntryBridge;
+  /**
+   * 带间谍方法的假批量桥, 与假条目桥共享条目数据.
+   */
+  readonly batchBridge: BatchBridge;
+  /**
+   * 被测的批量选中 store.
+   */
+  readonly batchSelectionStore: BatchSelectionStore;
   /**
    * 带间谍方法的假 TOTP 桥.
    */
@@ -111,9 +115,44 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
 }
 
 /**
+ * 条目测试环境里的假桥.
+ */
+type EntryTestBridges = Pick<
+  EntryTestEnvironment,
+  "entryBridge" | "batchBridge" | "totpBridge" | "folderBridge" | "tagBridge"
+>;
+
+/**
+ * 按选项创建条目测试环境里的全部假桥, 假条目桥与假批量桥共享同一份条目数据.
+ * @param options 初始条目, 文件夹与标签, 桥方法的覆盖.
+ * @returns 假桥.
+ */
+function createEntryTestBridges(
+  options: EntryTestEnvironmentOptions,
+): EntryTestBridges {
+  const details = [...(options.entries ?? [])];
+  return {
+    entryBridge: createFakeEntryBridge(
+      options.entries,
+      options.entryBridgeOverrides,
+      options.tags,
+      details,
+    ),
+    batchBridge: createFakeBatchBridge(details, options.batchBridgeOverrides),
+    totpBridge: createFakeTotpBridge(options.totpBridgeOverrides),
+    folderBridge: createFakeFolderBridge(
+      options.folders,
+      options.folderBridgeOverrides,
+    ),
+    tagBridge: createFakeTagBridge(options.tags, options.tagBridgeOverrides),
+  };
+}
+
+/**
  * 创建组件测试用的条目环境, 保险库默认已解锁.
  * @param options 保险库初始状态, 初始条目, 文件夹与标签, 桥方法的覆盖.
- * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目, 文件夹, 标签五个 store 与 TOTP 桥.
+ * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目, 文件夹, 标签, 批量选中六个 store,
+ * 批量桥与 TOTP 桥.
  */
 export async function createEntryTestEnvironment(
   options: EntryTestEnvironmentOptions = {},
@@ -122,39 +161,27 @@ export async function createEntryTestEnvironment(
     status: "unlocked",
     ...options,
   });
-  const entryBridge = createFakeEntryBridge(
-    options.entries,
-    options.entryBridgeOverrides,
-    options.tags,
-  );
-  const totpBridge = createFakeTotpBridge(options.totpBridgeOverrides);
-  const folderBridge = createFakeFolderBridge(
-    options.folders,
-    options.folderBridgeOverrides,
-  );
-  const tagBridge = createFakeTagBridge(
-    options.tags,
-    options.tagBridgeOverrides,
-  );
+  const bridges = createEntryTestBridges(options);
+  const { entryBridge, batchBridge, totpBridge, folderBridge, tagBridge } =
+    bridges;
+  const batchSelectionStore = createBatchSelectionStore();
   const entryStore = createEntryStore({ bridge: entryBridge });
   const folderStore = createFolderStore({ bridge: folderBridge });
   const tagStore = createTagStore({ bridge: tagBridge });
-  const Providers = (props: EntryTestProvidersProps): React.JSX.Element => (
-    <vault.Providers>
-      <EntryStoreProvider store={entryStore}>
-        <FolderStoreProvider store={folderStore}>
-          <TagStoreProvider store={tagStore}>
-            <TotpBridgeProvider bridge={totpBridge}>
-              {props.children}
-            </TotpBridgeProvider>
-          </TagStoreProvider>
-        </FolderStoreProvider>
-      </EntryStoreProvider>
-    </vault.Providers>
-  );
+  const Providers = createEntryTestProviders({
+    VaultProviders: vault.Providers,
+    entryStore,
+    folderStore,
+    tagStore,
+    batchSelectionStore,
+    batchBridge,
+    totpBridge,
+  });
   return {
     ...vault,
     entryBridge,
+    batchBridge,
+    batchSelectionStore,
     totpBridge,
     entryStore,
     folderBridge,

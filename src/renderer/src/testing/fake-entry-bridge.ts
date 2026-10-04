@@ -85,14 +85,17 @@ function detailFromUpdate(
  * @param initial 初始条目, 按最新创建在前排列.
  * @param overrides 覆盖假桥上的方法, 例如让复制失败.
  * @param tags 假标签桥里的标签, 搜索时用来把条目的标签编号换成标签名.
+ * @param sharedDetails 与假批量桥共享的条目数据数组, 假桥直接读写它, 传入时 `initial` 被忽略, 默认
+ * 是 `initial` 的副本.
  * @returns 假条目桥.
  */
 export function createFakeEntryBridge(
   initial: readonly EntryDetail[] = [],
   overrides: Partial<EntryBridge> = {},
   tags: readonly TagSummary[] = [],
+  sharedDetails: EntryDetail[] | undefined = undefined,
 ): EntryBridge {
-  const details = [...initial];
+  const details = sharedDetails ?? [...initial];
   return {
     list: vi.fn(() =>
       Promise.resolve(entrySucceeded(details.map(toEntrySummary))),

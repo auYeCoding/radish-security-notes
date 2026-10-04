@@ -1,3 +1,4 @@
+import type { EntryTagAssignment } from "@shared/batch/entry-tag-assignment";
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import type { EntryResult } from "@shared/entries/entry-result";
 import type {
@@ -16,11 +17,17 @@ import {
   selectEntry,
 } from "./entry-store-actions";
 import {
+  applyBatchFolder,
+  applyBatchRemoval,
+  applyBatchTags,
+} from "./entry-store-batch-mutations";
+import {
   applyEntryFolder,
   releaseFolder,
   selectView,
 } from "./entry-store-folder-mutations";
 import { removeEntry, updateEntry } from "./entry-store-mutations";
+import { refreshEntries } from "./entry-store-refresh";
 import { applyQuery, runEntrySearch } from "./entry-store-search";
 import { releaseTag, toggleTag } from "./entry-store-tag-mutations";
 import { INITIAL_ENTRY_STATE, type EntryState } from "./entry-state";
@@ -119,6 +126,36 @@ export interface EntryActions {
    * @param tagId 被删除的标签编号.
    */
   releaseTag: (tagId: string) => void;
+  /**
+   * 在内存里移除一批已被批量删除的条目; 详情里的条目被删除时选中相邻条目. 主进程里的记录须先经
+   * 批量接口删除.
+   * @param ids 被删除的条目编号.
+   * @returns 选中相邻条目时, 它的详情读取完成后兑现.
+   */
+  applyBatchRemoval: (ids: readonly string[]) => Promise<void>;
+  /**
+   * 在内存里把一批条目放进文件夹或移回未分类; 详情里的条目不再出现在当前可见列表时选中相邻条目.
+   * 主进程里的归属须先经批量接口写入.
+   * @param ids 被移动的条目编号.
+   * @param folderId 目标文件夹编号, 未分类时为 undefined.
+   * @returns 选中相邻条目时, 它的详情读取完成后兑现.
+   */
+  applyBatchFolder: (
+    ids: readonly string[],
+    folderId: string | undefined,
+  ) => Promise<void>;
+  /**
+   * 在内存里把一批条目的标签换成批量接口返回的新标签; 详情里的条目不再出现在当前可见列表时选中
+   * 相邻条目.
+   * @param assignments 受影响的条目现在带的标签.
+   * @returns 选中相邻条目时, 它的详情读取完成后兑现.
+   */
+  applyBatchTags: (assignments: readonly EntryTagAssignment[]) => Promise<void>;
+  /**
+   * 静默重新读取全部条目的摘要, 不改读取状态.
+   * @returns 读取完成后兑现.
+   */
+  refresh: () => Promise<void>;
 }
 
 /**
@@ -165,6 +202,11 @@ export function createEntryStore(
       releaseFolder: (folderId) => releaseFolder(access, folderId),
       toggleTag: (tagId) => toggleTag(access, tagId),
       releaseTag: (tagId) => releaseTag(access, tagId),
+      applyBatchRemoval: (ids) => applyBatchRemoval(access, ids),
+      applyBatchFolder: (ids, folderId) =>
+        applyBatchFolder(access, ids, folderId),
+      applyBatchTags: (assignments) => applyBatchTags(access, assignments),
+      refresh: () => refreshEntries(access),
     };
   });
 }

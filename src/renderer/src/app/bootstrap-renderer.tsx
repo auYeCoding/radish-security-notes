@@ -5,6 +5,9 @@ import { createRoot } from "react-dom/client";
 
 import { App } from "@renderer/app/app";
 import { syncDocumentLanguage } from "@renderer/i18n/sync-document-language";
+import { BatchBridgeProvider } from "@renderer/stores/batch-bridge-provider";
+import { createBatchSelectionStore } from "@renderer/stores/batch-selection-store";
+import { BatchSelectionStoreProvider } from "@renderer/stores/batch-selection-store-provider";
 import { createEntryStore } from "@renderer/stores/entry-store";
 import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
 import { createFolderStore } from "@renderer/stores/folder-store";
@@ -24,7 +27,8 @@ import { forceLightThemeWhilePrinting } from "@renderer/theme/print-theme";
 
 /**
  * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store, 条目 store,
- * 文件夹 store 与标签 store, 让深色类名跟随系统外观 (打印时强制浅色), 最后把根组件挂到容器上.
+ * 文件夹 store, 标签 store 与批量选中 store, 让深色类名跟随系统外观 (打印时强制浅色), 最后把根组件
+ * 挂到容器上.
  * @param container 挂载根组件的容器元素.
  * @returns 挂载完成后兑现.
  */
@@ -40,6 +44,7 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
   const entryStore = createEntryStore({ bridge: window.api.entries });
   const folderStore = createFolderStore({ bridge: window.api.folders });
   const tagStore = createTagStore({ bridge: window.api.tags });
+  const batchSelectionStore = createBatchSelectionStore();
   const i18n = await createI18nInstance({
     language: snapshot.language,
     isPseudoLocalizationEnabled: snapshot.isPseudoLocalizationEnabled,
@@ -59,9 +64,13 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
             <EntryStoreProvider store={entryStore}>
               <FolderStoreProvider store={folderStore}>
                 <TagStoreProvider store={tagStore}>
-                  <TotpBridgeProvider bridge={window.api.totp}>
-                    <App />
-                  </TotpBridgeProvider>
+                  <BatchSelectionStoreProvider store={batchSelectionStore}>
+                    <BatchBridgeProvider bridge={window.api.batch}>
+                      <TotpBridgeProvider bridge={window.api.totp}>
+                        <App />
+                      </TotpBridgeProvider>
+                    </BatchBridgeProvider>
+                  </BatchSelectionStoreProvider>
                 </TagStoreProvider>
               </FolderStoreProvider>
             </EntryStoreProvider>

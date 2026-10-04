@@ -2,6 +2,7 @@ import { electronAPI } from "@electron-toolkit/preload";
 import type { RendererApi } from "@shared/ipc/renderer-api";
 import { contextBridge, ipcRenderer } from "electron";
 
+import { createBatchBridge } from "./create-batch-bridge";
 import { createEntryBridge } from "./create-entry-bridge";
 import { createFolderBridge } from "./create-folder-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
@@ -20,6 +21,7 @@ const api: RendererApi = {
   entries: createEntryBridge(ipcRenderer),
   folders: createFolderBridge(ipcRenderer),
   tags: createTagBridge(ipcRenderer),
+  batch: createBatchBridge(ipcRenderer),
   totp: createTotpBridge(ipcRenderer),
 };
 

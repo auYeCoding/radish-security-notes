@@ -1,3 +1,4 @@
+import { EntryBatchBar } from "@renderer/features/entry-batch-bar/entry-batch-bar";
 import { NewEntryTrigger } from "@renderer/features/entry-create/new-entry-trigger";
 import { DeleteEntryTrigger } from "@renderer/features/entry-delete/delete-entry-trigger";
 import { EntryDetailPane } from "@renderer/features/entry-detail-pane/entry-detail-pane";
@@ -18,8 +19,8 @@ import { TagRowActions } from "./tag-row-actions";
 /**
  * 三栏主界面的布局: 左侧栏通高, 含应用名称, 标签与文件夹和底部的设置按钮, 标签与文件夹分区
  * 标题行各放新建按钮, 每个标签行与文件夹行尾放更多菜单; 右侧区域顶部是搜索栏与右侧的主题和语言切换, 下方是条目列表与
- * 条目详情, 列表标题行放新建按钮, 详情标题行放编辑与删除按钮; 整个界面包在拖放根里, 列表里的条目
- * 可以拖到左侧的文件夹上. 只负责布局与组装, 不含业务逻辑.
+ * 条目详情, 列表标题行放新建按钮, 其下是批量选择栏, 详情标题行放编辑与删除按钮; 整个界面包在
+ * 拖放根里, 列表里的条目可以拖到左侧的文件夹上. 只负责布局与组装, 不含业务逻辑.
  * @returns 三栏主界面元素.
  */
 export function AppShell(): React.JSX.Element {
@@ -46,7 +47,10 @@ export function AppShell(): React.JSX.Element {
             <PreferencesSwitchers />
           </header>
           <div className="flex min-h-0 flex-1">
-            <EntryListPane headerAction={<NewEntryTrigger />} />
+            <EntryListPane
+              headerAction={<NewEntryTrigger />}
+              selectionBar={<EntryBatchBar />}
+            />
             <EntryDetailPane
               renderActions={(detail) => (
                 <>

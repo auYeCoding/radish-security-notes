@@ -2,6 +2,7 @@ import { electronApp, optimizer } from "@electron-toolkit/utils";
 import { BrowserWindow, app, ipcMain } from "electron";
 
 import icon from "../../../resources/icon.png?asset";
+import { registerBatchIpc } from "../ipc/batch-ipc";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
@@ -16,6 +17,7 @@ import {
   createPreferencesRuntime,
   type PreferencesRuntime,
 } from "./preferences-runtime";
+import { createBatchService } from "./batch-runtime";
 import { createEntryRuntime } from "./entry-runtime";
 import { createFolderService } from "./folder-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
@@ -80,6 +82,7 @@ export async function startApplication(): Promise<void> {
   registerEntryIpc(ipcMain, entries.service);
   registerFolderIpc(ipcMain, createFolderService(vault.service));
   registerTagIpc(ipcMain, createTagService(vault.service));
+  registerBatchIpc(ipcMain, createBatchService(vault.service));
   registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
   app.on("will-quit", () => vault.service.close());
   keepWindowsInSync(runtime);
