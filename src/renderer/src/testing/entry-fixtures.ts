@@ -11,6 +11,7 @@ export const FORUM_ENTRY: EntryDetail = {
   account: "forum-account",
   fields: { account: "forum-account", password: "forum-password", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   hasTotp: false,
 };
@@ -25,6 +26,7 @@ export const BANK_ENTRY: EntryDetail = {
   account: "bank-account",
   fields: { account: "bank-account", password: "bank-password", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   hasTotp: false,
 };
@@ -39,6 +41,7 @@ export const WIKI_ENTRY: EntryDetail = {
   account: "wiki-account",
   fields: { account: "wiki-account", password: "wiki-password", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   hasTotp: false,
 };
@@ -58,6 +61,7 @@ export const WALLET_ENTRY: EntryDetail = {
     url: "https://wallet.example.test/login",
   },
   notes: "备注第一行\n备注第二行",
+  notesFormat: "plain",
   customFields: [
     {
       id: "wallet-pin",
@@ -86,6 +90,7 @@ export const MAIL_ENTRY: EntryDetail = {
   account: "mail-account",
   fields: { account: "mail-account", password: "mail-password", url: "" },
   notes: "邮箱备注",
+  notesFormat: "plain",
   customFields: [
     { id: "mail-pin", label: "备用码", value: "pin-0000", isHidden: false },
   ],
@@ -131,6 +136,7 @@ export function sampleEntryOf(type: PresetEntryTypeDefinition): EntryDetail {
     account: readAccount(fields),
     fields,
     notes: `${type.key}-notes`,
+    notesFormat: "plain",
     customFields: [],
     hasTotp: false,
   };

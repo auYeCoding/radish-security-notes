@@ -25,6 +25,7 @@ describe("toEntrySummary", () => {
       account: "someone",
       fields: { account: "someone", password: "secret", email: "", url: "" },
       notes: "备注",
+      notesFormat: "plain",
       customFields: [],
       hasTotp: true,
     };
@@ -45,6 +46,7 @@ describe("toEntrySummary", () => {
       account: "",
       fields: { cardNumber: "6222" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       hasTotp: false,
     };

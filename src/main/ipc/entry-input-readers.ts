@@ -1,5 +1,6 @@
 import type { NewCustomFieldInput } from "@shared/entries/custom-field-types";
 import type { EntryFieldValues } from "@shared/entries/entry-types";
+import { isNotesFormat, type NotesFormat } from "@shared/entries/notes-format";
 
 /**
  * 条目内容类型不对时的错误信息.
@@ -88,6 +89,20 @@ export function readOptionalStringArray(
 export function readBoolean(source: object, key: string): boolean {
   const value: unknown = Reflect.get(source, key);
   if (typeof value !== "boolean") {
+    throw new Error(INVALID_ENTRY_INPUT_MESSAGE);
+  }
+  return value;
+}
+
+/**
+ * 取出对象上的备注格式属性.
+ * @param source 对象.
+ * @returns 备注格式.
+ * @throws Error 当属性不是共享层定义的备注格式时.
+ */
+export function readNotesFormat(source: object): NotesFormat {
+  const value: unknown = Reflect.get(source, "notesFormat");
+  if (!isNotesFormat(value)) {
     throw new Error(INVALID_ENTRY_INPUT_MESSAGE);
   }
   return value;

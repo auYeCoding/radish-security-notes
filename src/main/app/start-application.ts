@@ -6,6 +6,8 @@ import { registerAttachmentIpc } from "../ipc/attachment-ipc";
 import { registerBatchIpc } from "../ipc/batch-ipc";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
+import { registerLinkIpc } from "../ipc/link-ipc";
+import type { ExternalLinkOpener } from "../links/external-link-opener";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
 import { registerRecoveryIpc } from "../ipc/recovery-ipc";
 import { registerTagIpc } from "../ipc/tag-ipc";
@@ -22,6 +24,7 @@ import { createAttachmentRuntime } from "./attachment-runtime";
 import { createBatchService } from "./batch-runtime";
 import { createEntryRuntime } from "./entry-runtime";
 import { createFolderService } from "./folder-runtime";
+import { createLinkRuntime } from "./link-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
 import { createTagService } from "./tag-runtime";
 import { createVaultRuntime } from "./vault-runtime";
@@ -53,14 +56,19 @@ function keepWindowsInSync(runtime: PreferencesRuntime): void {
 /**
  * 按当前主题与语言创建主窗口.
  * @param runtime 偏好运行时对象.
+ * @param openExternalLink 外部链接打开器.
  */
-function openMainWindow(runtime: PreferencesRuntime): void {
+function openMainWindow(
+  runtime: PreferencesRuntime,
+  openExternalLink: ExternalLinkOpener,
+): void {
   createMainWindow({
     icon,
     title: runtime.i18n.t("app.title"),
     backgroundColor: resolveWindowBackground(
       runtime.themeController.getResolvedTheme(),
     ),
+    openExternalLink,
   });
 }
 
@@ -88,15 +96,17 @@ export async function startApplication(): Promise<void> {
   registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
   const attachments = createAttachmentRuntime(vault.service, runtime.i18n);
   registerAttachmentIpc(ipcMain, attachments);
+  const openExternalLink = createLinkRuntime();
+  registerLinkIpc(ipcMain, openExternalLink);
   app.on("will-quit", () => {
     attachments.discardTemporaryCopies();
     vault.service.close();
   });
   keepWindowsInSync(runtime);
-  openMainWindow(runtime);
+  openMainWindow(runtime, openExternalLink);
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      openMainWindow(runtime);
+      openMainWindow(runtime, openExternalLink);
     }
   });
 }

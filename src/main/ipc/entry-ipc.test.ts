@@ -107,6 +107,7 @@ describe("registerEntryIpc 转发", () => {
       name: "n",
       fields: { cardNumber: "6222", expiry: "12/30" },
       notes: "第一行\n第二行",
+      notesFormat: "markdown",
       customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
       totp: "JBSWY3DPEHPK3PXP",
     };
@@ -188,6 +189,7 @@ const validUpdate = {
   name: "n",
   fields: { account: "a", password: "p", url: "" },
   notes: "第一行\n第二行",
+  notesFormat: "markdown",
   customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
   totp: "",
   removeTotp: true,
@@ -245,6 +247,8 @@ describe("registerEntryIpc 更新与删除参数校验", () => {
       { ...validUpdate, totp: undefined },
       { ...validUpdate, removeTotp: "yes" },
       { ...validUpdate, removeTotp: undefined },
+      { ...validUpdate, notesFormat: undefined },
+      { ...validUpdate, notesFormat: "html" },
     ]) {
       expect(() =>
         ipcMain.invoke(IPC_CHANNELS.entriesUpdate, "id-1", input),
@@ -263,6 +267,7 @@ describe("registerEntryIpc 新建参数校验", () => {
       name: "n",
       fields: { account: "a" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
     };
@@ -272,6 +277,8 @@ describe("registerEntryIpc 新建参数校验", () => {
       "text",
       { name: "n" },
       { ...valid, type: "custom" },
+      { ...valid, notesFormat: undefined },
+      { ...valid, notesFormat: "html" },
       { ...valid, fields: { account: 1 } },
       { ...valid, fields: undefined },
       { ...valid, customFields: undefined },

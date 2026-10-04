@@ -84,6 +84,7 @@ describe("编辑表单保存", () => {
       name: "钱包",
       fields: WALLET_ENTRY.fields,
       notes: WALLET_ENTRY.notes,
+      notesFormat: WALLET_ENTRY.notesFormat,
       customFields: WALLET_ENTRY.customFields.map(
         ({ label, value, isHidden }) => ({ label, value, isHidden }),
       ),

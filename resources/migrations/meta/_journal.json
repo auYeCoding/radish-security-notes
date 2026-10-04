@@ -64,6 +64,13 @@
       "when": 1791117581763,
       "tag": "0008_add-attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1791123379468,
+      "tag": "0009_add-notes-format",
+      "breakpoints": true
     }
   ]
 }

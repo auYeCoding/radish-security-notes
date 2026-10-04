@@ -47,7 +47,7 @@ function resolveUpdatedTotp(
 
 /**
  * 由已保存的行与校验后的编辑取值生成更新后的行: 编号, 类型与创建时间保持不变, 自定义字段重新
- * 分配编号, TOTP 按取值保持, 替换或移除, 所属文件夹取自取值.
+ * 分配编号, 备注格式取自取值, TOTP 按取值保持, 替换或移除, 所属文件夹取自取值.
  * @param source 已保存的行, 校验后的取值与编号生成函数.
  * @returns 可以写回条目表的行.
  */
@@ -58,6 +58,7 @@ export function buildUpdatedRecord(source: EntryUpdateSource): EntryRecord {
     name: values.name,
     fields: values.fields,
     notes: values.notes,
+    notesFormat: values.notesFormat,
     customFields: assignCustomFieldIdentifiers(
       values.customFields,
       createIdentifier,

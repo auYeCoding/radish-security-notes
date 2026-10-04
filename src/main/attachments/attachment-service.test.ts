@@ -70,6 +70,7 @@ describe("附件服务: 列出", () => {
       name: "另一个",
       fields: { account: "", password: "", url: "" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
     });

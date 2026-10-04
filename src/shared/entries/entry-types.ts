@@ -3,6 +3,7 @@ import type {
   EntryCustomField,
   NewCustomFieldInput,
 } from "./custom-field-types";
+import type { NotesFormat } from "./notes-format";
 import type { EntryTypeKey } from "./preset-entry-types";
 
 /**
@@ -54,9 +55,13 @@ export interface EntryDetail extends EntrySummary {
    */
   readonly fields: EntryFieldValues;
   /**
-   * 条目的备注, 纯文本, 可以是多行, 也可以为空串.
+   * 条目的备注原文, 可以是多行, 也可以为空串; 按 `notesFormat` 呈现.
    */
   readonly notes: string;
+  /**
+   * 备注的格式, 既有条目是纯文本.
+   */
+  readonly notesFormat: NotesFormat;
   /**
    * 条目的自定义字段, 按填写顺序排列, 没有时为空数组.
    */
@@ -112,6 +117,10 @@ export interface NewEntryInput {
    * 条目的备注.
    */
   readonly notes: string;
+  /**
+   * 备注的格式.
+   */
+  readonly notesFormat: NotesFormat;
   /**
    * 条目的自定义字段, 没有时为空数组.
    */

@@ -50,6 +50,7 @@ const UPGRADED_ROWS = [
       url: "https://wallet.example.test",
     },
     notes: "备注第一行\n备注第二行",
+    notesFormat: "plain",
     customFields: [
       { id: "f-1", label: "助记词", value: "a b\nc d", isHidden: true },
     ],
@@ -63,6 +64,7 @@ const UPGRADED_ROWS = [
     type: "login",
     fields: { account: "", password: "", url: "" },
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: null,
     folderId: null,
@@ -103,7 +105,7 @@ describe("条目表迁移: 0003 与 0004 把旧条目归入通用登录", () => 
 describe("条目表迁移: 升级后的表结构", () => {
   const getDirectory = useTemporaryDirectory("entry-type-migration");
 
-  it("条目表不再有账号, 密码与网址三列, 多了 TOTP 与所属文件夹两列", () => {
+  it("条目表不再有账号, 密码与网址三列, 多了 TOTP, 所属文件夹与备注格式三列", () => {
     const database = openVaultDatabase({
       databaseFile: join(getDirectory(), "vault.db"),
       dataKey: randomBytes(32),
@@ -122,6 +124,7 @@ describe("条目表迁移: 升级后的表结构", () => {
       "id",
       "name",
       "notes",
+      "notes_format",
       "totp",
       "type",
     ]);

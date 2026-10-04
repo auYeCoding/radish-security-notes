@@ -78,6 +78,7 @@ describe("新建表单 逐个预设类型保存", () => {
         name: "样例条目",
         fields: values,
         notes: "",
+        notesFormat: "plain",
         customFields: [],
         totp: "",
       });

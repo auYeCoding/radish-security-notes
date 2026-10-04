@@ -47,4 +47,5 @@ export const IPC_CHANNELS = {
   attachmentsOpen: "attachments:open",
   attachmentsPreview: "attachments:preview",
   attachmentsRemove: "attachments:remove",
+  linksOpenExternal: "links:open-external",
 } as const;

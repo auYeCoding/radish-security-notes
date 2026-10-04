@@ -158,6 +158,7 @@ describe("NewEntryTrigger 保存", () => {
       name: "新论坛",
       fields: { account: "someone", password: "s3cret", url: "" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
     });
@@ -180,6 +181,7 @@ describe("NewEntryTrigger 保存", () => {
       name: "只有名称",
       fields: { account: "", password: "", url: "" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
     });

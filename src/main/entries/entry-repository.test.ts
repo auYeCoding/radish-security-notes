@@ -35,6 +35,7 @@ function recordOf(id: string, createdAt: number): EntryRecord {
       url: `https://example.test/${id}`,
     },
     notes: `notes-${id}\nline-2`,
+    notesFormat: "plain",
     customFields: [
       { id: `field-${id}`, label: `label-${id}`, value: "v", isHidden: true },
     ],
@@ -72,6 +73,17 @@ describe("条目仓库: 读写", () => {
     insertEntry(getDatabase().orm, recordOf("a", 1));
 
     expect(findEntry(getDatabase().orm, "a")).toEqual(recordOf("a", 1));
+  });
+
+  it("备注格式随条目写入, 读回的是 Markdown, 没有指明时的行是纯文本", () => {
+    insertEntry(getDatabase().orm, {
+      ...recordOf("md", 1),
+      notesFormat: "markdown",
+    });
+    insertEntry(getDatabase().orm, recordOf("plain", 2));
+
+    expect(findEntry(getDatabase().orm, "md")?.notesFormat).toBe("markdown");
+    expect(findEntry(getDatabase().orm, "plain")?.notesFormat).toBe("plain");
   });
 
   it("没有这个编号时读不到", () => {
@@ -117,6 +129,7 @@ describe("条目仓库: 更新", () => {
       name: "new-name",
       fields: { account: "new-account" },
       notes: "new-notes",
+      notesFormat: "markdown",
       customFields: [{ id: "f", label: "l", value: "v", isHidden: false }],
       totp,
     });
@@ -128,6 +141,7 @@ describe("条目仓库: 更新", () => {
       type: "login",
       fields: { account: "new-account" },
       notes: "new-notes",
+      notesFormat: "markdown",
       customFields: [{ id: "f", label: "l", value: "v", isHidden: false }],
       totp,
       folderId: null,

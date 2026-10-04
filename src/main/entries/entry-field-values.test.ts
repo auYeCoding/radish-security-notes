@@ -14,6 +14,7 @@ const BANK_CARD_RECORD: EntryRecord = {
   type: "bankCard",
   fields: { cardNumber: "6222", cardPin: "9999", legacyKey: "dropped" },
   notes: "备注\n第二行",
+  notesFormat: "plain",
   customFields: [],
   totp: null,
   folderId: null,

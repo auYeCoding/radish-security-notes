@@ -10,6 +10,7 @@ const VALID_INPUT = {
   name: "n",
   fields: { cardNumber: "6222", expiry: "12/30" },
   notes: "第一行\n第二行",
+  notesFormat: "markdown",
   customFields: [{ label: "助记词", value: "a b\nc", isHidden: true }],
   totp: "JBSWY3DPEHPK3PXP",
 };
@@ -45,6 +46,32 @@ describe("requireNewEntryInput", () => {
       { ...VALID_INPUT, totp: 123456 },
     ]) {
       expect(() => requireNewEntryInput(input)).toThrow("无效的条目内容");
+    }
+  });
+});
+
+describe("requireNewEntryInput 备注格式", () => {
+  it("纯文本与 Markdown 都通过, 原样返回", () => {
+    expect(
+      requireNewEntryInput({ ...VALID_INPUT, notesFormat: "plain" })
+        .notesFormat,
+    ).toBe("plain");
+    expect(requireNewEntryInput(VALID_INPUT).notesFormat).toBe("markdown");
+  });
+
+  it("缺失, 不在共享层取值里或不是字符串时抛出错误", () => {
+    for (const notesFormat of [
+      undefined,
+      null,
+      "html",
+      "Markdown",
+      "",
+      1,
+      {},
+    ]) {
+      expect(() =>
+        requireNewEntryInput({ ...VALID_INPUT, notesFormat }),
+      ).toThrow("无效的条目内容");
     }
   });
 });

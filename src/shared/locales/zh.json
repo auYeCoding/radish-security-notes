@@ -231,6 +231,11 @@
     "tagsNoMatches": "没有匹配的标签",
     "tagRemove": "移除标签 {name}",
     "notesLabel": "备注",
+    "notesFormat": {
+      "label": "备注格式",
+      "plain": "纯文本",
+      "markdown": "Markdown"
+    },
     "customFields": {
       "legend": "自定义字段",
       "add": "添加字段",
@@ -340,6 +345,17 @@
       "tagLimit": "有条目已带满 {max} 个标签, 操作没有执行.",
       "invalidInput": "没有选中任何条目, 操作没有执行.",
       "unexpected": "操作失败, 没有任何改动. 请重试, 仍失败请关闭应用后重试."
+    }
+  },
+  "markdown": {
+    "imageNotLoaded": "图片未加载",
+    "openLink": {
+      "title": "打开外部链接?",
+      "description": "将用系统默认程序打开下面的地址. 请先确认它可信.",
+      "cancel": "取消",
+      "confirm": "打开",
+      "opening": "正在打开...",
+      "failed": "无法打开这个链接. 请把地址复制到浏览器里打开."
     }
   },
   "entryAttachments": {

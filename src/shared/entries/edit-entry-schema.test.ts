@@ -27,6 +27,7 @@ function loginInputOf(
     name: "n",
     fields: { account: "", password: "", url: "" },
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: "",
     removeTotp: false,

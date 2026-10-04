@@ -1,15 +1,12 @@
 import type { ReactNode } from "react";
-import { useFormContext } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 
-import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
 import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 
-import { TextareaField } from "@renderer/components/textarea-field";
 import { FieldGroup } from "@renderer/components/ui/field";
 
 import { CustomFieldsEditor } from "./custom-fields-editor";
 import { EntryNameField } from "./entry-name-field";
+import { NotesField } from "./notes-field";
 import { TypeFieldsEditor } from "./type-fields-editor";
 
 /**
@@ -43,8 +40,6 @@ interface EntryFormFieldsProps {
 export function EntryFormFields(
   props: EntryFormFieldsProps,
 ): React.JSX.Element {
-  const { t } = useTranslation();
-  const { register } = useFormContext<NewEntryFormValues>();
   return (
     <div className="-m-1 max-h-96 overflow-y-auto p-1">
       <FieldGroup>
@@ -53,11 +48,7 @@ export function EntryFormFields(
         {props.tagField}
         <TypeFieldsEditor type={props.type} />
         <CustomFieldsEditor />
-        <TextareaField
-          {...register("notes")}
-          label={t("entryForm.notesLabel")}
-          autoComplete="off"
-        />
+        <NotesField />
         {props.totpField}
       </FieldGroup>
     </div>

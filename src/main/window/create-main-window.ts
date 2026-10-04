@@ -1,7 +1,10 @@
 import { join } from "path";
 
 import { is } from "@electron-toolkit/utils";
-import { BrowserWindow, shell } from "electron";
+import { BrowserWindow } from "electron";
+
+import type { ExternalLinkOpener } from "../links/external-link-opener";
+import { guardWindowNavigation } from "./navigation-guard";
 
 /**
  * 创建主窗口的选项.
@@ -19,6 +22,10 @@ export interface MainWindowOptions {
    * 窗口背景色, 与当前明暗主题的背景 token 一致, 避免首帧白闪.
    */
   readonly backgroundColor: string;
+  /**
+   * 外部链接打开器, 页面请求打开的新窗口改由它交给系统默认程序.
+   */
+  readonly openExternalLink: ExternalLinkOpener;
 }
 
 /**
@@ -37,8 +44,8 @@ export const MAIN_WINDOW_WIDTH = 1100;
 export const MAIN_WINDOW_HEIGHT = 720;
 
 /**
- * 创建主窗口, 渲染完成后再显示. 开发环境加载 electron-vite 提供的渲染进程地址,
- * 生产环境加载打包后的本地 index.html.
+ * 创建主窗口, 渲染完成后再显示, 并加上导航防护: 页面不能导航离开应用, 新窗口一律拒绝. 开发环境
+ * 加载 electron-vite 提供的渲染进程地址, 生产环境加载打包后的本地 index.html.
  * @param options 窗口选项.
  * @returns 新建的主窗口.
  */
@@ -60,10 +67,7 @@ export function createMainWindow(options: MainWindowOptions): BrowserWindow {
   });
   mainWindow.on("page-title-updated", (event) => event.preventDefault());
   mainWindow.on("ready-to-show", () => mainWindow.show());
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
-    return { action: "deny" };
-  });
+  guardWindowNavigation(mainWindow.webContents, options.openExternalLink);
   loadRenderer(mainWindow);
   return mainWindow;
 }

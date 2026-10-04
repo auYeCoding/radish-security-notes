@@ -47,7 +47,7 @@ export function listEntrySummaries(orm: VaultOrm): EntrySummary[] {
 }
 
 /**
- * 更新一个条目的内容: 名称, 类型字段, 备注, 自定义字段, TOTP 与所属文件夹. 编号, 类型与创建时间不变.
+ * 更新一个条目的内容: 名称, 类型字段, 备注与备注格式, 自定义字段, TOTP 与所属文件夹. 编号, 类型与创建时间不变.
  * @param orm 已解锁数据库的查询入口.
  * @param record 更新后的行, 编号指明要更新的条目.
  * @returns 条目存在并已更新时为 true, 没有这个编号时为 false.
@@ -59,6 +59,7 @@ export function updateEntry(orm: VaultOrm, record: EntryRecord): boolean {
       name: record.name,
       fields: record.fields,
       notes: record.notes,
+      notesFormat: record.notesFormat,
       customFields: record.customFields,
       totp: record.totp,
       folderId: record.folderId,

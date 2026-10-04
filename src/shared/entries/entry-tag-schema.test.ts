@@ -16,6 +16,7 @@ const NEW_VALUES = {
   name: "n",
   fields: { account: "a", password: "p", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   totp: "",
 };
@@ -103,6 +104,7 @@ describe("toEntrySummary 与标签", () => {
       account: "a",
       fields: { account: "a" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       hasTotp: false,
       tagIds: ["t-1", "t-2"],

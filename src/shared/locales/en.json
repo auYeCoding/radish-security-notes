@@ -231,6 +231,11 @@
     "tagsNoMatches": "No matching tags",
     "tagRemove": "Remove tag {name}",
     "notesLabel": "Notes",
+    "notesFormat": {
+      "label": "Notes format",
+      "plain": "Plain text",
+      "markdown": "Markdown"
+    },
     "customFields": {
       "legend": "Custom fields",
       "add": "Add field",
@@ -340,6 +345,17 @@
       "tagLimit": "Some entries already have {max} tags. Nothing was changed.",
       "invalidInput": "No entries are selected. Nothing was changed.",
       "unexpected": "The action failed and nothing was changed. Try again, and if it still fails close the app and try again."
+    }
+  },
+  "markdown": {
+    "imageNotLoaded": "Image not loaded",
+    "openLink": {
+      "title": "Open external link?",
+      "description": "The address below will open in your default app. Make sure you trust it first.",
+      "cancel": "Cancel",
+      "confirm": "Open",
+      "opening": "Opening...",
+      "failed": "Couldn't open this link. Copy the address into your browser instead."
     }
   },
   "entryAttachments": {

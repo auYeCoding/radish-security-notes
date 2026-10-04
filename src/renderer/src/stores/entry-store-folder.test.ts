@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import type { EntryDetail, NewEntryInput } from "@shared/entries/entry-types";
+import type {
+  EntryDetail,
+  NewEntryInput,
+  UpdateEntryInput,
+} from "@shared/entries/entry-types";
 import {
   ALL_ENTRIES_VIEW,
   UNCATEGORIZED_VIEW,
@@ -71,6 +75,7 @@ function newInputIn(folderId?: string): NewEntryInput {
     name: "新条目",
     fields: { account: "n", password: "p", url: "" },
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: "",
     folderId,
@@ -219,6 +224,19 @@ describe("条目 store 释放已删除的文件夹", () => {
   });
 });
 
+/**
+ * 论坛条目的更新输入, 不带所属文件夹.
+ */
+const FORUM_UPDATE_INPUT: UpdateEntryInput = {
+  name: "论坛",
+  fields: { account: "a", password: "p", url: "" },
+  notes: "",
+  notesFormat: "plain",
+  customFields: [],
+  totp: "",
+  removeTotp: false,
+};
+
 describe("条目 store 入口跟随条目", () => {
   it("新建的条目不属于当前入口时, 入口切到它所属的文件夹, 未分类则切到未分类", async () => {
     const store = await createLoadedStore();
@@ -247,18 +265,14 @@ describe("条目 store 入口跟随条目", () => {
     const store = await createLoadedStore();
     store.getState().selectView(folderViewOf("work"));
     await store.getState().select("forum");
-    const input = {
-      name: "论坛",
-      fields: { account: "a", password: "p", url: "" },
-      notes: "",
-      customFields: [],
-      totp: "",
-      removeTotp: false,
-    };
 
-    await store.getState().update("forum", { ...input, folderId: "work" });
+    await store
+      .getState()
+      .update("forum", { ...FORUM_UPDATE_INPUT, folderId: "work" });
     expect(store.getState().view).toEqual(folderViewOf("work"));
-    await store.getState().update("forum", { ...input, folderId: "home" });
+    await store
+      .getState()
+      .update("forum", { ...FORUM_UPDATE_INPUT, folderId: "home" });
 
     expect(store.getState().view).toEqual(folderViewOf("home"));
     expect(store.getState().selection).toMatchObject({

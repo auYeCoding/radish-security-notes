@@ -49,6 +49,7 @@ describe("createEntryBridge 读取与新建", () => {
       name: "n",
       fields: { cardNumber: "6222" },
       notes: "第一行\n第二行",
+      notesFormat: "markdown" as const,
       customFields: [{ label: "助记词", value: "a b", isHidden: true }],
       totp: "",
     };
@@ -66,6 +67,7 @@ describe("createEntryBridge 更新与删除", () => {
       name: "n",
       fields: { cardNumber: "6222" },
       notes: "备注",
+      notesFormat: "plain" as const,
       customFields: [{ label: "助记词", value: "a b", isHidden: true }],
       totp: "",
       removeTotp: false,

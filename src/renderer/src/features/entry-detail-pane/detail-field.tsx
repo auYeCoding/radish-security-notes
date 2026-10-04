@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
+import { cn } from "@renderer/lib/class-names";
+
 /**
  * 详情字段行的属性.
  */
@@ -17,6 +19,14 @@ interface DetailFieldProps {
    * 值右侧的操作按钮, 例如显示与隐藏, 复制.
    */
   readonly actions?: ReactNode;
+  /**
+   * 追加给值区域的类名, 与默认类名冲突时以它为准, 例如换行方式.
+   */
+  readonly contentClassName?: string;
+  /**
+   * 操作按钮是否与值的顶部对齐, 默认与值垂直居中; 值很高时 (例如渲染后的 Markdown) 对齐顶部更清楚.
+   */
+  readonly isTopAligned?: boolean;
 }
 
 /**
@@ -28,8 +38,20 @@ export function DetailField(props: DetailFieldProps): React.JSX.Element {
   return (
     <div className="flex flex-col gap-1">
       <dt className="text-xs break-all text-muted-foreground">{props.label}</dt>
-      <dd className="flex items-center gap-2">
-        <div className="min-w-0 flex-1 text-sm break-all">{props.children}</div>
+      <dd
+        className={cn(
+          "flex gap-2",
+          props.isTopAligned === true ? "items-start" : "items-center",
+        )}
+      >
+        <div
+          className={cn(
+            "min-w-0 flex-1 text-sm break-all",
+            props.contentClassName,
+          )}
+        >
+          {props.children}
+        </div>
         {props.actions}
       </dd>
     </div>

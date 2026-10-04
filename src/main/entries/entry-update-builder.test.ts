@@ -25,6 +25,7 @@ const EXISTING_RECORD: EntryRecord = {
   type: "login",
   fields: { account: "old", password: "old-p", url: "" },
   notes: "旧备注",
+  notesFormat: "plain",
   customFields: [{ id: "old-field", label: "旧", value: "v", isHidden: true }],
   totp: EXISTING_TOTP,
   folderId: null,
@@ -43,6 +44,7 @@ function valuesOf(
     name: "新名称",
     fields: { account: "new", password: "new-p", url: "https://a.test" },
     notes: "新备注",
+    notesFormat: "markdown",
     customFields: [{ label: "新", value: "n", isHidden: false }],
     totp: "",
     removeTotp: false,
@@ -86,11 +88,22 @@ describe("buildUpdatedRecord 内容", () => {
       type: "login",
       fields: { account: "new", password: "new-p", url: "https://a.test" },
       notes: "新备注",
+      notesFormat: "markdown",
       customFields: [{ id: "new-1", label: "新", value: "n", isHidden: false }],
       totp: EXISTING_TOTP,
       folderId: null,
       createdAt: 42,
     });
+  });
+
+  it("备注格式取自取值, 可以从 Markdown 改回纯文本", () => {
+    const toPlain = buildWith(valuesOf({ notesFormat: "plain" }), {
+      ...EXISTING_RECORD,
+      notesFormat: "markdown",
+    });
+
+    expect(toPlain.notesFormat).toBe("plain");
+    expect(buildWith(valuesOf()).notesFormat).toBe("markdown");
   });
 
   it("不修改传入的原行", () => {

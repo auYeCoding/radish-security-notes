@@ -29,6 +29,7 @@ function entryOf(id: string): EntryRecord {
     type: "login",
     fields: {},
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: null,
     folderId: null,

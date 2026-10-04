@@ -1,0 +1,1 @@
+ALTER TABLE `entries` ADD `notes_format` text DEFAULT 'plain' NOT NULL;

@@ -38,6 +38,7 @@ export function searchRecordOf(
       url: `https://${id}.example.test`,
     },
     notes: `notes-${id}`,
+    notesFormat: "plain",
     customFields: [
       {
         id: `${id}-field-1`,

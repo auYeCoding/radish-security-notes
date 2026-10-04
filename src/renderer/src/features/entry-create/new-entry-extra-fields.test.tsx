@@ -43,6 +43,7 @@ describe("新建表单 网址与备注", () => {
       name: "钱包",
       fields: { account: "", password: "", url: "https://wallet.example.test" },
       notes: "第一行\n第二行",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
     });
@@ -111,6 +112,7 @@ describe("新建表单 自定义字段保存", () => {
       name: "钱包",
       fields: { account: "", password: "", url: "" },
       notes: "",
+      notesFormat: "plain",
       customFields: [
         { label: "助记词", value: "a b\nc d", isHidden: true },
         { label: "取款码", value: "", isHidden: false },

@@ -11,6 +11,7 @@ const NEW_INPUT = {
   name: "n",
   fields: { account: "a", password: "p", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   totp: "",
 };
@@ -22,6 +23,7 @@ const UPDATE_INPUT = {
   name: "n",
   fields: { account: "a", password: "p", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   totp: "",
   removeTotp: false,

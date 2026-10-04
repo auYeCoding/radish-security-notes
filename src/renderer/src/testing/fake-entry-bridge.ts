@@ -44,6 +44,7 @@ function detailFromCreate(id: string, input: NewEntryInput): EntryDetail {
     account: readAccount(input.fields),
     fields: input.fields,
     notes: input.notes,
+    notesFormat: input.notesFormat,
     customFields: withFieldIdentifiers("created-field", input.customFields),
     hasTotp: input.totp.trim() !== "",
     folderId: input.folderId,
@@ -70,6 +71,7 @@ function detailFromUpdate(
     account: readAccount(input.fields),
     fields: input.fields,
     notes: input.notes,
+    notesFormat: input.notesFormat,
     customFields: withFieldIdentifiers(
       `${existing.id}-updated-field`,
       input.customFields,

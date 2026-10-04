@@ -3,6 +3,10 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import type { EntryCustomField } from "@shared/entries/custom-field-types";
 import type { EntryFieldValues } from "@shared/entries/entry-types";
 import {
+  DEFAULT_NOTES_FORMAT,
+  type NotesFormat,
+} from "@shared/entries/notes-format";
+import {
   LEGACY_ENTRY_TYPE_KEY,
   type EntryTypeKey,
 } from "@shared/entries/preset-entry-types";
@@ -15,7 +19,8 @@ import type { TotpConfig } from "@shared/entries/totp-config";
  * 密码与网址三列在迁移 0004 里删除, 旧条目归入通用登录. TOTP 在迁移 0005 加入, 对所有条目共有:
  * `totp` 是 JSON 对象, 含密钥, 算法, 位数与周期, 条目不带 TOTP 时为 NULL. 所属文件夹在迁移 0006
  * 加入: `folder_id` 是文件夹表里的编号, 条目未分类时为 NULL; 它不设外键, 文件夹被删除时由服务在
- * 同一个事务里把它清空.
+ * 同一个事务里把它清空. 备注格式在迁移 0009 加入: `notes_format` 是备注的呈现格式, 纯文本或
+ * Markdown, 迁移之前已有的条目都是纯文本.
  */
 export const entries = sqliteTable("entries", {
   id: text("id").primaryKey(),
@@ -29,6 +34,10 @@ export const entries = sqliteTable("entries", {
     .notNull()
     .default({}),
   notes: text("notes").notNull().default(""),
+  notesFormat: text("notes_format")
+    .$type<NotesFormat>()
+    .notNull()
+    .default(DEFAULT_NOTES_FORMAT),
   customFields: text("custom_fields", { mode: "json" })
     .$type<readonly EntryCustomField[]>()
     .notNull()

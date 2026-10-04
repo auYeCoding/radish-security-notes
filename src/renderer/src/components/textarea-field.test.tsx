@@ -25,6 +25,13 @@ describe("TextareaField", () => {
     expect(textarea.getAttribute("autocomplete")).toBe("off");
   });
 
+  it("给了标签行操作时显示在标签旁, 输入框仍与标签关联", () => {
+    render(<TextareaField label="备注" labelAction={<span>格式选择</span>} />);
+
+    expect(screen.getByText("格式选择")).toBeDefined();
+    expect(screen.getByLabelText("备注").tagName).toBe("TEXTAREA");
+  });
+
   it("没有错误时不标红", () => {
     render(<TextareaField label="备注" />);
 

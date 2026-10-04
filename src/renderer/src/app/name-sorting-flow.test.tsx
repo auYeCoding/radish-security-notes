@@ -56,6 +56,7 @@ function renameInput(name: string): UpdateEntryInput {
     name,
     fields: { account: "forum-account", password: "forum-password", url: "" },
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: "",
     removeTotp: false,
@@ -73,6 +74,7 @@ function newEntryInput(name: string): NewEntryInput {
     name,
     fields: { account: "new-account", password: "new-password", url: "" },
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: "",
   };

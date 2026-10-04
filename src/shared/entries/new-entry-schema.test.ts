@@ -29,6 +29,7 @@ function loginInputOf(input: Record<string, unknown>): Record<string, unknown> {
     name: "n",
     fields: { account: "", password: "", url: "" },
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: "",
     ...input,
@@ -76,9 +77,38 @@ describe("createNewEntrySchema 名称与必填", () => {
       name: "论坛",
       fields: { account: " a ", password: " p ", url: " u " },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
     });
+  });
+});
+
+describe("createNewEntrySchema 备注格式", () => {
+  it("纯文本与 Markdown 都通过, 原样保存", () => {
+    const plain = loginSchema.safeParse(loginInputOf({ notesFormat: "plain" }));
+    const markdown = loginSchema.safeParse(
+      loginInputOf({ notesFormat: "markdown" }),
+    );
+
+    expect(plain.data?.notesFormat).toBe("plain");
+    expect(markdown.data?.notesFormat).toBe("markdown");
+  });
+
+  it("缺失, 不在取值集合里或不是字符串时不通过", () => {
+    const { notesFormat: omitted, ...withoutFormat } = loginInputOf({});
+
+    expect(omitted).toBe("plain");
+    expect(loginSchema.safeParse(withoutFormat).success).toBe(false);
+    expect(
+      loginSchema.safeParse(loginInputOf({ notesFormat: "html" })).success,
+    ).toBe(false);
+    expect(
+      loginSchema.safeParse(loginInputOf({ notesFormat: "Markdown" })).success,
+    ).toBe(false);
+    expect(
+      loginSchema.safeParse(loginInputOf({ notesFormat: 1 })).success,
+    ).toBe(false);
   });
 });
 
@@ -202,7 +232,12 @@ describe("createNewEntrySchema 自定义字段", () => {
   });
 
   it("备注或自定义字段缺失, 或字段形状不对时不通过", () => {
-    const withoutNotes = { name: "n", fields: {}, customFields: [] };
+    const withoutNotes = {
+      name: "n",
+      fields: {},
+      notesFormat: "plain",
+      customFields: [],
+    };
 
     expect(loginSchema.safeParse(withoutNotes).success).toBe(false);
     expect(loginSchema.safeParse(loginInputOf({ notes: 1 })).success).toBe(
@@ -228,6 +263,7 @@ describe("createNewEntrySchema 逐个类型", () => {
         name: "n",
         fields,
         notes: "",
+        notesFormat: "plain",
         customFields: [],
         totp: "",
       });

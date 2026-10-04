@@ -10,16 +10,26 @@ import {
 /**
  * 替身 electron 模块里的窗口构造函数间谍, 记录收到的窗口选项, 返回只有创建流程用到的方法的假窗口.
  */
-const electronMocks = vi.hoisted(() => ({
-  createWindow: vi.fn(function () {
-    return {
-      webContents: { setWindowOpenHandler: vi.fn() },
-      on: vi.fn(),
-      loadURL: vi.fn(),
-      loadFile: vi.fn(),
-    };
-  }),
-}));
+const electronMocks = vi.hoisted(() => {
+  const webContentsOn = vi.fn();
+  const setWindowOpenHandler = vi.fn();
+  return {
+    webContentsOn,
+    setWindowOpenHandler,
+    createWindow: vi.fn(function () {
+      return {
+        webContents: {
+          setWindowOpenHandler,
+          on: webContentsOn,
+          getURL: vi.fn(() => ""),
+        },
+        on: vi.fn(),
+        loadURL: vi.fn(),
+        loadFile: vi.fn(),
+      };
+    }),
+  };
+});
 
 vi.mock("electron", () => ({
   BrowserWindow: electronMocks.createWindow,
@@ -35,10 +45,25 @@ const WINDOW_OPTIONS = {
   icon: "icon.png",
   title: "Radish",
   backgroundColor: "#ffffff",
+  openExternalLink: () => Promise.resolve(true),
 };
 
 afterEach(() => {
   electronMocks.createWindow.mockClear();
+  electronMocks.webContentsOn.mockClear();
+  electronMocks.setWindowOpenHandler.mockClear();
+});
+
+describe("createMainWindow 导航防护", () => {
+  it("监听页面导航并设置新窗口处理函数, 窗口不会导航离开应用", () => {
+    createMainWindow(WINDOW_OPTIONS);
+
+    expect(electronMocks.webContentsOn).toHaveBeenCalledWith(
+      "will-navigate",
+      expect.any(Function),
+    );
+    expect(electronMocks.setWindowOpenHandler).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("createMainWindow 窗口尺寸", () => {

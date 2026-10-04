@@ -17,6 +17,7 @@ const EMPTY_LOGIN_INPUT = {
   name: "",
   fields: { account: "", password: "", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   totp: "",
 } as const;
@@ -142,6 +143,7 @@ describe("条目 store 新建", () => {
         url: "https://example.test",
       },
       notes: "第一行\n第二行",
+      notesFormat: "markdown",
       customFields: [{ label: "助记词", value: "a b", isHidden: true }],
       totp: "",
     });
@@ -164,6 +166,7 @@ describe("条目 store 新建", () => {
           url: "https://example.test",
         },
         notes: "第一行\n第二行",
+        notesFormat: "markdown",
         customFields: [{ label: "助记词", value: "a b", isHidden: true }],
       },
     });

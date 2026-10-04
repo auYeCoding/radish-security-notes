@@ -19,6 +19,7 @@ const RENAME_FORUM_INPUT: UpdateEntryInput = {
   name: "论坛改",
   fields: { account: "forum-new", password: "forum-new-p", url: "" },
   notes: "",
+  notesFormat: "plain",
   customFields: [],
   totp: "",
   removeTotp: false,

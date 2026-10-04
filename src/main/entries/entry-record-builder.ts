@@ -62,6 +62,7 @@ export function buildEntryRecord(source: EntryRecordSource): EntryRecord {
     type: type.key,
     fields: values.fields,
     notes: values.notes,
+    notesFormat: values.notesFormat,
     customFields: assignCustomFieldIdentifiers(
       values.customFields,
       createIdentifier,

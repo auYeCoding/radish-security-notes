@@ -144,6 +144,7 @@ describe("条目 store 搜索: 新建, 编辑与删除之后", () => {
       name: "新条目",
       fields: { account: "new", password: "", url: "" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
     });
@@ -163,6 +164,7 @@ describe("条目 store 搜索: 新建, 编辑与删除之后", () => {
       name: FORUM_ENTRY.name,
       fields: { account: "renamed-account", password: "x", url: "" },
       notes: "",
+      notesFormat: "plain",
       customFields: [],
       totp: "",
       removeTotp: false,

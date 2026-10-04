@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CopyButton } from "@renderer/components/copy-button";
@@ -24,6 +25,19 @@ interface DetailCopyRowProps {
    * 点击复制按钮时执行复制, 成功时兑现 true.
    */
   readonly onCopy: () => Promise<boolean>;
+  /**
+   * 代替默认的原样文本显示值的内容, 例如渲染后的 Markdown; 值为空串时不使用, 复制按钮复制的仍是
+   * `value`.
+   */
+  readonly renderedValue?: ReactNode;
+  /**
+   * 追加给值区域的类名, 例如换行方式.
+   */
+  readonly contentClassName?: string;
+  /**
+   * 复制按钮是否与值的顶部对齐, 默认与值垂直居中.
+   */
+  readonly isTopAligned?: boolean;
 }
 
 /**
@@ -37,6 +51,8 @@ export function DetailCopyRow(props: DetailCopyRowProps): React.JSX.Element {
   return (
     <DetailField
       label={props.label}
+      contentClassName={props.contentClassName}
+      isTopAligned={props.isTopAligned}
       actions={
         <CopyButton
           label={props.copyLabel}
@@ -49,7 +65,9 @@ export function DetailCopyRow(props: DetailCopyRowProps): React.JSX.Element {
       {isEmpty ? (
         <NotFilledText />
       ) : (
-        <span className="whitespace-pre-wrap">{props.value}</span>
+        (props.renderedValue ?? (
+          <span className="whitespace-pre-wrap">{props.value}</span>
+        ))
       )}
     </DetailField>
   );

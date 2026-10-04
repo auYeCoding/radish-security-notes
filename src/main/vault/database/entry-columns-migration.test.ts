@@ -49,6 +49,7 @@ describe("条目表迁移: 骨架阶段的旧条目升级", () => {
         type: "login",
         fields: { account: "old-account", password: "old-password", url: "" },
         notes: "",
+        notesFormat: "plain",
         customFields: [],
         totp: null,
         folderId: null,
@@ -76,6 +77,7 @@ describe("条目表迁移: 类型字段, 备注与自定义字段读写", () => 
         recoveryPhrase: "a b c\nd e f",
       },
       notes: "第一行\n第二行",
+      notesFormat: "markdown" as const,
       customFields: [
         {
           id: "field-1",

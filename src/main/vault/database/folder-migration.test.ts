@@ -37,6 +37,7 @@ const UPGRADED_ROWS = [
     type: "forum",
     fields: { account: "a", password: "p", email: "", url: "" },
     notes: "备注第一行\n备注第二行",
+    notesFormat: "plain",
     customFields: [
       { id: "f-1", label: "助记词", value: "a b", isHidden: true },
     ],
@@ -55,6 +56,7 @@ const UPGRADED_ROWS = [
     type: "login",
     fields: {},
     notes: "",
+    notesFormat: "plain",
     customFields: [],
     totp: null,
     folderId: null,

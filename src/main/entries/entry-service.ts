@@ -82,6 +82,7 @@ function toDetail(record: EntryRecord, tagIds: readonly string[]): EntryDetail {
     account: readAccount(fields),
     fields,
     notes: record.notes,
+    notesFormat: record.notesFormat,
     customFields: record.customFields,
     hasTotp: record.totp !== null,
     folderId: record.folderId ?? undefined,

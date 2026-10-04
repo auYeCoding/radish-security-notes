@@ -12,6 +12,7 @@ const LOGIN_VALUES: NewEntryFormValues = {
   name: "论坛",
   fields: { account: "a", password: "p", url: "" },
   notes: "备注",
+  notesFormat: "plain",
   customFields: [
     { label: "一", value: "1", isHidden: false },
     { label: "二", value: "2", isHidden: true },
@@ -44,6 +45,7 @@ describe("buildEntryRecord", () => {
       type: "login",
       fields: { account: "a", password: "p", url: "" },
       notes: "备注",
+      notesFormat: "plain",
       customFields: [
         { id: "id-2", label: "一", value: "1", isHidden: false },
         { id: "id-3", label: "二", value: "2", isHidden: true },
@@ -52,6 +54,16 @@ describe("buildEntryRecord", () => {
       folderId: null,
       createdAt: 42,
     });
+  });
+
+  it("备注格式取自取值, 纯文本与 Markdown 都原样记下", () => {
+    const markdown = buildLoginRecord({
+      ...LOGIN_VALUES,
+      notesFormat: "markdown",
+    });
+
+    expect(markdown.notesFormat).toBe("markdown");
+    expect(buildLoginRecord(LOGIN_VALUES).notesFormat).toBe("plain");
   });
 });
 

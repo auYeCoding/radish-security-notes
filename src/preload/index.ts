@@ -6,6 +6,7 @@ import { createAttachmentBridge } from "./create-attachment-bridge";
 import { createBatchBridge } from "./create-batch-bridge";
 import { createEntryBridge } from "./create-entry-bridge";
 import { createFolderBridge } from "./create-folder-bridge";
+import { createLinkBridge } from "./create-link-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
 import { createRecoveryBridge } from "./create-recovery-bridge";
 import { createTagBridge } from "./create-tag-bridge";
@@ -28,6 +29,7 @@ const api: RendererApi = {
     ipcRenderer,
     getPathForFile: (file) => webUtils.getPathForFile(file),
   }),
+  links: createLinkBridge(ipcRenderer),
 };
 
 if (process.contextIsolated) {

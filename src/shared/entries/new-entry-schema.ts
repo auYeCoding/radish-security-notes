@@ -5,6 +5,7 @@ import { isWithinLength } from "../text/is-within-length";
 import { customFieldInputSchema } from "./custom-field-schema";
 import type { NewCustomFieldInput } from "./custom-field-types";
 import type { EntryFieldDefinition } from "./entry-field-types";
+import { NOTES_FORMATS, type NotesFormat } from "./notes-format";
 import type { PresetEntryTypeDefinition } from "./preset-entry-types";
 import { isTotpInputBlank, parseTotpInput } from "./totp-input-parser";
 
@@ -30,6 +31,10 @@ export interface NewEntryFormValues {
    * 条目的备注.
    */
   notes: string;
+  /**
+   * 备注的格式.
+   */
+  notesFormat: NotesFormat;
   /**
    * 条目的自定义字段.
    */
@@ -124,6 +129,10 @@ export interface EntryContentShape {
    */
   readonly notes: z.ZodType<string, string>;
   /**
+   * 备注格式的校验规则.
+   */
+  readonly notesFormat: z.ZodType<NotesFormat, NotesFormat>;
+  /**
    * 自定义字段的校验规则.
    */
   readonly customFields: z.ZodType<
@@ -173,6 +182,7 @@ export function createEntryContentShape(
       ),
     ),
     notes: z.string(),
+    notesFormat: z.enum(NOTES_FORMATS),
     customFields: z.array(customFieldInputSchema),
     totp: createTotpSchema(),
     folderId: z.string().optional(),

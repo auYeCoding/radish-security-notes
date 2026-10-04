@@ -3,6 +3,7 @@ import type { BatchBridge } from "../batch/batch-bridge";
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
 import type { FolderBridge } from "../folders/folder-bridge";
+import type { LinkBridge } from "../links/link-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
 import type { TagBridge } from "../tags/tag-bridge";
 import type { RecoveryBridge } from "../vault/recovery-bridge";
@@ -48,4 +49,8 @@ export interface RendererApi {
    * 附件接口: 读取元数据, 添加, 另存为, 打开, 预览与删除附件.
    */
   readonly attachments: AttachmentBridge;
+  /**
+   * 链接接口: 请主进程用系统默认程序打开外部链接.
+   */
+  readonly links: LinkBridge;
 }
