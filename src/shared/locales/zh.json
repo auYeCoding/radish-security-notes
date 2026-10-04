@@ -342,6 +342,60 @@
       "unexpected": "操作失败, 没有任何改动. 请重试, 仍失败请关闭应用后重试."
     }
   },
+  "entryAttachments": {
+    "heading": "附件 ({count})",
+    "sectionLabel": "附件",
+    "add": "添加附件",
+    "adding": "正在添加...",
+    "empty": "还没有附件. 点 \"添加附件\", 或把文件拖到这里.",
+    "dropActive": "松开鼠标, 把文件添加为附件",
+    "loadFailed": "无法读取附件. 请关闭应用后重试.",
+    "dismiss": "关闭提示",
+    "dialog": {
+      "openTitle": "选择要添加的附件",
+      "saveTitle": "另存附件"
+    },
+    "size": {
+      "bytes": "{value} B",
+      "kilobytes": "{value} KB",
+      "megabytes": "{value} MB",
+      "gigabytes": "{value} GB"
+    },
+    "actions": {
+      "preview": "预览 {name}",
+      "open": "打开 {name}",
+      "saveAs": "另存 {name} 为",
+      "delete": "删除 {name}"
+    },
+    "delete": {
+      "title": "删除这个附件?",
+      "description": "附件 \"{name}\" 将被永久删除, 无法恢复.",
+      "cancel": "取消",
+      "confirm": "删除",
+      "deleting": "正在删除..."
+    },
+    "preview": {
+      "title": "预览 {name}",
+      "description": "图片附件的预览, 关闭后不会留存.",
+      "loading": "正在读取...",
+      "imageAlt": "{name} 的预览"
+    },
+    "error": {
+      "invalidInput": "没有可添加的文件. 拖入的内容需要是磁盘上的文件.",
+      "notFound": "这个条目或附件已不存在.",
+      "emptyFile": "\"{name}\" 是空文件, 没有添加任何附件.",
+      "fileTooLarge": "\"{name}\" 超过单个附件 {fileLimit} 的上限, 没有添加任何附件.",
+      "tooManyAttachments": "一个条目最多 {max} 个附件, 没有添加任何附件.",
+      "totalTooLarge": "一个条目的附件加起来最多 {totalLimit}, 没有添加任何附件.",
+      "notAFile": "\"{name}\" 不是文件, 没有添加任何附件.",
+      "readFailed": "无法读取 \"{name}\", 没有添加任何附件.",
+      "writeFailed": "无法写出文件. 请换一个位置重试.",
+      "notOpenable": "这类文件会被系统直接运行, 不能在这里打开. 可以另存后自行处理.",
+      "notPreviewable": "这个附件无法预览.",
+      "openFailed": "系统没有打开这个文件. 可以改用另存为.",
+      "unexpected": "操作失败, 没有任何改动. 请重试, 仍失败请关闭应用后重试."
+    }
+  },
   "settings": {
     "open": "设置"
   },

@@ -2,6 +2,7 @@ import { electronApp, optimizer } from "@electron-toolkit/utils";
 import { BrowserWindow, app, ipcMain } from "electron";
 
 import icon from "../../../resources/icon.png?asset";
+import { registerAttachmentIpc } from "../ipc/attachment-ipc";
 import { registerBatchIpc } from "../ipc/batch-ipc";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
@@ -17,6 +18,7 @@ import {
   createPreferencesRuntime,
   type PreferencesRuntime,
 } from "./preferences-runtime";
+import { createAttachmentRuntime } from "./attachment-runtime";
 import { createBatchService } from "./batch-runtime";
 import { createEntryRuntime } from "./entry-runtime";
 import { createFolderService } from "./folder-runtime";
@@ -84,7 +86,12 @@ export async function startApplication(): Promise<void> {
   registerTagIpc(ipcMain, createTagService(vault.service));
   registerBatchIpc(ipcMain, createBatchService(vault.service));
   registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
-  app.on("will-quit", () => vault.service.close());
+  const attachments = createAttachmentRuntime(vault.service, runtime.i18n);
+  registerAttachmentIpc(ipcMain, attachments);
+  app.on("will-quit", () => {
+    attachments.discardTemporaryCopies();
+    vault.service.close();
+  });
   keepWindowsInSync(runtime);
   openMainWindow(runtime);
   app.on("activate", () => {

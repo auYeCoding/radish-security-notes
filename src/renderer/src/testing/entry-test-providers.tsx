@@ -1,7 +1,9 @@
+import type { AttachmentBridge } from "@shared/attachments/attachment-bridge";
 import type { BatchBridge } from "@shared/batch/batch-bridge";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
 import type { ReactNode } from "react";
 
+import { AttachmentBridgeProvider } from "@renderer/stores/attachment-bridge-provider";
 import { BatchBridgeProvider } from "@renderer/stores/batch-bridge-provider";
 import type { BatchSelectionStore } from "@renderer/stores/batch-selection-store";
 import { BatchSelectionStoreProvider } from "@renderer/stores/batch-selection-store-provider";
@@ -57,11 +59,15 @@ export interface EntryTestProviderValues {
    * TOTP 桥.
    */
   readonly totpBridge: TotpBridge;
+  /**
+   * 附件桥.
+   */
+  readonly attachmentBridge: AttachmentBridge;
 }
 
 /**
  * 创建包裹被测组件的 Provider: 在保险库 Provider 之内依次注入条目, 文件夹, 标签, 批量选中 store,
- * 批量桥与 TOTP 桥.
+ * 批量桥, TOTP 桥与附件桥.
  * @param values 要注入的 store 与桥.
  * @returns Provider 组件.
  */
@@ -80,7 +86,9 @@ export function createEntryTestProviders(
               <BatchSelectionStoreProvider store={values.batchSelectionStore}>
                 <BatchBridgeProvider bridge={values.batchBridge}>
                   <TotpBridgeProvider bridge={values.totpBridge}>
-                    {props.children}
+                    <AttachmentBridgeProvider bridge={values.attachmentBridge}>
+                      {props.children}
+                    </AttachmentBridgeProvider>
                   </TotpBridgeProvider>
                 </BatchBridgeProvider>
               </BatchSelectionStoreProvider>

@@ -1,3 +1,4 @@
+import type { AttachmentBridge } from "@shared/attachments/attachment-bridge";
 import type { BatchBridge } from "@shared/batch/batch-bridge";
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import type { EntryDetail } from "@shared/entries/entry-types";
@@ -22,6 +23,10 @@ import {
 import { createTagStore, type TagStore } from "@renderer/stores/tag-store";
 
 import { createEntryTestProviders } from "./entry-test-providers";
+import {
+  createFakeAttachmentBridge,
+  type FakeAttachmentsByEntry,
+} from "./fake-attachment-bridge";
 import { createFakeBatchBridge } from "./fake-batch-bridge";
 import { createFakeEntryBridge } from "./fake-entry-bridge";
 import { createFakeFolderBridge } from "./fake-folder-bridge";
@@ -54,6 +59,14 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    */
   readonly totpBridgeOverrides?: Partial<TotpBridge>;
   /**
+   * 假附件桥里的初始附件, 键是条目编号, 默认没有附件.
+   */
+  readonly attachments?: FakeAttachmentsByEntry;
+  /**
+   * 覆盖假附件桥上的方法, 例如让添加失败.
+   */
+  readonly attachmentBridgeOverrides?: Partial<AttachmentBridge>;
+  /**
    * 假文件夹桥里的初始文件夹, 按创建先后排列, 默认没有文件夹.
    */
   readonly folders?: readonly FolderSummary[];
@@ -73,7 +86,8 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
 
 /**
  * 组件测试用的条目环境: 在保险库环境之上增加假的条目桥, 真实的条目 store, 假的文件夹桥, 真实的
- * 文件夹 store, 假的标签桥, 真实的标签 store, 假的批量桥, 真实的批量选中 store 与假的 TOTP 桥.
+ * 文件夹 store, 假的标签桥, 真实的标签 store, 假的批量桥, 真实的批量选中 store, 假的 TOTP 桥与
+ * 假的附件桥.
  */
 export interface EntryTestEnvironment extends VaultTestEnvironment {
   /**
@@ -92,6 +106,10 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
    * 带间谍方法的假 TOTP 桥.
    */
   readonly totpBridge: TotpBridge;
+  /**
+   * 带间谍方法的假附件桥.
+   */
+  readonly attachmentBridge: AttachmentBridge;
   /**
    * 被测的条目 store.
    */
@@ -119,7 +137,12 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
  */
 type EntryTestBridges = Pick<
   EntryTestEnvironment,
-  "entryBridge" | "batchBridge" | "totpBridge" | "folderBridge" | "tagBridge"
+  | "entryBridge"
+  | "batchBridge"
+  | "totpBridge"
+  | "attachmentBridge"
+  | "folderBridge"
+  | "tagBridge"
 >;
 
 /**
@@ -140,6 +163,10 @@ function createEntryTestBridges(
     ),
     batchBridge: createFakeBatchBridge(details, options.batchBridgeOverrides),
     totpBridge: createFakeTotpBridge(options.totpBridgeOverrides),
+    attachmentBridge: createFakeAttachmentBridge(
+      options.attachments,
+      options.attachmentBridgeOverrides,
+    ),
     folderBridge: createFakeFolderBridge(
       options.folders,
       options.folderBridgeOverrides,
@@ -152,7 +179,7 @@ function createEntryTestBridges(
  * 创建组件测试用的条目环境, 保险库默认已解锁.
  * @param options 保险库初始状态, 初始条目, 文件夹与标签, 桥方法的覆盖.
  * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目, 文件夹, 标签, 批量选中六个 store,
- * 批量桥与 TOTP 桥.
+ * 批量桥, TOTP 桥与附件桥.
  */
 export async function createEntryTestEnvironment(
   options: EntryTestEnvironmentOptions = {},
@@ -162,8 +189,14 @@ export async function createEntryTestEnvironment(
     ...options,
   });
   const bridges = createEntryTestBridges(options);
-  const { entryBridge, batchBridge, totpBridge, folderBridge, tagBridge } =
-    bridges;
+  const {
+    entryBridge,
+    batchBridge,
+    totpBridge,
+    attachmentBridge,
+    folderBridge,
+    tagBridge,
+  } = bridges;
   const batchSelectionStore = createBatchSelectionStore();
   const entryStore = createEntryStore({ bridge: entryBridge });
   const folderStore = createFolderStore({ bridge: folderBridge });
@@ -176,6 +209,7 @@ export async function createEntryTestEnvironment(
     batchSelectionStore,
     batchBridge,
     totpBridge,
+    attachmentBridge,
   });
   return {
     ...vault,
@@ -183,6 +217,7 @@ export async function createEntryTestEnvironment(
     batchBridge,
     batchSelectionStore,
     totpBridge,
+    attachmentBridge,
     entryStore,
     folderBridge,
     folderStore,

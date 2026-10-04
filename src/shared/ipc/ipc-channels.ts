@@ -40,4 +40,11 @@ export const IPC_CHANNELS = {
   totpCopyCode: "totp:copy-code",
   totpCopySecret: "totp:copy-secret",
   totpDecodeQrImage: "totp:decode-qr-image",
+  attachmentsList: "attachments:list",
+  attachmentsAddFromDialog: "attachments:add-from-dialog",
+  attachmentsAddPaths: "attachments:add-paths",
+  attachmentsSaveAs: "attachments:save-as",
+  attachmentsOpen: "attachments:open",
+  attachmentsPreview: "attachments:preview",
+  attachmentsRemove: "attachments:remove",
 } as const;

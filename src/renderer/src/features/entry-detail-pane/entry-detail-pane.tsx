@@ -17,6 +17,10 @@ interface EntryDetailPaneProps {
    * 生成标题行右侧操作的函数, 例如编辑与删除按钮. 由 app 层传入, feature 之间不互相引用.
    */
   readonly renderActions?: (detail: EntryDetail) => ReactNode;
+  /**
+   * 生成备注之后的附件区的函数. 由 app 层传入, feature 之间不互相引用.
+   */
+  readonly renderAttachments?: (detail: EntryDetail) => ReactNode;
 }
 
 /**
@@ -46,14 +50,14 @@ function CenteredMessage(props: CenteredMessageProps): React.JSX.Element {
  * @param selection 当前选中状态.
  * @param revision 条目被编辑保存的次数.
  * @param translate 翻译函数.
- * @param renderActions 生成标题行右侧操作的函数.
+ * @param renderers 生成标题行右侧操作与备注之后附件区的函数.
  * @returns 窗格内容, 读取中时为 null.
  */
 function renderSelection(
   selection: EntrySelection,
   revision: number,
   translate: TFunction,
-  renderActions: EntryDetailPaneProps["renderActions"],
+  renderers: Pick<EntryDetailPaneProps, "renderActions" | "renderAttachments">,
 ): React.JSX.Element | null {
   switch (selection.status) {
     case "none":
@@ -69,7 +73,8 @@ function renderSelection(
         <EntryDetailView
           key={`${selection.detail.id}:${revision}`}
           detail={selection.detail}
-          actions={renderActions?.(selection.detail)}
+          actions={renderers.renderActions?.(selection.detail)}
+          attachments={renderers.renderAttachments?.(selection.detail)}
         />
       );
   }
@@ -91,7 +96,7 @@ export function EntryDetailPane(
       aria-label={t("entryDetailPane.heading")}
       className="flex min-w-0 flex-1 flex-col overflow-y-auto"
     >
-      {renderSelection(selection, revision, t, props.renderActions)}
+      {renderSelection(selection, revision, t, props)}
     </section>
   );
 }

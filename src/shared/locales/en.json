@@ -342,6 +342,60 @@
       "unexpected": "The action failed and nothing was changed. Try again, and if it still fails close the app and try again."
     }
   },
+  "entryAttachments": {
+    "heading": "Attachments ({count})",
+    "sectionLabel": "Attachments",
+    "add": "Add attachment",
+    "adding": "Adding...",
+    "empty": "No attachments yet. Choose \"Add attachment\" or drag files here.",
+    "dropActive": "Release to add the files as attachments",
+    "loadFailed": "Could not load the attachments. Close the app and try again.",
+    "dismiss": "Dismiss message",
+    "dialog": {
+      "openTitle": "Choose files to attach",
+      "saveTitle": "Save attachment as"
+    },
+    "size": {
+      "bytes": "{value} B",
+      "kilobytes": "{value} KB",
+      "megabytes": "{value} MB",
+      "gigabytes": "{value} GB"
+    },
+    "actions": {
+      "preview": "Preview {name}",
+      "open": "Open {name}",
+      "saveAs": "Save {name} as",
+      "delete": "Delete {name}"
+    },
+    "delete": {
+      "title": "Delete this attachment?",
+      "description": "The attachment \"{name}\" will be deleted permanently. This cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting..."
+    },
+    "preview": {
+      "title": "Preview {name}",
+      "description": "A preview of the image attachment. Nothing is kept after you close it.",
+      "loading": "Loading...",
+      "imageAlt": "Preview of {name}"
+    },
+    "error": {
+      "invalidInput": "There are no files to add. Dragged items must be files on disk.",
+      "notFound": "This entry or attachment no longer exists.",
+      "emptyFile": "\"{name}\" is an empty file. No attachments were added.",
+      "fileTooLarge": "\"{name}\" is larger than the {fileLimit} limit for one attachment. No attachments were added.",
+      "tooManyAttachments": "An entry can have at most {max} attachments. No attachments were added.",
+      "totalTooLarge": "The attachments of one entry can total at most {totalLimit}. No attachments were added.",
+      "notAFile": "\"{name}\" is not a file. No attachments were added.",
+      "readFailed": "Could not read \"{name}\". No attachments were added.",
+      "writeFailed": "Could not write the file. Try another location.",
+      "notOpenable": "The system would run this kind of file directly, so it cannot be opened here. Save it and handle it yourself.",
+      "notPreviewable": "This attachment cannot be previewed.",
+      "openFailed": "The system did not open this file. Try Save as instead.",
+      "unexpected": "The action failed and nothing was changed. Try again, and if it still fails close the app and try again."
+    }
+  },
   "settings": {
     "open": "Settings"
   },

@@ -1,12 +1,6 @@
-import { XIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import {
-  Alert,
-  AlertAction,
-  AlertDescription,
-} from "@renderer/components/ui/alert";
-import { Button } from "@renderer/components/ui/button";
+import { DismissibleAlert } from "@renderer/components/dismissible-alert";
 
 /**
  * 批量操作失败提示的属性.
@@ -23,8 +17,8 @@ interface BatchFailureNoticeProps {
 }
 
 /**
- * 选择栏下方的批量操作失败提示: 说明失败原因与整批都没有执行, 带关闭按钮. 提示条自带
- * `role="alert"`, 屏幕阅读器会立即朗读.
+ * 选择栏下方的批量操作失败提示: 说明失败原因与整批都没有执行, 带关闭按钮. 提示条由共用的
+ * 可关闭提示条提供, 自带 `role="alert"`, 屏幕阅读器会立即朗读.
  * @param props 组件属性.
  * @returns 失败提示元素.
  */
@@ -34,19 +28,11 @@ export function BatchFailureNotice(
   const { t } = useTranslation();
   return (
     <div className="border-b border-border p-2">
-      <Alert variant="destructive">
-        <AlertDescription>{props.message}</AlertDescription>
-        <AlertAction>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            aria-label={t("batch.dismiss")}
-            onClick={props.onDismiss}
-          >
-            <XIcon aria-hidden="true" />
-          </Button>
-        </AlertAction>
-      </Alert>
+      <DismissibleAlert
+        message={props.message}
+        dismissLabel={t("batch.dismiss")}
+        onDismiss={props.onDismiss}
+      />
     </div>
   );
 }

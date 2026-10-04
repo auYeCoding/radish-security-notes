@@ -1,7 +1,8 @@
 import { electronAPI } from "@electron-toolkit/preload";
 import type { RendererApi } from "@shared/ipc/renderer-api";
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, webUtils } from "electron";
 
+import { createAttachmentBridge } from "./create-attachment-bridge";
 import { createBatchBridge } from "./create-batch-bridge";
 import { createEntryBridge } from "./create-entry-bridge";
 import { createFolderBridge } from "./create-folder-bridge";
@@ -23,6 +24,10 @@ const api: RendererApi = {
   tags: createTagBridge(ipcRenderer),
   batch: createBatchBridge(ipcRenderer),
   totp: createTotpBridge(ipcRenderer),
+  attachments: createAttachmentBridge({
+    ipcRenderer,
+    getPathForFile: (file) => webUtils.getPathForFile(file),
+  }),
 };
 
 if (process.contextIsolated) {

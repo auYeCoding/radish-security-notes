@@ -1,3 +1,4 @@
+import type { AttachmentBridge } from "../attachments/attachment-bridge";
 import type { BatchBridge } from "../batch/batch-bridge";
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
@@ -43,4 +44,8 @@ export interface RendererApi {
    * TOTP 接口: 读取验证码与密钥, 复制验证码与密钥, 解码二维码图片.
    */
   readonly totp: TotpBridge;
+  /**
+   * 附件接口: 读取元数据, 添加, 另存为, 打开, 预览与删除附件.
+   */
+  readonly attachments: AttachmentBridge;
 }

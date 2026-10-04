@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 
-import { BrowserWindow, app, dialog } from "electron";
+import { app } from "electron";
 import type { i18n } from "i18next";
 
 import { readRecoveryTextFileLabels } from "../recovery/recovery-text-file-labels";
@@ -9,6 +9,7 @@ import {
   type RecoveryTextFilePort,
   type SaveDialogRequest,
 } from "../recovery/recovery-text-file-saver";
+import { showSaveDialogOnFocusedWindow } from "./electron-dialogs";
 import { reportFailure } from "./report-failure";
 
 /**
@@ -27,24 +28,18 @@ export interface RecoveryRuntime {
 }
 
 /**
- * 弹出 Electron 的系统保存对话框, 有焦点窗口时作为它的模态子窗口.
+ * 弹出 Electron 的系统保存对话框, 过滤器只列恢复词文本文件的扩展名.
  * @param request 对话框的预填信息.
  * @returns 用户选定的路径, 取消时为 undefined.
  */
-async function showElectronSaveDialog(
+function showElectronSaveDialog(
   request: SaveDialogRequest,
 ): Promise<string | undefined> {
-  const options = {
+  return showSaveDialogOnFocusedWindow({
     title: request.title,
     defaultPath: request.defaultPath,
     filters: [{ name: request.fileTypeName, extensions: [request.extension] }],
-  };
-  const focusedWindow = BrowserWindow.getFocusedWindow();
-  const result =
-    focusedWindow === null
-      ? await dialog.showSaveDialog(options)
-      : await dialog.showSaveDialog(focusedWindow, options);
-  return result.canceled ? undefined : result.filePath;
+  });
 }
 
 /**
