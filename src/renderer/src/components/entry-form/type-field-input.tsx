@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 
 import type { EntryFieldDefinition } from "@shared/entries/entry-field-types";
 import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
-import type { EntryFieldKey } from "@shared/entries/preset-entry-types";
 
+import { entryFieldName } from "@renderer/components/entry-type-naming";
 import { PasswordField } from "@renderer/components/password-field";
 import { TextareaField } from "@renderer/components/textarea-field";
 import { TextField } from "@renderer/components/text-field";
@@ -18,13 +18,13 @@ interface TypeFieldInputProps {
   /**
    * 要输入的字段定义.
    */
-  readonly field: EntryFieldDefinition<EntryFieldKey>;
+  readonly field: EntryFieldDefinition;
 }
 
 /**
- * 条目表单里类型的一个字段, 新建与编辑共用: 多行字段用多行输入框, 敏感的单行字段用带显示与
- * 隐藏切换的输入框, 其余用普通输入框, 标签是字段名, 超长的错误显示在输入框下方. 必须在
- * `FormProvider` 里使用.
+ * 条目表单里类型的一个字段, 新建与编辑共用, 预设与自定义类型共用: 多行字段用多行输入框, 敏感的
+ * 单行字段用带显示与隐藏切换的输入框, 其余用普通输入框, 标签是字段名, 超长的错误显示在输入框
+ * 下方. 必须在 `FormProvider` 里使用.
  * @param props 组件属性.
  * @returns 字段输入元素.
  */
@@ -32,7 +32,7 @@ export function TypeFieldInput(props: TypeFieldInputProps): React.JSX.Element {
   const { t } = useTranslation();
   const { register, formState } = useFormContext<NewEntryFormValues>();
   const { field } = props;
-  const label = t(`entryFields.${field.key}`);
+  const label = entryFieldName(field, t);
   const registration = register(`fields.${field.key}`);
   const error = describeFieldError(
     formState.errors.fields?.[field.key]?.message,

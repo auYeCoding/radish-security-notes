@@ -1,5 +1,10 @@
+import type { CustomEntryType } from "@shared/entries/custom-types/custom-entry-type-types";
 import type { EntryBridge } from "@shared/entries/entry-bridge";
-import { entryFailed, entrySucceeded } from "@shared/entries/entry-result";
+import {
+  entryFailed,
+  entrySucceeded,
+  type EntryResult,
+} from "@shared/entries/entry-result";
 import {
   readAccount,
   toEntrySummary,
@@ -83,12 +88,53 @@ function detailFromUpdate(
 }
 
 /**
+ * 更新假桥里存着的一个条目, 找不到时不改动.
+ * @param details 假桥里的条目详情, 原地更新.
+ * @param id 条目编号.
+ * @param input 更新输入.
+ * @returns 更新后的条目详情, 没有这个编号时为失败结果.
+ */
+function updateStoredDetail(
+  details: EntryDetail[],
+  id: string,
+  input: UpdateEntryInput,
+): EntryResult<EntryDetail> {
+  const index = details.findIndex((detail) => detail.id === id);
+  const existing = details[index];
+  if (existing === undefined) {
+    return entryFailed("not-found");
+  }
+  const detail = detailFromUpdate(existing, input);
+  details[index] = detail;
+  return entrySucceeded(detail);
+}
+
+/**
+ * 从假桥里移除一个条目.
+ * @param details 假桥里的条目详情, 原地移除.
+ * @param id 条目编号.
+ * @returns 移除结果, 没有这个编号时为失败结果.
+ */
+function removeStoredDetail(
+  details: EntryDetail[],
+  id: string,
+): EntryResult<undefined> {
+  const index = details.findIndex((detail) => detail.id === id);
+  if (index < 0) {
+    return entryFailed("not-found");
+  }
+  details.splice(index, 1);
+  return entrySucceeded(undefined);
+}
+
+/**
  * 创建组件测试用的假条目桥: 条目存在内存里, 最新创建的在最前, 每个方法都是间谍.
  * @param initial 初始条目, 按最新创建在前排列.
  * @param overrides 覆盖假桥上的方法, 例如让复制失败.
  * @param tags 假标签桥里的标签, 搜索时用来把条目的标签编号换成标签名.
  * @param sharedDetails 与假批量桥共享的条目数据数组, 假桥直接读写它, 传入时 `initial` 被忽略, 默认
  * 是 `initial` 的副本.
+ * @param customTypes 假自定义类型桥里的自定义类型, 搜索时用来取自定义类型的可搜字段, 默认没有.
  * @returns 假条目桥.
  */
 export function createFakeEntryBridge(
@@ -96,6 +142,7 @@ export function createFakeEntryBridge(
   overrides: Partial<EntryBridge> = {},
   tags: readonly TagSummary[] = [],
   sharedDetails: EntryDetail[] | undefined = undefined,
+  customTypes: readonly CustomEntryType[] = [],
 ): EntryBridge {
   const details = sharedDetails ?? [...initial];
   return {
@@ -103,7 +150,9 @@ export function createFakeEntryBridge(
       Promise.resolve(entrySucceeded(details.map(toEntrySummary))),
     ),
     search: vi.fn((query: string) =>
-      Promise.resolve(entrySucceeded(searchFakeEntries(details, tags, query))),
+      Promise.resolve(
+        entrySucceeded(searchFakeEntries(details, tags, query, customTypes)),
+      ),
     ),
     get: vi.fn((id: string) => {
       const found = details.find((detail) => detail.id === id);
@@ -116,24 +165,12 @@ export function createFakeEntryBridge(
       details.unshift(detail);
       return Promise.resolve(entrySucceeded(detail));
     }),
-    update: vi.fn((id: string, input) => {
-      const index = details.findIndex((detail) => detail.id === id);
-      const existing = details[index];
-      if (existing === undefined) {
-        return Promise.resolve(entryFailed("not-found"));
-      }
-      const detail = detailFromUpdate(existing, input);
-      details[index] = detail;
-      return Promise.resolve(entrySucceeded(detail));
-    }),
-    remove: vi.fn((id: string) => {
-      const index = details.findIndex((detail) => detail.id === id);
-      if (index < 0) {
-        return Promise.resolve(entryFailed("not-found"));
-      }
-      details.splice(index, 1);
-      return Promise.resolve(entrySucceeded(undefined));
-    }),
+    update: vi.fn((id: string, input) =>
+      Promise.resolve(updateStoredDetail(details, id, input)),
+    ),
+    remove: vi.fn((id: string) =>
+      Promise.resolve(removeStoredDetail(details, id)),
+    ),
     copyField: vi.fn(() => Promise.resolve(entrySucceeded(undefined))),
     copyCustomField: vi.fn(() => Promise.resolve(entrySucceeded(undefined))),
     ...overrides,

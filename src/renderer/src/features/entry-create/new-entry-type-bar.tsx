@@ -1,7 +1,7 @@
 import { ArrowLeftIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
 import { EntryTypeLabel } from "@renderer/components/entry-type-label";
 import { Button } from "@renderer/components/ui/button";
@@ -13,7 +13,7 @@ interface NewEntryTypeBarProps {
   /**
    * 已选中的条目类型.
    */
-  readonly type: PresetEntryTypeDefinition;
+  readonly type: EntryTypeDefinition;
   /**
    * 点击返回按钮时的回调, 回到类型选择.
    */
@@ -45,7 +45,7 @@ export function NewEntryTypeBar(
         <ArrowLeftIcon aria-hidden="true" />
         {t("entryCreate.typeStep.back")}
       </Button>
-      <EntryTypeLabel typeKey={props.type.key} />
+      <EntryTypeLabel type={props.type} />
     </div>
   );
 }

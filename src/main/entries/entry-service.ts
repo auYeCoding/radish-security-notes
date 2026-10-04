@@ -1,4 +1,5 @@
 import { createEditEntrySchema } from "@shared/entries/edit-entry-schema";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import {
   entryFailed,
   entrySucceeded,
@@ -12,13 +13,10 @@ import {
   type UpdateEntryInput,
 } from "@shared/entries/entry-types";
 import { createNewEntrySchema } from "@shared/entries/new-entry-schema";
-import {
-  findEntryType,
-  requireEntryType,
-} from "@shared/entries/preset-entry-types";
 import type { EntrySearchHit } from "@shared/search/entry-search-types";
 import { tagIdsOrOmitted } from "@shared/tags/tag-filter";
 
+import { loadEntryTypeCatalog } from "../entry-types/entry-type-catalog";
 import { isFolderChoiceValid } from "../folders/folder-repository";
 import {
   areAllTagsExisting,
@@ -68,12 +66,15 @@ export interface EntryServiceDependencies extends DatabaseAccess {
 /**
  * 把表里的一行转成条目详情, 类型字段按类型补全.
  * @param record 条目所在的行.
+ * @param type 条目的类型定义.
  * @param tagIds 条目带的标签编号, 按选择顺序排列.
  * @returns 条目详情.
- * @throws Error 当行里的类型不是预设类型时.
  */
-function toDetail(record: EntryRecord, tagIds: readonly string[]): EntryDetail {
-  const type = requireEntryType(record.type);
+function toDetail(
+  record: EntryRecord,
+  type: EntryTypeDefinition,
+  tagIds: readonly string[],
+): EntryDetail {
   const fields = normalizeFieldValues(type, record.fields);
   return {
     id: record.id,
@@ -132,9 +133,11 @@ export class EntryService {
   get(id: string): EntryResult<EntryDetail> {
     return this.withDatabase((orm) => {
       const record = findEntry(orm, id);
-      return record === undefined
-        ? entryFailed("not-found")
-        : entrySucceeded(toDetail(record, listTagIdsOfEntry(orm, id)));
+      if (record === undefined) {
+        return entryFailed("not-found");
+      }
+      const type = loadEntryTypeCatalog(orm).require(record.type);
+      return entrySucceeded(toDetail(record, type, listTagIdsOfEntry(orm, id)));
     });
   }
 
@@ -142,17 +145,17 @@ export class EntryService {
    * 新建一个条目: 按类型校验输入, 名称与自定义字段的字段名去首尾空格, 生成条目编号, 自定义
    * 字段编号与创建时间后写入数据库. 选了所属文件夹与标签时, 它们必须存在; 条目与标签关联
    * 在同一个事务里写入.
-   * @param input 用户选的类型, 填写的名称, 类型字段, 备注, 自定义字段, 所属文件夹与标签.
+   * @param input 用户选的类型 (预设或自定义), 填写的名称, 类型字段, 备注, 自定义字段, 所属文件夹与标签.
    * @returns 新建的条目详情, 未解锁, 输入不合规 (含未知类型), 所选文件夹或标签不存在时为失败结果.
    */
   create(input: NewEntryInput): EntryResult<EntryDetail> {
     return this.withDatabase((orm) => {
-      const type = findEntryType(input.type);
-      const parsed =
-        type === undefined
-          ? undefined
-          : createNewEntrySchema(type).safeParse(input);
-      if (type === undefined || !parsed?.success) {
+      const type = loadEntryTypeCatalog(orm).find(input.type);
+      if (type === undefined) {
+        return entryFailed("invalid-input");
+      }
+      const parsed = createNewEntrySchema(type).safeParse(input);
+      if (!parsed.success) {
         return entryFailed("invalid-input");
       }
       if (!isFolderChoiceValid(orm, parsed.data.folderId)) {
@@ -172,7 +175,7 @@ export class EntryService {
         insertEntry(transaction, record);
         replaceEntryTags(transaction, record.id, tagIds);
       });
-      return entrySucceeded(toDetail(record, tagIds));
+      return entrySucceeded(toDetail(record, type, tagIds));
     });
   }
 
@@ -191,12 +194,12 @@ export class EntryService {
       if (existing === undefined) {
         return entryFailed("not-found");
       }
-      const type = findEntryType(existing.type);
-      const parsed =
-        type === undefined
-          ? undefined
-          : createEditEntrySchema(type).safeParse(input);
-      if (!parsed?.success) {
+      const type = loadEntryTypeCatalog(orm).find(existing.type);
+      if (type === undefined) {
+        return entryFailed("invalid-input");
+      }
+      const parsed = createEditEntrySchema(type).safeParse(input);
+      if (!parsed.success) {
         return entryFailed("invalid-input");
       }
       if (!isFolderChoiceValid(orm, parsed.data.folderId)) {
@@ -215,7 +218,7 @@ export class EntryService {
         updateEntry(transaction, record);
         replaceEntryTags(transaction, record.id, tagIds);
       });
-      return entrySucceeded(toDetail(record, tagIds));
+      return entrySucceeded(toDetail(record, type, tagIds));
     });
   }
 
@@ -242,7 +245,13 @@ export class EntryService {
     return this.withDatabase((orm) => {
       const record = findEntry(orm, id);
       const value =
-        record === undefined ? undefined : findCopyValue(record, field);
+        record === undefined
+          ? undefined
+          : findCopyValue(
+              record,
+              loadEntryTypeCatalog(orm).find(record.type),
+              field,
+            );
       if (value === undefined) {
         return entryFailed("not-found");
       }

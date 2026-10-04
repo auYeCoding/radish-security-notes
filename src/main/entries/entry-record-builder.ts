@@ -1,5 +1,5 @@
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
-import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 import type { TotpConfig } from "@shared/entries/totp-config";
 import {
   isTotpInputBlank,
@@ -16,7 +16,7 @@ export interface EntryRecordSource {
   /**
    * 条目的类型定义.
    */
-  readonly type: PresetEntryTypeDefinition;
+  readonly type: EntryTypeDefinition;
   /**
    * 经新建校验方案校验后的取值.
    */

@@ -64,6 +64,22 @@ export function isEntryTypeKey(value: unknown): value is EntryTypeKey {
 }
 
 /**
+ * 全部预设条目类型里出现过的字段键的集合.
+ */
+const PRESET_FIELD_KEYS: ReadonlySet<string> = new Set(
+  PRESET_ENTRY_TYPES.flatMap((type) => type.fields.map((field) => field.key)),
+);
+
+/**
+ * 判断一个值是否是预设条目类型里出现过的字段键.
+ * @param value 待判断的值.
+ * @returns 是预设字段键时返回 true.
+ */
+export function isEntryFieldKey(value: unknown): value is EntryFieldKey {
+  return typeof value === "string" && PRESET_FIELD_KEYS.has(value);
+}
+
+/**
  * 按类型键找预设条目类型.
  * @param key 类型键.
  * @returns 类型定义, 不是预设类型键时为 undefined.

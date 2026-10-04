@@ -4,7 +4,6 @@ import type {
   NewCustomFieldInput,
 } from "./custom-field-types";
 import type { NotesFormat } from "./notes-format";
-import type { EntryTypeKey } from "./preset-entry-types";
 
 /**
  * 条目里类型字段的取值: 键是字段键, 值是用户填写的文本, 可以是多行, 也可以为空串.
@@ -29,9 +28,9 @@ export interface EntrySummary {
    */
   readonly name: string;
   /**
-   * 条目的类型键.
+   * 条目的类型键, 是预设类型键或自定义类型键.
    */
-  readonly type: EntryTypeKey;
+  readonly type: string;
   /**
    * 条目的账号, 类型没有账号字段或没有填写时为空串.
    */
@@ -102,9 +101,9 @@ export function toEntrySummary(detail: EntryDetail): EntrySummary {
  */
 export interface NewEntryInput {
   /**
-   * 条目的类型键.
+   * 条目的类型键, 是预设类型键或自定义类型键.
    */
-  readonly type: EntryTypeKey;
+  readonly type: string;
   /**
    * 条目名称.
    */

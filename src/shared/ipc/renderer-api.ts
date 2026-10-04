@@ -1,5 +1,6 @@
 import type { AttachmentBridge } from "../attachments/attachment-bridge";
 import type { BatchBridge } from "../batch/batch-bridge";
+import type { CustomEntryTypeBridge } from "../entries/custom-types/custom-entry-type-bridge";
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
 import type { FolderBridge } from "../folders/folder-bridge";
@@ -29,6 +30,10 @@ export interface RendererApi {
    * 条目接口: 读取列表与详情, 新建, 更新与删除条目, 复制字段.
    */
   readonly entries: EntryBridge;
+  /**
+   * 自定义条目类型接口: 读取与新建自定义类型.
+   */
+  readonly entryTypes: CustomEntryTypeBridge;
   /**
    * 文件夹接口: 读取, 新建, 重命名与删除文件夹, 把条目放进文件夹.
    */

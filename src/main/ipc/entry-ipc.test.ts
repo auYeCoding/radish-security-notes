@@ -276,7 +276,8 @@ describe("registerEntryIpc 新建参数校验", () => {
       null,
       "text",
       { name: "n" },
-      { ...valid, type: "custom" },
+      { ...valid, type: 1 },
+      { ...valid, type: undefined },
       { ...valid, notesFormat: undefined },
       { ...valid, notesFormat: "html" },
       { ...valid, fields: { account: 1 } },
@@ -288,6 +289,22 @@ describe("registerEntryIpc 新建参数校验", () => {
       );
     }
     expect(service.create).not.toHaveBeenCalled();
+  });
+
+  it("类型键是字符串即交给服务, 键是否属于预设或自定义类型由服务判定", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    ipcMain.invoke(IPC_CHANNELS.entriesCreate, {
+      type: "custom:abc",
+      name: "n",
+      fields: {},
+      notes: "",
+      notesFormat: "plain",
+      customFields: [],
+      totp: "",
+    });
+
+    expect(service.create).toHaveBeenCalledTimes(1);
   });
 });
 

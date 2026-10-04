@@ -2,8 +2,8 @@ import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import type { EditEntryFormValues } from "@shared/entries/edit-entry-schema";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import type { EntryDetail } from "@shared/entries/entry-types";
-import { requireEntryType } from "@shared/entries/preset-entry-types";
 
 import { EntryFormActions } from "@renderer/components/entry-form/entry-form-actions";
 import { EntryFormFields } from "@renderer/components/entry-form/entry-form-fields";
@@ -26,6 +26,10 @@ interface EditEntryFormProps {
    */
   readonly detail: EntryDetail;
   /**
+   * 条目的类型定义 (预设或自定义), 表单显示它的字段.
+   */
+  readonly type: EntryTypeDefinition;
+  /**
    * 保存成功后的回调, 例如关闭对话框.
    */
   readonly onSaved: () => void;
@@ -40,8 +44,7 @@ interface EditEntryFormProps {
  */
 export function EditEntryForm(props: EditEntryFormProps): React.JSX.Element {
   const { t } = useTranslation();
-  const { detail } = props;
-  const type = requireEntryType(detail.type);
+  const { detail, type } = props;
   const { failureMessage, submit } = useEditEntry(detail.id, props.onSaved);
   const form = useFormContext<EditEntryFormValues>();
   const folders = useSortedFolders();
@@ -52,7 +55,7 @@ export function EditEntryForm(props: EditEntryFormProps): React.JSX.Element {
       className="flex flex-col gap-5"
       onSubmit={(event) => void form.handleSubmit(submit)(event)}
     >
-      <EntryTypeLabel typeKey={type.key} />
+      <EntryTypeLabel type={type} />
       {failureMessage !== undefined && (
         <Alert variant="destructive">
           <AlertDescription>{failureMessage}</AlertDescription>

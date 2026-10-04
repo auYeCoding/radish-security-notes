@@ -3,11 +3,11 @@ import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import {
   createNewEntrySchema,
   type NewEntryFormValues,
 } from "@shared/entries/new-entry-schema";
-import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 import { folderIdOfView } from "@shared/folders/folder-view";
 
 import { EntryFormActions } from "@renderer/components/entry-form/entry-form-actions";
@@ -31,7 +31,7 @@ interface NewEntryFormProps {
   /**
    * 用户选的条目类型, 表单显示该类型的字段.
    */
-  readonly type: PresetEntryTypeDefinition;
+  readonly type: EntryTypeDefinition;
   /**
    * 点击返回按钮时的回调, 回到类型选择.
    */

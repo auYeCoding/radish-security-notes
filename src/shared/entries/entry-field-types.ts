@@ -1,11 +1,16 @@
 /**
- * 条目类型里一个字段的定义. 字段名的显示文案按字段键从 `entryFields.<字段键>` 取.
+ * 条目类型里一个字段的定义. 预设类型的字段名按字段键从 `entryFields.<字段键>` 取文案, 自定义
+ * 类型的字段带 `name`, 直接显示它.
  */
 export interface EntryFieldDefinition<Key extends string = string> {
   /**
    * 字段键, 在同一个类型里唯一, 也是存进条目 `fields` 里的键与复制时的字段名.
    */
   readonly key: Key;
+  /**
+   * 字段名, 只有自定义类型的字段有, 预设类型的字段没有这一项.
+   */
+  readonly name?: string;
   /**
    * 是否是敏感字段, 敏感字段在详情里默认遮罩.
    */
@@ -57,8 +62,9 @@ export function defineField<const Key extends string>(
 }
 
 /**
- * 一个条目类型的定义: 类型键与按显示顺序排列的字段. 类型名的显示文案按类型键从
- * `entryTypes.<类型键>.name` 取. 名称, 自定义字段与备注是所有类型共有的, 不在这里.
+ * 一个条目类型的定义: 类型键与按显示顺序排列的字段. 预设类型的名称按类型键从
+ * `entryTypes.<类型键>` 取文案, 自定义类型带 `name`, 直接显示它. 名称, 自定义字段与备注是所有
+ * 类型共有的, 不在这里.
  */
 export interface EntryTypeDefinition<
   Key extends string = string,
@@ -68,6 +74,10 @@ export interface EntryTypeDefinition<
    * 类型键, 存进条目的 `type` 列.
    */
   readonly key: Key;
+  /**
+   * 类型名称, 只有自定义类型有, 预设类型没有这一项.
+   */
+  readonly name?: string;
   /**
    * 类型的字段, 顺序就是表单与详情里的顺序.
    */

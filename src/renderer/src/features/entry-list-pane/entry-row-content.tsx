@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 
 import type { EntrySummary } from "@shared/entries/entry-types";
 
+import { entryTypeName } from "@renderer/components/entry-type-naming";
 import { HighlightedText } from "@renderer/components/highlighted-text";
+import { useEntryTypeCatalog } from "@renderer/stores/use-entry-type-catalog";
 
 import { EntryHitLine } from "./entry-hit-line";
 import { entryNameElementId } from "./entry-row-ids";
@@ -22,8 +24,9 @@ interface EntryRowContentProps {
 
 /**
  * 列表项里的文字部分: 第一行名称, 第二行 "类型名 · 账号", 没有账号时只有类型名; 条目在最近一次搜索
- * 里命中时, 名称与账号里命中关键字的部分高亮, 条目在其它字段命中时第三行写 "命中: 字段名". 用
- * `memo` 包住: 列表项只是勾选状态变化时 (例如全选), 文字部分不用跟着重新渲染.
+ * 里命中时, 名称与账号里命中关键字的部分高亮, 条目在其它字段命中时第三行写 "命中: 字段名". 类型名
+ * 与命中字段名经类型目录解析, 预设与自定义类型一样. 用 `memo` 包住: 列表项只是勾选状态变化时
+ * (例如全选), 文字部分不用跟着重新渲染.
  * @param props 组件属性.
  * @returns 文字部分元素.
  */
@@ -32,6 +35,7 @@ export const EntryRowContent = memo(function EntryRowContent(
 ): React.JSX.Element {
   const { t } = useTranslation();
   const { entry } = props;
+  const type = useEntryTypeCatalog().find(entry.type);
   const { hitFields, nameRanges, accountRanges } = useEntryHighlights(entry);
   return (
     <>
@@ -42,11 +46,13 @@ export const EntryRowContent = memo(function EntryRowContent(
         <HighlightedText text={entry.name} ranges={nameRanges} />
       </span>
       <EntrySubtitle
-        typeName={t(`entryTypes.${entry.type}`)}
+        typeName={type === undefined ? "" : entryTypeName(type, t)}
         account={entry.account}
         accountRanges={accountRanges}
       />
-      {hitFields === undefined ? null : <EntryHitLine fields={hitFields} />}
+      {hitFields === undefined ? null : (
+        <EntryHitLine fields={hitFields} type={type} />
+      )}
     </>
   );
 });

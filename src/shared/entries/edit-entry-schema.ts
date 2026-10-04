@@ -4,7 +4,7 @@ import {
   createEntryContentShape,
   type NewEntryFormValues,
 } from "./new-entry-schema";
-import type { PresetEntryTypeDefinition } from "./preset-entry-types";
+import type { EntryTypeDefinition } from "./entry-field-types";
 
 /**
  * 编辑条目表单的取值, 不含类型, 条目的类型保持不变. `totp` 为空串表示保持原来的 TOTP 配置,
@@ -24,7 +24,7 @@ export interface EditEntryFormValues extends NewEntryFormValues {
  * @returns 该类型的编辑条目校验方案.
  */
 export function createEditEntrySchema(
-  type: PresetEntryTypeDefinition,
+  type: EntryTypeDefinition,
 ): z.ZodType<EditEntryFormValues, EditEntryFormValues> {
   return z.object({
     ...createEntryContentShape(type),

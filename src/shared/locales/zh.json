@@ -276,7 +276,46 @@
     "typeStep": {
       "title": "选择条目类型",
       "description": "先选一个类型, 表单会显示该类型的字段.",
-      "back": "返回"
+      "back": "返回",
+      "newType": "新建类型"
+    },
+    "customType": {
+      "title": "新建条目类型",
+      "description": "类型名称与至少一个字段必填. 保密字段默认遮掩, 不参与搜索.",
+      "nameLabel": "类型名称",
+      "fieldsLegend": "字段",
+      "fieldGroup": "字段 {index}",
+      "fieldNameLabel": "字段名",
+      "kindLabel": "取值形态",
+      "kind": {
+        "singleLine": "单行文本",
+        "multiLine": "多行文本"
+      },
+      "sensitiveLabel": "保密",
+      "summaryGroup": "列表摘要字段",
+      "summaryLabel": "列表摘要",
+      "summaryNone": "不设列表摘要",
+      "summaryHelp": "列表摘要显示在条目列表的第二行, 只能指定一个非保密的单行字段.",
+      "addField": "添加字段",
+      "removeField": "删除字段 {index}",
+      "cancel": "取消",
+      "submit": "保存类型",
+      "submitting": "正在保存...",
+      "error": {
+        "nameRequired": "请填写类型名称.",
+        "nameTooLong": "类型名称最多 {maxLength} 个字符.",
+        "fieldsRequired": "至少添加一个字段.",
+        "tooManyFields": "一个类型最多 {maxCount} 个字段.",
+        "fieldNameRequired": "请填写字段名.",
+        "fieldNameTooLong": "字段名最多 {maxLength} 个字符.",
+        "fieldNameDuplicate": "字段名与前面的字段重复.",
+        "unknownKind": "取值形态不受支持.",
+        "summaryInvalid": "列表摘要只能指定一个非保密的单行字段.",
+        "invalid": "内容不符合要求. 请检查后重试.",
+        "nameTaken": "已有同名的类型. 请换一个名称.",
+        "limitReached": "自定义类型已达 {maxCount} 个上限.",
+        "unexpected": "保存失败. 请关闭应用后重试."
+      }
     },
     "cancel": "取消",
     "submit": "保存",

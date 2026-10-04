@@ -4,11 +4,12 @@ import {
   ENTRY_NAME_MAX_LENGTH,
   NEW_ENTRY_ERROR_CODES,
 } from "@shared/entries/new-entry-schema";
-import type { EntryFieldKey } from "@shared/entries/preset-entry-types";
 import { MAX_TAGS_PER_ENTRY } from "@shared/tags/tag-limits";
 import { MAX_TOTP_PERIOD_SECONDS } from "@shared/entries/totp-config";
 import { TOTP_INPUT_ERROR_CODES } from "@shared/entries/totp-input-parser";
 import type { TFunction } from "i18next";
+
+import { entryFieldName } from "@renderer/components/entry-type-naming";
 
 /**
  * 把条目表单里名称, 自定义字段, TOTP 与标签的校验错误代码换成当前语言的文案.
@@ -55,14 +56,14 @@ export function describeEntryFormError(
  */
 export function describeFieldError(
   code: string | undefined,
-  field: EntryFieldDefinition<EntryFieldKey>,
+  field: EntryFieldDefinition,
   translate: TFunction,
 ): string | undefined {
   if (code !== NEW_ENTRY_ERROR_CODES.fieldTooLong) {
     return undefined;
   }
   return translate("entryForm.error.fieldTooLong", {
-    label: translate(`entryFields.${field.key}`),
+    label: entryFieldName(field, translate),
     maxLength: field.maxLength,
   });
 }

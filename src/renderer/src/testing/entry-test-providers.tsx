@@ -10,6 +10,8 @@ import type { BatchSelectionStore } from "@renderer/stores/batch-selection-store
 import { BatchSelectionStoreProvider } from "@renderer/stores/batch-selection-store-provider";
 import type { EntryStore } from "@renderer/stores/entry-store";
 import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
+import type { EntryTypeStore } from "@renderer/stores/entry-type-store";
+import { EntryTypeStoreProvider } from "@renderer/stores/entry-type-store-provider";
 import type { FolderStore } from "@renderer/stores/folder-store";
 import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { LinkBridgeProvider } from "@renderer/stores/link-bridge-provider";
@@ -42,6 +44,10 @@ export interface EntryTestProviderValues {
    */
   readonly entryStore: EntryStore;
   /**
+   * 自定义条目类型 store.
+   */
+  readonly entryTypeStore: EntryTypeStore;
+  /**
    * 文件夹 store.
    */
   readonly folderStore: FolderStore;
@@ -72,8 +78,8 @@ export interface EntryTestProviderValues {
 }
 
 /**
- * 创建包裹被测组件的 Provider: 在保险库 Provider 之内依次注入条目, 文件夹, 标签, 批量选中 store,
- * 批量桥, TOTP 桥, 附件桥与链接桥.
+ * 创建包裹被测组件的 Provider: 在保险库 Provider 之内依次注入条目, 自定义类型, 文件夹, 标签,
+ * 批量选中 store, 批量桥, TOTP 桥, 附件桥与链接桥.
  * @param values 要注入的 store 与桥.
  * @returns Provider 组件.
  */
@@ -87,21 +93,25 @@ export function createEntryTestProviders(
     return (
       <VaultProviders>
         <EntryStoreProvider store={values.entryStore}>
-          <FolderStoreProvider store={values.folderStore}>
-            <TagStoreProvider store={values.tagStore}>
-              <BatchSelectionStoreProvider store={values.batchSelectionStore}>
-                <BatchBridgeProvider bridge={values.batchBridge}>
-                  <TotpBridgeProvider bridge={values.totpBridge}>
-                    <AttachmentBridgeProvider bridge={values.attachmentBridge}>
-                      <LinkBridgeProvider bridge={values.linkBridge}>
-                        {props.children}
-                      </LinkBridgeProvider>
-                    </AttachmentBridgeProvider>
-                  </TotpBridgeProvider>
-                </BatchBridgeProvider>
-              </BatchSelectionStoreProvider>
-            </TagStoreProvider>
-          </FolderStoreProvider>
+          <EntryTypeStoreProvider store={values.entryTypeStore}>
+            <FolderStoreProvider store={values.folderStore}>
+              <TagStoreProvider store={values.tagStore}>
+                <BatchSelectionStoreProvider store={values.batchSelectionStore}>
+                  <BatchBridgeProvider bridge={values.batchBridge}>
+                    <TotpBridgeProvider bridge={values.totpBridge}>
+                      <AttachmentBridgeProvider
+                        bridge={values.attachmentBridge}
+                      >
+                        <LinkBridgeProvider bridge={values.linkBridge}>
+                          {props.children}
+                        </LinkBridgeProvider>
+                      </AttachmentBridgeProvider>
+                    </TotpBridgeProvider>
+                  </BatchBridgeProvider>
+                </BatchSelectionStoreProvider>
+              </TagStoreProvider>
+            </FolderStoreProvider>
+          </EntryTypeStoreProvider>
         </EntryStoreProvider>
       </VaultProviders>
     );

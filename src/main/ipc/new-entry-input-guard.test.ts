@@ -77,10 +77,19 @@ describe("requireNewEntryInput 备注格式", () => {
 });
 
 describe("requireNewEntryInput 类型与类型字段", () => {
-  it("类型不是预设类型键, 或类型字段不是值都为字符串的对象时抛出错误", () => {
+  it("类型是字符串时原样返回, 自定义类型键也通过, 键是否有效由服务判定", () => {
+    expect(
+      requireNewEntryInput({ ...VALID_INPUT, type: "custom:abc" }).type,
+    ).toBe("custom:abc");
+    expect(requireNewEntryInput({ ...VALID_INPUT, type: "unknown" }).type).toBe(
+      "unknown",
+    );
+  });
+
+  it("类型不是字符串, 或类型字段不是值都为字符串的对象时抛出错误", () => {
     for (const input of [
       { ...VALID_INPUT, type: undefined },
-      { ...VALID_INPUT, type: "custom" },
+      { ...VALID_INPUT, type: null },
       { ...VALID_INPUT, type: 1 },
       { ...VALID_INPUT, fields: undefined },
       { ...VALID_INPUT, fields: "text" },

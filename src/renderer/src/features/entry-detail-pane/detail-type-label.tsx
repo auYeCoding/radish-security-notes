@@ -1,17 +1,18 @@
 import { useTranslation } from "react-i18next";
 
-import type { EntryTypeKey } from "@shared/entries/preset-entry-types";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
 import { EntryTypeIcon } from "@renderer/components/entry-type-icon";
+import { entryTypeName } from "@renderer/components/entry-type-naming";
 
 /**
  * 详情类型标识的属性.
  */
 interface DetailTypeLabelProps {
   /**
-   * 条目的类型键.
+   * 条目的类型定义.
    */
-  readonly typeKey: EntryTypeKey;
+  readonly type: EntryTypeDefinition;
 }
 
 /**
@@ -25,8 +26,8 @@ export function DetailTypeLabel(
   const { t } = useTranslation();
   return (
     <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-      <EntryTypeIcon typeKey={props.typeKey} className="size-3.5" />
-      {t(`entryTypes.${props.typeKey}`)}
+      <EntryTypeIcon typeKey={props.type.key} className="size-3.5" />
+      {entryTypeName(props.type, t)}
     </p>
   );
 }

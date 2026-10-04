@@ -10,6 +10,7 @@ import {
 import type { EntryFieldDefinition } from "./entry-field-types";
 import {
   findEntryType,
+  isEntryFieldKey,
   isEntryTypeKey,
   LEGACY_ENTRY_TYPE_KEY,
   PRESET_ENTRY_TYPES,
@@ -170,6 +171,14 @@ describe("预设条目类型的查找", () => {
     expect(isEntryTypeKey("custom")).toBe(false);
     expect(isEntryTypeKey(1)).toBe(false);
     expect(isEntryTypeKey(undefined)).toBe(false);
+  });
+
+  it("认得预设字段键, 不认得其它值, 自定义字段键也不是预设字段键", () => {
+    expect(isEntryFieldKey("cardNumber")).toBe(true);
+    expect(isEntryFieldKey("account")).toBe(true);
+    expect(isEntryFieldKey("field-abc")).toBe(false);
+    expect(isEntryFieldKey(1)).toBe(false);
+    expect(isEntryFieldKey(undefined)).toBe(false);
   });
 
   it("按类型键找类型, 未知类型键时 find 返回 undefined, require 抛错", () => {

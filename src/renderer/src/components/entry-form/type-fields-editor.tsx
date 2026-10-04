@@ -1,4 +1,4 @@
-import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
 import { TypeFieldInput } from "./type-field-input";
 
@@ -9,7 +9,7 @@ interface TypeFieldsEditorProps {
   /**
    * 要输入字段的条目类型.
    */
-  readonly type: PresetEntryTypeDefinition;
+  readonly type: EntryTypeDefinition;
 }
 
 /**

@@ -117,6 +117,30 @@ describe("matchEntryDocument 的拼音首字母", () => {
   });
 });
 
+describe("matchEntryDocument 对自定义类型的字段键", () => {
+  const document: EntrySearchDocument = {
+    ...DOCUMENT,
+    fields: { account: "router-admin", "field-abc": "192.168.1.1" },
+  };
+
+  it("field- 前缀的键参与搜索, 命中的字段名是这个键", () => {
+    expect(matchEntryDocument(document, parseSearchQuery("192.168"))).toEqual([
+      "field-abc",
+    ]);
+  });
+
+  it("其它不带前缀的键仍被忽略", () => {
+    const withOther: EntrySearchDocument = {
+      ...document,
+      fields: { ...document.fields, secret: "hunter2" },
+    };
+
+    expect(
+      matchEntryDocument(withOther, parseSearchQuery("hunter2")),
+    ).toBeUndefined();
+  });
+});
+
 describe("matchEntryDocument 不参与搜索的内容", () => {
   it("文档里出现的非白名单键被忽略, 即使它的值含关键字", () => {
     const document: EntrySearchDocument = {

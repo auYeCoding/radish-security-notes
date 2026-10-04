@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { defineField } from "../entries/entry-field-types";
 import { PRESET_ENTRY_TYPES } from "../entries/preset-entry-types";
 import {
   SEARCHABLE_FIELD_KEYS,
@@ -93,6 +94,30 @@ describe("searchableFieldKeysOf", () => {
       "bankName",
       "expiry",
     ]);
+  });
+});
+
+describe("searchableFieldKeysOf 对自定义类型", () => {
+  const customType = {
+    key: "custom:t1",
+    name: "路由器",
+    fields: [
+      defineField("account"),
+      defineField("field-a", { isSensitive: true }),
+      defineField("field-b"),
+      defineField("field-c", { isSensitive: true, isMultiline: true }),
+      defineField("password"),
+    ],
+  };
+
+  it("只取非保密字段键, 保密字段键即使不在预设里也不取", () => {
+    expect(searchableFieldKeysOf(customType)).toEqual(["account", "field-b"]);
+  });
+
+  it("自定义字段键 field- 前缀的算搜索文档里可以出现的键, 其余字符串不算", () => {
+    expect(isSearchableFieldKey("field-b")).toBe(true);
+    expect(isSearchableFieldKey("field-")).toBe(false);
+    expect(isSearchableFieldKey("other")).toBe(false);
   });
 });
 

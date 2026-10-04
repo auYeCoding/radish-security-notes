@@ -4,9 +4,11 @@ import { MAX_TAGS_PER_ENTRY } from "../tags/tag-limits";
 import { isWithinLength } from "../text/is-within-length";
 import { customFieldInputSchema } from "./custom-field-schema";
 import type { NewCustomFieldInput } from "./custom-field-types";
-import type { EntryFieldDefinition } from "./entry-field-types";
+import type {
+  EntryFieldDefinition,
+  EntryTypeDefinition,
+} from "./entry-field-types";
 import { NOTES_FORMATS, type NotesFormat } from "./notes-format";
-import type { PresetEntryTypeDefinition } from "./preset-entry-types";
 import { isTotpInputBlank, parseTotpInput } from "./totp-input-parser";
 
 /**
@@ -164,7 +166,7 @@ export interface EntryContentShape {
  * @returns 名称, 类型字段, 备注, 自定义字段与 TOTP 输入各自的校验规则.
  */
 export function createEntryContentShape(
-  type: PresetEntryTypeDefinition,
+  type: EntryTypeDefinition,
 ): EntryContentShape {
   return {
     name: z
@@ -196,7 +198,7 @@ export function createEntryContentShape(
  * @returns 该类型的新建条目校验方案.
  */
 export function createNewEntrySchema(
-  type: PresetEntryTypeDefinition,
+  type: EntryTypeDefinition,
 ): z.ZodType<NewEntryFormValues, NewEntryFormValues> {
   return z.object(createEntryContentShape(type));
 }

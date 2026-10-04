@@ -27,6 +27,8 @@ export const IPC_CHANNELS = {
   foldersRename: "folders:rename",
   foldersRemove: "folders:remove",
   foldersAssignEntry: "folders:assign-entry",
+  entryTypesList: "entry-types:list",
+  entryTypesCreate: "entry-types:create",
   tagsList: "tags:list",
   tagsCreate: "tags:create",
   tagsUpdate: "tags:update",

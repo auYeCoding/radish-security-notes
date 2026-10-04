@@ -4,6 +4,7 @@ import { BrowserWindow, app, ipcMain } from "electron";
 import icon from "../../../resources/icon.png?asset";
 import { registerAttachmentIpc } from "../ipc/attachment-ipc";
 import { registerBatchIpc } from "../ipc/batch-ipc";
+import { registerCustomEntryTypeIpc } from "../ipc/custom-entry-type-ipc";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
 import { registerLinkIpc } from "../ipc/link-ipc";
@@ -23,6 +24,7 @@ import {
 import { createAttachmentRuntime } from "./attachment-runtime";
 import { createBatchService } from "./batch-runtime";
 import { createEntryRuntime } from "./entry-runtime";
+import { createCustomEntryTypeService } from "./entry-type-runtime";
 import { createFolderService } from "./folder-runtime";
 import { createLinkRuntime } from "./link-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
@@ -90,6 +92,10 @@ export async function startApplication(): Promise<void> {
   registerRecoveryIpc(ipcMain, vault.service, recovery.textFileSaver);
   const entries = createEntryRuntime(vault.service);
   registerEntryIpc(ipcMain, entries.service);
+  registerCustomEntryTypeIpc(
+    ipcMain,
+    createCustomEntryTypeService(vault.service),
+  );
   registerFolderIpc(ipcMain, createFolderService(vault.service));
   registerTagIpc(ipcMain, createTagService(vault.service));
   registerBatchIpc(ipcMain, createBatchService(vault.service));

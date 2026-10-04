@@ -1,8 +1,9 @@
 import { useTranslation } from "react-i18next";
 
-import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
 import { EntryTypeIcon } from "@renderer/components/entry-type-icon";
+import { entryTypeName } from "@renderer/components/entry-type-naming";
 import { Button } from "@renderer/components/ui/button";
 
 /**
@@ -12,15 +13,15 @@ interface EntryTypeTileProps {
   /**
    * 这个格子代表的条目类型.
    */
-  readonly type: PresetEntryTypeDefinition;
+  readonly type: EntryTypeDefinition;
   /**
    * 点击格子时的回调, 参数是被选中的类型.
    */
-  readonly onSelect: (type: PresetEntryTypeDefinition) => void;
+  readonly onSelect: (type: EntryTypeDefinition) => void;
 }
 
 /**
- * 类型选择网格里的一格: 图标在上, 类型名在下, 点击即选中这个类型.
+ * 类型选择网格里的一格: 图标在上, 类型名在下, 点击即选中这个类型. 预设类型与自定义类型共用.
  * @param props 组件属性.
  * @returns 类型格元素.
  */
@@ -36,7 +37,7 @@ export function EntryTypeTile(props: EntryTypeTileProps): React.JSX.Element {
     >
       <EntryTypeIcon typeKey={type.key} className="size-6" />
       <span className="text-center text-sm break-words whitespace-normal">
-        {t(`entryTypes.${type.key}`)}
+        {entryTypeName(type, t)}
       </span>
     </Button>
   );

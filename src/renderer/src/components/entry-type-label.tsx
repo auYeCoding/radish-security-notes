@@ -1,17 +1,18 @@
 import { useTranslation } from "react-i18next";
 
-import type { EntryTypeKey } from "@shared/entries/preset-entry-types";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
 import { EntryTypeIcon } from "@renderer/components/entry-type-icon";
+import { entryTypeName } from "@renderer/components/entry-type-naming";
 
 /**
  * 条目类型标识的属性.
  */
 interface EntryTypeLabelProps {
   /**
-   * 条目的类型键.
+   * 条目的类型定义.
    */
-  readonly typeKey: EntryTypeKey;
+  readonly type: EntryTypeDefinition;
 }
 
 /**
@@ -23,8 +24,8 @@ export function EntryTypeLabel(props: EntryTypeLabelProps): React.JSX.Element {
   const { t } = useTranslation();
   return (
     <p className="flex items-center gap-2 text-sm font-medium">
-      <EntryTypeIcon typeKey={props.typeKey} className="size-4" />
-      {t(`entryTypes.${props.typeKey}`)}
+      <EntryTypeIcon typeKey={props.type.key} className="size-4" />
+      {entryTypeName(props.type, t)}
     </p>
   );
 }

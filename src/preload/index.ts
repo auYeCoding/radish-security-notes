@@ -5,6 +5,7 @@ import { contextBridge, ipcRenderer, webUtils } from "electron";
 import { createAttachmentBridge } from "./create-attachment-bridge";
 import { createBatchBridge } from "./create-batch-bridge";
 import { createEntryBridge } from "./create-entry-bridge";
+import { createEntryTypeBridge } from "./create-entry-type-bridge";
 import { createFolderBridge } from "./create-folder-bridge";
 import { createLinkBridge } from "./create-link-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
@@ -21,6 +22,7 @@ const api: RendererApi = {
   vault: createVaultBridge(ipcRenderer),
   recovery: createRecoveryBridge(ipcRenderer),
   entries: createEntryBridge(ipcRenderer),
+  entryTypes: createEntryTypeBridge(ipcRenderer),
   folders: createFolderBridge(ipcRenderer),
   tags: createTagBridge(ipcRenderer),
   batch: createBatchBridge(ipcRenderer),

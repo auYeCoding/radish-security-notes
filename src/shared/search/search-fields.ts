@@ -1,4 +1,12 @@
 import {
+  isCustomFieldKey,
+  type CustomFieldKey,
+} from "../entries/custom-types/custom-entry-type-key";
+import type {
+  EntryFieldDefinition,
+  EntryTypeDefinition,
+} from "../entries/entry-field-types";
+import {
   PRESET_ENTRY_TYPES,
   type EntryFieldKey,
   type PresetEntryTypeDefinition,
@@ -25,14 +33,16 @@ export const SEARCH_CUSTOM_FIELD_LABEL_FIELD = "customFieldLabel";
 export const SEARCH_TAG_FIELD = "tag";
 
 /**
- * 搜索命中的字段: 名称, 备注, 自定义字段名, 标签名, 或预设类型里的非保密字段键.
+ * 搜索命中的字段: 名称, 备注, 条目的自定义字段名, 标签名, 预设类型里的非保密字段键, 或自定义
+ * 类型里的非保密字段键.
  */
 export type EntrySearchField =
   | typeof SEARCH_NAME_FIELD
   | typeof SEARCH_NOTES_FIELD
   | typeof SEARCH_CUSTOM_FIELD_LABEL_FIELD
   | typeof SEARCH_TAG_FIELD
-  | EntryFieldKey;
+  | EntryFieldKey
+  | CustomFieldKey;
 
 /**
  * 做拼音首字母匹配的字段: 名称与标签名.
@@ -55,7 +65,7 @@ const ALL_FIELD_DEFINITIONS = PRESET_TYPES.flatMap((type) => type.fields);
 /**
  * 在任何类型里被标为敏感的字段键. 搜索的键白名单必须排除它们, 否则同键的敏感字段会随白名单被读取.
  */
-const SENSITIVE_FIELD_KEYS: ReadonlySet<EntryFieldKey> = new Set(
+const SENSITIVE_FIELD_KEYS: ReadonlySet<string> = new Set(
   ALL_FIELD_DEFINITIONS.filter((field) => field.isSensitive).map(
     (field) => field.key,
   ),
@@ -80,25 +90,35 @@ const SEARCHABLE_FIELD_KEY_SET: ReadonlySet<string> = new Set(
 );
 
 /**
- * 判断一个字符串是否是参与搜索的类型字段键.
+ * 判断一个字符串是否是搜索文档里可以出现的类型字段键: 预设类型里参与搜索的字段键, 或自定义类型
+ * 的非摘要字段键. 共享层不知道自定义字段是否保密, 保密的自定义字段不进搜索文档由主进程保证.
  * @param key 待判断的字符串.
- * @returns 是参与搜索的类型字段键时返回 true.
+ * @returns 是搜索文档里可以出现的类型字段键时返回 true.
  */
-export function isSearchableFieldKey(key: string): key is EntryFieldKey {
-  return SEARCHABLE_FIELD_KEY_SET.has(key);
+export function isSearchableFieldKey(
+  key: string,
+): key is EntryFieldKey | CustomFieldKey {
+  return SEARCHABLE_FIELD_KEY_SET.has(key) || isCustomFieldKey(key);
 }
 
 /**
- * 取一个类型里参与搜索的字段键, 保持类型里的字段顺序.
+ * 判断一个字段是否参与搜索: 自身不是保密字段, 且字段键在任何预设类型里都没有被标为保密.
+ * @param field 字段定义.
+ * @returns 参与搜索时返回 true.
+ */
+function isSearchableField(field: EntryFieldDefinition): boolean {
+  return !field.isSensitive && !SENSITIVE_FIELD_KEYS.has(field.key);
+}
+
+/**
+ * 取一个类型里参与搜索的字段键, 保持类型里的字段顺序. 预设与自定义类型适用同一条规则.
  * @param type 条目的类型定义.
  * @returns 该类型里参与搜索的字段键.
  */
 export function searchableFieldKeysOf(
-  type: PresetEntryTypeDefinition,
-): readonly EntryFieldKey[] {
-  return type.fields
-    .map((field) => field.key)
-    .filter((key) => SEARCHABLE_FIELD_KEYS.includes(key));
+  type: EntryTypeDefinition,
+): readonly string[] {
+  return type.fields.filter(isSearchableField).map((field) => field.key);
 }
 
 /**

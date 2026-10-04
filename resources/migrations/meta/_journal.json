@@ -71,6 +71,13 @@
       "when": 1791123379468,
       "tag": "0009_add-notes-format",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1791131614847,
+      "tag": "0010_add-custom-entry-types",
+      "breakpoints": true
     }
   ]
 }

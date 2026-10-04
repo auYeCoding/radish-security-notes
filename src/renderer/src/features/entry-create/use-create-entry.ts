@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
-import type { EntryTypeKey } from "@shared/entries/preset-entry-types";
 
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 
@@ -27,12 +26,12 @@ export interface CreateEntry {
 
 /**
  * 跟踪新建条目的提交结果.
- * @param typeKey 用户选的条目类型键.
+ * @param typeKey 用户选的条目类型键, 预设类型键或自定义类型键.
  * @param onCreated 新建成功后的回调, 例如关闭对话框.
  * @returns 失败文案与提交方法.
  */
 export function useCreateEntry(
-  typeKey: EntryTypeKey,
+  typeKey: string,
   onCreated: () => void,
 ): CreateEntry {
   const { t } = useTranslation();

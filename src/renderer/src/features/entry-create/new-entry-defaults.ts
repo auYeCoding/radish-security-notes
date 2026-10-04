@@ -1,6 +1,6 @@
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import { DEFAULT_NOTES_FORMAT } from "@shared/entries/notes-format";
 import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
-import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
 
 /**
  * 某个类型的新建表单默认取值: 名称与类型的每个字段都为空, 没有自定义字段, 备注与 TOTP, 所属文件夹
@@ -12,7 +12,7 @@ import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-typ
  * @returns 表单默认取值.
  */
 export function createDefaultFormValues(
-  type: PresetEntryTypeDefinition,
+  type: EntryTypeDefinition,
   folderId?: string,
   tagIds: readonly string[] = [],
 ): NewEntryFormValues {

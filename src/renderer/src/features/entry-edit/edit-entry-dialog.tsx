@@ -7,8 +7,8 @@ import {
   createEditEntrySchema,
   type EditEntryFormValues,
 } from "@shared/entries/edit-entry-schema";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import type { EntryDetail } from "@shared/entries/entry-types";
-import { requireEntryType } from "@shared/entries/preset-entry-types";
 
 import {
   Dialog,
@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@renderer/components/ui/dialog";
+import { useEntryTypeCatalog } from "@renderer/stores/use-entry-type-catalog";
 
 import { DiscardChangesDialog } from "./discard-changes-dialog";
 import { createEditFormValues } from "./edit-entry-values";
@@ -37,21 +38,28 @@ interface EditEntryDialogProps {
 }
 
 /**
- * 编辑条目的对话框, 挂载即打开, 关闭即卸载, 所以每次打开都以条目的最新现值为初始取值. 表单有
- * 未保存的修改时, 取消, 按 Esc, 点遮罩或点关闭按钮都先弹出放弃修改的确认, 没有修改则直接关闭;
- * 保存进行中不响应关闭. 宽度与新建对话框一致.
+ * 已确定条目类型的编辑对话框的属性.
+ */
+interface EditEntryDialogContentProps extends EditEntryDialogProps {
+  /**
+   * 条目的类型定义, 表单的字段与校验方案都来自它.
+   */
+  readonly type: EntryTypeDefinition;
+}
+
+/**
+ * 已确定条目类型的编辑对话框, 挂载即打开, 关闭即卸载, 所以每次打开都以条目的最新现值为初始取值.
+ * 表单有未保存的修改时, 取消, 按 Esc, 点遮罩或点关闭按钮都先弹出放弃修改的确认, 没有修改则直接
+ * 关闭; 保存进行中不响应关闭. 宽度与新建对话框一致.
  * @param props 组件属性.
  * @returns 对话框元素.
  */
-export function EditEntryDialog(
-  props: EditEntryDialogProps,
+function EditEntryDialogContent(
+  props: EditEntryDialogContentProps,
 ): React.JSX.Element {
   const { t } = useTranslation();
-  const { detail, onClose } = props;
-  const schema = useMemo(
-    () => createEditEntrySchema(requireEntryType(detail.type)),
-    [detail.type],
-  );
+  const { detail, type, onClose } = props;
+  const schema = useMemo(() => createEditEntrySchema(type), [type]);
   const form = useForm<EditEntryFormValues>({
     resolver: zodResolver(schema),
     defaultValues: createEditFormValues(detail),
@@ -77,7 +85,7 @@ export function EditEntryDialog(
             <DialogDescription>{t("entryEdit.description")}</DialogDescription>
           </DialogHeader>
           <FormProvider {...form}>
-            <EditEntryForm detail={detail} onSaved={onClose} />
+            <EditEntryForm detail={detail} type={type} onSaved={onClose} />
           </FormProvider>
         </DialogContent>
       </Dialog>
@@ -87,5 +95,20 @@ export function EditEntryDialog(
         onConfirm={onClose}
       />
     </>
+  );
+}
+
+/**
+ * 编辑条目的对话框: 经类型目录取得条目的类型 (预设或自定义), 取得后渲染编辑对话框, 目录里没有
+ * 这个类型时不渲染.
+ * @param props 组件属性.
+ * @returns 对话框元素, 条目的类型不在目录里时为 null.
+ */
+export function EditEntryDialog(
+  props: EditEntryDialogProps,
+): React.JSX.Element | null {
+  const type = useEntryTypeCatalog().find(props.detail.type);
+  return type === undefined ? null : (
+    <EditEntryDialogContent {...props} type={type} />
   );
 }

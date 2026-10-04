@@ -6,10 +6,7 @@ import {
   DEFAULT_NOTES_FORMAT,
   type NotesFormat,
 } from "@shared/entries/notes-format";
-import {
-  LEGACY_ENTRY_TYPE_KEY,
-  type EntryTypeKey,
-} from "@shared/entries/preset-entry-types";
+import { LEGACY_ENTRY_TYPE_KEY } from "@shared/entries/preset-entry-types";
 import type { TotpConfig } from "@shared/entries/totp-config";
 
 /**
@@ -20,15 +17,13 @@ import type { TotpConfig } from "@shared/entries/totp-config";
  * `totp` 是 JSON 对象, 含密钥, 算法, 位数与周期, 条目不带 TOTP 时为 NULL. 所属文件夹在迁移 0006
  * 加入: `folder_id` 是文件夹表里的编号, 条目未分类时为 NULL; 它不设外键, 文件夹被删除时由服务在
  * 同一个事务里把它清空. 备注格式在迁移 0009 加入: `notes_format` 是备注的呈现格式, 纯文本或
- * Markdown, 迁移之前已有的条目都是纯文本.
+ * Markdown, 迁移之前已有的条目都是纯文本. `type` 是预设类型键, 或 `custom:` 加自定义类型编号
+ * (自定义类型在迁移 0010 加入, 见 `custom-entry-type-schema.ts`), 自定义类型的字段键存进 `fields`.
  */
 export const entries = sqliteTable("entries", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
-  type: text("type")
-    .$type<EntryTypeKey>()
-    .notNull()
-    .default(LEGACY_ENTRY_TYPE_KEY),
+  type: text("type").$type<string>().notNull().default(LEGACY_ENTRY_TYPE_KEY),
   fields: text("fields", { mode: "json" })
     .$type<EntryFieldValues>()
     .notNull()

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import type { EntryDetail } from "@shared/entries/entry-types";
 
 import { DetailFolderLabel } from "./detail-folder-label";
@@ -14,6 +15,10 @@ interface EntryDetailHeaderProps {
    * 要展示的条目详情.
    */
   readonly detail: EntryDetail;
+  /**
+   * 条目的类型定义, 标题上方标明它的类型名.
+   */
+  readonly type: EntryTypeDefinition;
   /**
    * 标题行右侧的操作, 例如编辑与删除按钮.
    */
@@ -31,7 +36,7 @@ export function EntryDetailHeader(
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex min-w-0 flex-col gap-1">
-        <DetailTypeLabel typeKey={props.detail.type} />
+        <DetailTypeLabel type={props.type} />
         <h2 className="text-xl font-semibold break-words">
           {props.detail.name}
         </h2>

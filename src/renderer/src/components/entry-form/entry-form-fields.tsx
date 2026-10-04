@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import type { PresetEntryTypeDefinition } from "@shared/entries/preset-entry-types";
+import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
 import { FieldGroup } from "@renderer/components/ui/field";
 
@@ -16,7 +16,7 @@ interface EntryFormFieldsProps {
   /**
    * 条目类型, 字段区显示该类型的字段.
    */
-  readonly type: PresetEntryTypeDefinition;
+  readonly type: EntryTypeDefinition;
   /**
    * 名称之后的所属文件夹选择, 新建与编辑各自给出.
    */
