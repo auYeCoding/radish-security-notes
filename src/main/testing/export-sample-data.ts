@@ -9,6 +9,7 @@ import { insertFolder, type FolderRecord } from "../folders/folder-repository";
 import { replaceEntryTags } from "../tags/entry-tag-repository";
 import { insertTag, type TagRecord } from "../tags/tag-repository";
 import type { VaultOrm } from "../vault/database/drizzle-adapter";
+import { ED25519_PUBLIC_KEY_SAMPLE } from "./ssh-public-key-samples";
 
 /**
  * RFC 6238 附录 B 的 SHA1 种子的 Base32 形式, 样例里的 TOTP 密钥.
@@ -256,7 +257,7 @@ const SAMPLE_ENTRIES: readonly EntryRecord[] = [
       port: "22",
       account: "root",
       privateKey: "-----BEGIN KEY-----\nabc\n-----END KEY-----",
-      publicKey: "ssh-ed25519 AAAA",
+      publicKey: ED25519_PUBLIC_KEY_SAMPLE.line,
       keyPassphrase: "key-pass",
     },
   }),

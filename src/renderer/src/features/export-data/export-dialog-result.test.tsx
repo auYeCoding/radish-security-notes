@@ -94,6 +94,37 @@ describe("导出对话框: 结果页", () => {
     expect(await screen.findByText("这种格式没能带出的内容")).toBeDefined();
     expect(screen.getByText("标签: 3 个条目带的标签没有带出")).toBeDefined();
     expect(screen.queryByText("已导出的附件")).toBeNull();
+    expect(screen.queryByText(/SSH 密钥/)).toBeNull();
+  });
+});
+
+describe("导出对话框: 结果页的 SSH 密钥降级汇总", () => {
+  it("降级为登录的 SSH 密钥按条数汇总, 页面上没有密钥内容", async () => {
+    await openExportDialog({
+      exportBridgeOverrides: {
+        run: () =>
+          Promise.resolve(
+            savedWith({
+              format: "bitwardenJson",
+              includesAttachments: false,
+              losses: [
+                { reason: "tags", count: 3 },
+                { reason: "downgradedSshKeys", count: 2 },
+              ],
+            }),
+          ),
+      },
+    });
+
+    await startPlaintextExport();
+
+    expect(
+      await screen.findByText(
+        "SSH 密钥: 2 条缺私钥, 缺公钥或公钥无法解析, 已按登录导出",
+      ),
+    ).toBeDefined();
+    expect(screen.getByText("标签: 3 个条目带的标签没有带出")).toBeDefined();
+    expect(screen.queryByText(/ssh-ed25519|BEGIN/)).toBeNull();
   });
 });
 

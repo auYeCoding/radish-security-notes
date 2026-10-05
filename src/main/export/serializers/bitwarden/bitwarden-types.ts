@@ -219,7 +219,7 @@ export interface BitwardenSshKey {
    */
   readonly publicKey: string;
   /**
-   * 密钥指纹, 本应用不存指纹, 写空串.
+   * 密钥指纹, 本应用不存指纹, 由公钥算出 (`SHA256:` 加无补位 base64), 官方导入器要求非空.
    */
   readonly keyFingerprint: string;
 }

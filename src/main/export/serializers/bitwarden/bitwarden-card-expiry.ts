@@ -9,6 +9,16 @@ const EXPIRY_PATTERN = /^\s*(\d{1,2})\s*[/.-]\s*(\d{2}|\d{4})\s*$/;
 const TWO_DIGIT_YEAR_PREFIX = "20";
 
 /**
+ * 有效期里月份的下限.
+ */
+const MIN_EXPIRY_MONTH = 1;
+
+/**
+ * 有效期里月份的上限.
+ */
+const MAX_EXPIRY_MONTH = 12;
+
+/**
  * 解析好的有效期.
  */
 export interface CardExpiry {
@@ -34,7 +44,7 @@ export function parseCardExpiry(text: string): CardExpiry | undefined {
   }
   const month = Number(match[1]);
   const rawYear = match[2] ?? "";
-  if (month < 1 || month > 12) {
+  if (month < MIN_EXPIRY_MONTH || month > MAX_EXPIRY_MONTH) {
     return undefined;
   }
   return {

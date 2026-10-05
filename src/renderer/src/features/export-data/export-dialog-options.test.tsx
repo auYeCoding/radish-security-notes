@@ -43,6 +43,9 @@ describe("导出对话框: 选择格式", () => {
 
     expect(screen.getByText("这种格式带不出:")).toBeDefined();
     expect(screen.getByText("标签")).toBeDefined();
+    expect(
+      screen.getByText("SSH 密钥 (缺私钥, 缺公钥或公钥无法解析的按登录导出)"),
+    ).toBeDefined();
     expect(screen.getByText("这种格式不能带附件.")).toBeDefined();
     const attachments = screen.getByRole("checkbox", { name: "包含附件" });
     expect(attachments.getAttribute("aria-checked")).toBe("false");
@@ -55,6 +58,7 @@ describe("导出对话框: 选择格式", () => {
     await userEvent.setup().click(screen.getByText("浏览器密码 (CSV)"));
 
     expect(screen.getByText(/可能被当作公式执行/)).toBeDefined();
+    expect(screen.queryByText(/缺私钥, 缺公钥/)).toBeNull();
   });
 });
 

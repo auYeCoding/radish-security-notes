@@ -10,11 +10,12 @@ import type {
 import { streamJsonDocument } from "../json-document-stream";
 import { readableOfText } from "../text-stream";
 import { isMergedIntoLogin, toBitwardenItem } from "./bitwarden-item-mapper";
+import { isDowngradedSshKey } from "./bitwarden-ssh-eligibility";
 import type { BitwardenItem } from "./bitwarden-types";
 
 /**
  * 统计 Bitwarden JSON 实际带不出的内容, 个数为 0 的原因不列出: 带标签的条目数, 附件个数, 自定义
- * 类型个数, 被并入登录的条目数, Markdown 备注的条目数.
+ * 类型个数, 被并入登录的条目数, 被降级为登录的 SSH 密钥条目数, Markdown 备注的条目数.
  * @param dataset 数据集.
  * @returns 带不出内容的汇总.
  */
@@ -36,6 +37,10 @@ function countLosses(dataset: ExportDataset): ExportLossItem[] {
     {
       reason: "mergedTypes",
       count: entries.filter((entry) => isMergedIntoLogin(entry.typeKey)).length,
+    },
+    {
+      reason: "downgradedSshKeys",
+      count: entries.filter(isDowngradedSshKey).length,
     },
     {
       reason: "markdownNotes",

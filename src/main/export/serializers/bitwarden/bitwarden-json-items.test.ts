@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { exportSampleAsBitwarden } from "../../../testing/bitwarden-export-fixture";
+import { ED25519_PUBLIC_KEY_SAMPLE } from "../../../testing/ssh-public-key-samples";
 import { useVaultDatabase } from "../../../testing/use-vault-database";
 
 describe("Bitwarden JSON: 身份与安全笔记", () => {
@@ -42,14 +43,14 @@ describe("Bitwarden JSON: 身份与安全笔记", () => {
 describe("Bitwarden JSON: SSH 密钥", () => {
   const getDatabase = useVaultDatabase("export-bitwarden-ssh");
 
-  it("私钥与公钥对应写入, 指纹为空串, 其余字段写成自定义字段", async () => {
+  it("私钥与公钥对应写入, 指纹由公钥算出, 其余字段写成自定义字段", async () => {
     const { document } = await exportSampleAsBitwarden(getDatabase().orm);
     const item = document.items[5];
     expect(item?.type).toBe(5);
     expect(item?.sshKey).toEqual({
       privateKey: "-----BEGIN KEY-----\nabc\n-----END KEY-----",
-      publicKey: "ssh-ed25519 AAAA",
-      keyFingerprint: "",
+      publicKey: ED25519_PUBLIC_KEY_SAMPLE.line,
+      keyFingerprint: ED25519_PUBLIC_KEY_SAMPLE.fingerprint,
     });
     expect(item?.fields?.map((field) => [field.name, field.type])).toEqual([
       ["label:host", 0],

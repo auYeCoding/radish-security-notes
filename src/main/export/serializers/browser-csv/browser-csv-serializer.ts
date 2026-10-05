@@ -1,4 +1,8 @@
-import { ACCOUNT_FIELD_KEY } from "@shared/entries/common-entry-fields";
+import {
+  ACCOUNT_FIELD_KEY,
+  PASSWORD_FIELD,
+  URL_FIELD,
+} from "@shared/entries/common-entry-fields";
 import type { ExportLossItem } from "@shared/export/export-loss-reasons";
 
 import type { ExportDataset, ExportEntry } from "../../dataset/export-dataset";
@@ -11,8 +15,6 @@ import type {
 import { readableOfText } from "../text-stream";
 import {
   BROWSER_CSV_COLUMNS,
-  BROWSER_CSV_PASSWORD_KEY,
-  BROWSER_CSV_URL_KEY,
   formatCsvRow,
   toBrowserCsvCells,
 } from "./browser-csv-columns";
@@ -22,8 +24,8 @@ import {
  */
 const CARRIED_FIELD_KEYS: ReadonlySet<string> = new Set([
   ACCOUNT_FIELD_KEY,
-  BROWSER_CSV_PASSWORD_KEY,
-  BROWSER_CSV_URL_KEY,
+  PASSWORD_FIELD.key,
+  URL_FIELD.key,
 ]);
 
 /**
@@ -35,9 +37,8 @@ const CARRIED_FIELD_KEYS: ReadonlySet<string> = new Set([
 function canCarry(entry: ExportEntry, dataset: ExportDataset): boolean {
   const definition = dataset.catalog.find(entry.typeKey);
   return (
-    definition?.fields.some(
-      (field) => field.key === BROWSER_CSV_PASSWORD_KEY,
-    ) ?? false
+    definition?.fields.some((field) => field.key === PASSWORD_FIELD.key) ??
+    false
   );
 }
 

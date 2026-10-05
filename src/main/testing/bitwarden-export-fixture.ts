@@ -144,6 +144,23 @@ export const FULL_EXPORT_OPTIONS: ExportDatasetOptions = {
 };
 
 /**
+ * 按选项读出库里已有的数据并序列化成 Bitwarden JSON.
+ * @param orm 已解锁数据库的查询入口.
+ * @param options 范围与内容选项, 默认全部范围含保密字段.
+ * @returns 序列化的结果.
+ */
+export async function exportSeededAsBitwarden(
+  orm: VaultOrm,
+  options: ExportDatasetOptions = FULL_EXPORT_OPTIONS,
+): Promise<BitwardenExport> {
+  const dataset = readExportDataset(orm, options);
+  const fixture = createSerializeFixture();
+  const payload = bitwardenJsonSerializer.serialize(dataset, fixture.context);
+  const text = (await collectStream(payload.stream)).toString("utf8");
+  return { text, document: JSON.parse(text), payload, fixture };
+}
+
+/**
  * 写入样例, 按选项读出数据集并序列化成 Bitwarden JSON.
  * @param orm 已解锁数据库的查询入口.
  * @param options 范围与内容选项, 默认全部范围含保密字段.
@@ -154,9 +171,5 @@ export async function exportSampleAsBitwarden(
   options: ExportDatasetOptions = FULL_EXPORT_OPTIONS,
 ): Promise<BitwardenExport> {
   seedExportSample(orm);
-  const dataset = readExportDataset(orm, options);
-  const fixture = createSerializeFixture();
-  const payload = bitwardenJsonSerializer.serialize(dataset, fixture.context);
-  const text = (await collectStream(payload.stream)).toString("utf8");
-  return { text, document: JSON.parse(text), payload, fixture };
+  return exportSeededAsBitwarden(orm, options);
 }

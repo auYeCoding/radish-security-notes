@@ -1,18 +1,17 @@
 import { describe, expect, it } from "vitest";
 
+import { MAX_TRANSFER_ENTRIES } from "../data-transfer/transfer-limits";
 import {
   EXPORT_PASSPHRASE_MIN_LENGTH,
   EXPORT_SECRET_MAX_LENGTH,
   isExportPassphraseLongEnough,
   isExportPassphraseValid,
-  MAX_EXPORT_ENTRIES,
   MAX_EXPORT_SCOPE_IDS,
 } from "./export-limits";
 
 describe("导出的限制", () => {
-  it("条目上限是 10000, 范围编号的边界上限不小于它", () => {
-    expect(MAX_EXPORT_ENTRIES).toBe(10000);
-    expect(MAX_EXPORT_SCOPE_IDS).toBeGreaterThanOrEqual(MAX_EXPORT_ENTRIES);
+  it("范围编号的边界上限不小于条目上限", () => {
+    expect(MAX_EXPORT_SCOPE_IDS).toBeGreaterThanOrEqual(MAX_TRANSFER_ENTRIES);
   });
 
   it("口令至少 12 个字符", () => {

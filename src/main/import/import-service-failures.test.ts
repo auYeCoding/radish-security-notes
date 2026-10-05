@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MAX_IMPORT_ENTRIES } from "@shared/import/import-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 
 import { listEntrySummaries } from "../entries/entry-repository";
 import { listFolders } from "../folders/folder-repository";
@@ -62,7 +62,7 @@ describe("导入服务: 文件级的失败", () => {
 
   it("条目数超过上限整次拒绝", async () => {
     const fixture = createImportServiceFixture(() => getDatabase().orm);
-    const items = Array.from({ length: MAX_IMPORT_ENTRIES + 1 }, () => ({
+    const items = Array.from({ length: MAX_TRANSFER_ENTRIES + 1 }, () => ({
       type: 2,
       name: "n",
       notes: "",

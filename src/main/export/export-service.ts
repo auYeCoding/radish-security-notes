@@ -1,7 +1,7 @@
 import { join } from "node:path";
 
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 import { describeExportFormat } from "@shared/export/export-format-capabilities";
-import { MAX_EXPORT_ENTRIES } from "@shared/export/export-limits";
 import type { ExportTranslateKey } from "@shared/export/export-message-keys";
 import type { ExportRequest, ExportScope } from "@shared/export/export-request";
 import {
@@ -264,7 +264,7 @@ export class ExportService {
     if (counts.value.entryCount === 0) {
       return "no-entries";
     }
-    return counts.value.entryCount > MAX_EXPORT_ENTRIES
+    return counts.value.entryCount > MAX_TRANSFER_ENTRIES
       ? "too-many-entries"
       : undefined;
   }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MAX_EXPORT_ENTRIES } from "@shared/export/export-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 
 import { insertEntry } from "../entries/entry-repository";
 import { seedExportSample } from "../testing/export-sample-data";
@@ -119,7 +119,7 @@ describe("导出服务: 条目数上限", () => {
   it("恰好 10000 条可以导出, 超过 10000 条整次拒绝", async () => {
     const { orm } = getDatabase();
     orm.transaction((transaction) => {
-      for (let index = 0; index < MAX_EXPORT_ENTRIES; index += 1) {
+      for (let index = 0; index < MAX_TRANSFER_ENTRIES; index += 1) {
         insertBulkNote(transaction, index);
       }
     });
@@ -129,7 +129,7 @@ describe("导出服务: 条目数上限", () => {
       ok: true,
       value: { status: "saved" },
     });
-    insertBulkNote(orm, MAX_EXPORT_ENTRIES + 1);
+    insertBulkNote(orm, MAX_TRANSFER_ENTRIES + 1);
     state.files.clear();
     expect(await service.run(request)).toEqual({
       ok: false,

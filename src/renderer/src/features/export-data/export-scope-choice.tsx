@@ -1,7 +1,7 @@
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
-import { MAX_EXPORT_ENTRIES } from "@shared/export/export-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 
 import { formatByteSize } from "@renderer/components/format-byte-size";
 import { ChoiceOption } from "@renderer/components/choice-option";
@@ -75,7 +75,7 @@ function describeScopeProblem(
       return translate("export.options.scope.empty");
     default:
       return translate("export.options.scope.tooMany", {
-        limit: MAX_EXPORT_ENTRIES,
+        limit: MAX_TRANSFER_ENTRIES,
       });
   }
 }

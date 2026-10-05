@@ -45,6 +45,14 @@ describe("导出格式的能力", () => {
     }
   });
 
+  it("只有 Bitwarden JSON 把降级的 SSH 密钥列为带不出的内容", () => {
+    for (const key of EXPORT_FORMAT_KEYS) {
+      expect(
+        describeExportFormat(key).excludedContent.includes("downgradedSshKeys"),
+      ).toBe(key === "bitwardenJson");
+    }
+  });
+
   it("扩展名: 未加密用格式自己的, 加密时追加 age", () => {
     expect(ENCRYPTED_FILE_EXTENSION).toBe("age");
     expect(exportFileExtension("native", false)).toBe("zip");

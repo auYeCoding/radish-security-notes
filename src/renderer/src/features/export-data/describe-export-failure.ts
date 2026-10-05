@@ -1,6 +1,6 @@
 import type { TFunction } from "i18next";
 
-import { MAX_EXPORT_ENTRIES } from "@shared/export/export-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 import type {
   ExportFailure,
   ExportFailureReason,
@@ -36,6 +36,6 @@ export function describeExportFailure(
   translate: TFunction,
 ): string {
   return translate(FAILURE_MESSAGE_KEYS[failure.reason], {
-    limit: MAX_EXPORT_ENTRIES,
+    limit: MAX_TRANSFER_ENTRIES,
   });
 }

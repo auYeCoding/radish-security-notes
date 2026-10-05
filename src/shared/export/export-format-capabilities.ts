@@ -47,6 +47,7 @@ const EXPORT_FORMAT_CAPABILITIES: readonly ExportFormatCapability[] = [
       "attachments",
       "customEntryTypes",
       "mergedTypes",
+      "downgradedSshKeys",
       "markdownNotes",
     ],
   },

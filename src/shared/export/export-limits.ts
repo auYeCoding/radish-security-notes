@@ -1,10 +1,5 @@
 /**
- * 一次导出最多接受的条目个数, 与导入的条目上限一致, 超过时整次拒绝并建议按范围分批.
- */
-export const MAX_EXPORT_ENTRIES = 10000;
-
-/**
- * 范围里最多接受的条目编号个数, 只用来在进程边界挡掉异常大的请求, 超过 `MAX_EXPORT_ENTRIES`
+ * 范围里最多接受的条目编号个数, 只用来在进程边界挡掉异常大的请求, 超过 `MAX_TRANSFER_ENTRIES`
  * 但没有超过它的请求由服务按条目上限拒绝.
  */
 export const MAX_EXPORT_SCOPE_IDS = 100000;

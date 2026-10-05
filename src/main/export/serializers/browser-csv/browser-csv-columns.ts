@@ -1,6 +1,10 @@
 import { stringify } from "csv-stringify/sync";
 
-import { ACCOUNT_FIELD_KEY } from "@shared/entries/common-entry-fields";
+import {
+  ACCOUNT_FIELD_KEY,
+  PASSWORD_FIELD,
+  URL_FIELD,
+} from "@shared/entries/common-entry-fields";
 
 import type { ExportEntry } from "../../dataset/export-dataset";
 
@@ -14,16 +18,6 @@ export const BROWSER_CSV_COLUMNS = [
   "password",
   "note",
 ] as const;
-
-/**
- * 密码字段的键, 类型有这个字段才能写进浏览器密码 CSV.
- */
-export const BROWSER_CSV_PASSWORD_KEY = "password";
-
-/**
- * 网址字段的键.
- */
-export const BROWSER_CSV_URL_KEY = "url";
 
 /**
  * 含回车或换行的字段要加引号. csv-stringify 默认只在含分隔符, 引号或记录分隔符 (CRLF) 时加引号,
@@ -52,9 +46,9 @@ export function formatCsvRow(cells: readonly string[]): string {
 export function toBrowserCsvCells(entry: ExportEntry): string[] {
   return [
     entry.name,
-    entry.fields[BROWSER_CSV_URL_KEY] ?? "",
+    entry.fields[URL_FIELD.key] ?? "",
     entry.fields[ACCOUNT_FIELD_KEY] ?? "",
-    entry.fields[BROWSER_CSV_PASSWORD_KEY] ?? "",
+    entry.fields[PASSWORD_FIELD.key] ?? "",
     entry.notes,
   ];
 }

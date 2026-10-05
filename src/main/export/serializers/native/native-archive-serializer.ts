@@ -24,6 +24,11 @@ import { buildNativeManifest, countNativeAttachments } from "./native-manifest";
 import { buildNativeVaultParts } from "./native-vault-document";
 
 /**
+ * 清单文件缩进的空格数, 清单是给人读的小文件.
+ */
+const MANIFEST_INDENT_SPACES = 2;
+
+/**
  * 让整个压缩包以一个错误结束的函数.
  */
 type FailArchive = (error: Error) => void;
@@ -70,7 +75,10 @@ function addDocuments(
 ): void {
   const manifest = buildNativeManifest(dataset, context.createdAt);
   zip.addBuffer(
-    Buffer.from(`${JSON.stringify(manifest, undefined, 2)}\n`, "utf8"),
+    Buffer.from(
+      `${JSON.stringify(manifest, undefined, MANIFEST_INDENT_SPACES)}\n`,
+      "utf8",
+    ),
     NATIVE_MANIFEST_PATH,
     { mtime: context.createdAt, compress: true },
   );

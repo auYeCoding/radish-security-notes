@@ -1,4 +1,4 @@
-import { MAX_IMPORT_ENTRIES } from "@shared/import/import-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 import {
   importFailed,
   importSucceeded,
@@ -136,7 +136,7 @@ async function readAndPlan(
   if (!parsed.ok) {
     return parsed;
   }
-  if (parsed.value.drafts.length > MAX_IMPORT_ENTRIES) {
+  if (parsed.value.drafts.length > MAX_TRANSFER_ENTRIES) {
     return importFailed("too-many-entries");
   }
   tracker.begin("planning");

@@ -21,6 +21,11 @@ interface ExportProgressStepProps {
 }
 
 /**
+ * 进度条满格的百分比.
+ */
+const FULL_PERCENTAGE = 100;
+
+/**
  * 进度百分比, 阶段没有细分进度 (总数为 0) 时为 null, 进度条显示为不定进度.
  * @param progress 进度快照.
  * @returns 0 到 100 的百分比, 或 null.
@@ -31,7 +36,10 @@ function toPercentage(
   if (progress === undefined || progress.total === 0) {
     return null;
   }
-  return Math.min(100, (progress.processed / progress.total) * 100);
+  return Math.min(
+    FULL_PERCENTAGE,
+    (progress.processed / progress.total) * FULL_PERCENTAGE,
+  );
 }
 
 /**

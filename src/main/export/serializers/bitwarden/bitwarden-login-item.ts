@@ -1,4 +1,8 @@
-import { ACCOUNT_FIELD_KEY } from "@shared/entries/common-entry-fields";
+import {
+  ACCOUNT_FIELD_KEY,
+  PASSWORD_FIELD,
+  URL_FIELD,
+} from "@shared/entries/common-entry-fields";
 
 import {
   fieldValueOf,
@@ -8,16 +12,6 @@ import {
 } from "./bitwarden-mapping";
 import { formatBitwardenTotp } from "./bitwarden-totp";
 import { BITWARDEN_ITEM_TYPE } from "./bitwarden-types";
-
-/**
- * 密码字段的键.
- */
-const PASSWORD_FIELD_KEY = "password";
-
-/**
- * 网址字段的键.
- */
-const URL_FIELD_KEY = "url";
 
 /**
  * 把条目映射成 Bitwarden 登录: 账号进用户名, 密码进密码, 网址进网址列表, TOTP 进 totp. 登录,
@@ -30,18 +24,18 @@ export function mapLoginItem(
   input: BitwardenMappingInput,
 ): BitwardenTypedMapping {
   const { entry } = input;
-  const url = fieldValueOf(entry, URL_FIELD_KEY);
+  const url = fieldValueOf(entry, URL_FIELD.key);
   return {
     type: BITWARDEN_ITEM_TYPE.login,
     typed: {
       login: {
         uris: url === "" ? [] : [{ match: null, uri: url }],
         username: orNull(fieldValueOf(entry, ACCOUNT_FIELD_KEY)),
-        password: orNull(fieldValueOf(entry, PASSWORD_FIELD_KEY)),
+        password: orNull(fieldValueOf(entry, PASSWORD_FIELD.key)),
         totp: entry.totp === undefined ? null : formatBitwardenTotp(entry.totp),
       },
     },
-    consumedKeys: [ACCOUNT_FIELD_KEY, PASSWORD_FIELD_KEY, URL_FIELD_KEY],
+    consumedKeys: [ACCOUNT_FIELD_KEY, PASSWORD_FIELD.key, URL_FIELD.key],
     notes: entry.notes,
   };
 }

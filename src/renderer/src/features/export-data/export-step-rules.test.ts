@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MAX_EXPORT_ENTRIES } from "@shared/export/export-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 
 import { INITIAL_EXPORT_DRAFT, type ExportDraft } from "./export-draft";
 import type { ConfirmStepState } from "./export-flow-state";
@@ -58,8 +58,8 @@ describe("所选范围的问题", () => {
     expect(findScopeProblem({ status: "loading" })).toBe("loading");
     expect(findScopeProblem({ status: "failed" })).toBe("failed");
     expect(findScopeProblem(ready(0))).toBe("empty");
-    expect(findScopeProblem(ready(MAX_EXPORT_ENTRIES + 1))).toBe("too-many");
-    expect(findScopeProblem(ready(MAX_EXPORT_ENTRIES))).toBeUndefined();
+    expect(findScopeProblem(ready(MAX_TRANSFER_ENTRIES + 1))).toBe("too-many");
+    expect(findScopeProblem(ready(MAX_TRANSFER_ENTRIES))).toBeUndefined();
     expect(findScopeProblem(ready(1))).toBeUndefined();
   });
 

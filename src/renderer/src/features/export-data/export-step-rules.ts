@@ -1,4 +1,4 @@
-import { MAX_EXPORT_ENTRIES } from "@shared/export/export-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
 import type { ExportRequest, ExportScope } from "@shared/export/export-request";
 
 import {
@@ -28,7 +28,7 @@ export function findScopeProblem(
   if (summary.summary.entryCount === 0) {
     return "empty";
   }
-  return summary.summary.entryCount > MAX_EXPORT_ENTRIES
+  return summary.summary.entryCount > MAX_TRANSFER_ENTRIES
     ? "too-many"
     : undefined;
 }

@@ -1,9 +1,7 @@
 import type { TFunction } from "i18next";
 
-import {
-  MAX_IMPORT_ENTRIES,
-  MAX_IMPORT_FILE_BYTES,
-} from "@shared/import/import-limits";
+import { MAX_TRANSFER_ENTRIES } from "@shared/data-transfer/transfer-limits";
+import { MAX_IMPORT_FILE_BYTES } from "@shared/import/import-limits";
 import type {
   ImportFailure,
   ImportFailureReason,
@@ -57,6 +55,6 @@ export function describeImportFailure(
     limit:
       failure.reason === "file-too-large"
         ? MAX_IMPORT_FILE_BYTES / BYTES_PER_MEBIBYTE
-        : MAX_IMPORT_ENTRIES,
+        : MAX_TRANSFER_ENTRIES,
   });
 }
