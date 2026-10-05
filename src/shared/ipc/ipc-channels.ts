@@ -51,5 +51,11 @@ export const IPC_CHANNELS = {
   attachmentsOpen: "attachments:open",
   attachmentsPreview: "attachments:preview",
   attachmentsRemove: "attachments:remove",
+  importChooseFile: "import:choose-file",
+  importRun: "import:run",
+  importProgress: "import:progress",
+  importCancel: "import:cancel",
+  importSaveReport: "import:save-report",
+  importRevealFile: "import:reveal-file",
   linksOpenExternal: "links:open-external",
 } as const;

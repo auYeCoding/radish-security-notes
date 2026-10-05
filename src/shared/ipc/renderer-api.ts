@@ -4,6 +4,7 @@ import type { CustomEntryTypeBridge } from "../entries/custom-types/custom-entry
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
 import type { FolderBridge } from "../folders/folder-bridge";
+import type { ImportBridge } from "../import/import-bridge";
 import type { LinkBridge } from "../links/link-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
 import type { TagBridge } from "../tags/tag-bridge";
@@ -54,6 +55,10 @@ export interface RendererApi {
    * 附件接口: 读取元数据, 添加, 另存为, 打开, 预览与删除附件.
    */
   readonly attachments: AttachmentBridge;
+  /**
+   * 导入接口: 选择其他管理器的导出文件, 看解析概要, 确认导入, 取得未能带入清单.
+   */
+  readonly importer: ImportBridge;
   /**
    * 链接接口: 请主进程用系统默认程序打开外部链接.
    */

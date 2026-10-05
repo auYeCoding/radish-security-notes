@@ -480,6 +480,149 @@
       "unexpected": "The action failed and nothing was changed. Try again, and if it still fails close the app and try again."
     }
   },
+  "import": {
+    "trigger": {
+      "label": "Import data"
+    },
+    "dialog": {
+      "title": "Import data",
+      "description": "Import a file exported from another password manager. The file is read and parsed on this computer and its content never leaves the app.",
+      "openTitle": "Choose the export file",
+      "saveTitle": "Save the not-imported list",
+      "reportFileName": "not-imported-list.txt",
+      "filter": {
+        "json": "JSON files",
+        "csv": "CSV files"
+      }
+    },
+    "source": {
+      "heading": "Choose the source and file format",
+      "options": {
+        "bitwardenJson": {
+          "label": "Bitwarden (JSON)",
+          "hint": "Export as .json and do not choose the encrypted export. Logins, secure notes, cards, identities, SSH keys, folders, TOTP and custom fields can be imported."
+        },
+        "bitwardenCsv": {
+          "label": "Bitwarden (CSV)",
+          "hint": "Contains only logins and secure notes. Use the JSON export for cards and identities."
+        },
+        "browserCsv": {
+          "label": "Browser passwords (CSV)",
+          "hint": "Password files exported from Chrome, Edge or Firefox. Logins only."
+        },
+        "keepassxcCsv": {
+          "label": "KeePassXC (CSV)",
+          "hint": "Export as CSV in KeePassXC. Includes groups and TOTP."
+        }
+      },
+      "plaintextWarning": {
+        "title": "The export file is plain text",
+        "description": "It contains all of your passwords. Delete it as soon as the import is done."
+      },
+      "choose": "Choose file..."
+    },
+    "progress": {
+      "idle": "Working...",
+      "reading": "Reading the file...",
+      "parsing": "Parsing...",
+      "planning": "Checking entries...",
+      "writing": "Writing...",
+      "counts": "{processed} / {total}",
+      "cancel": "Cancel"
+    },
+    "preview": {
+      "heading": "Import preview",
+      "description": "Check the details below. Nothing is written until you choose Confirm import.",
+      "total": "Entries in the file",
+      "importable": "Entries that can be imported",
+      "skipped": "Entries skipped entirely",
+      "newFolders": "Folders to be created",
+      "newTags": "Tags to be created",
+      "duplicates": "Duplicates of existing entries",
+      "notImported": "Content that cannot be imported",
+      "notImportedHint": "A list is shown when the import finishes.",
+      "typesHeading": "Entry types",
+      "duplicatePolicy": {
+        "heading": "What should happen to duplicates?",
+        "description": "Entries count as duplicates only when name, account and URL are all the same. They are compared with the entries that existed before the import.",
+        "skip": "Skip them",
+        "import": "Import them anyway"
+      },
+      "back": "Choose again",
+      "confirm": "Confirm import"
+    },
+    "result": {
+      "heading": "Import finished",
+      "imported": "Entries imported",
+      "skippedDuplicates": "Skipped as duplicates",
+      "skippedEntries": "Skipped entirely",
+      "createdFolders": "Folders created",
+      "createdTags": "Tags created",
+      "deleteWarning": {
+        "title": "Delete the export file",
+        "description": "The export file is plain text and contains all of your passwords. The import is done and you no longer need it."
+      },
+      "revealFile": "Show in folder",
+      "notImported": {
+        "heading": "Content that was not imported ({count})",
+        "empty": "Everything was imported.",
+        "field": "Field {field}",
+        "truncated": "Showing the first {shown} items. Save the list as a text file to see all of it.",
+        "save": "Save as text file",
+        "saved": "The list was saved."
+      },
+      "done": "Done"
+    },
+    "report": {
+      "title": "List of content that was not imported",
+      "total": "{count} items in total",
+      "field": " (field {field})",
+      "line": "{scope} {name}{field}: {reason}",
+      "scope": {
+        "entry": "Entry",
+        "folder": "Folder",
+        "row": "File row"
+      }
+    },
+    "reasons": {
+      "type-unsupported": "This app has no matching entry type, so the whole entry was skipped",
+      "name-invalid": "The name is empty or longer than 100 characters, so the whole entry was skipped",
+      "field-too-long": "A field is longer than its limit, so the whole entry was skipped",
+      "row-malformed": "The number of columns in this row does not match the header, so it was skipped",
+      "favorite-unsupported": "Marked as a favorite in the source, which this app does not support",
+      "reprompt-unsupported": "The source asks for the master password again before showing it, which this app does not support",
+      "password-history-unsupported": "The password history in the source was not imported",
+      "passkey-unsupported": "The passkeys in the source were not imported",
+      "archived-unsupported": "Archived in the source, imported as a normal entry",
+      "linked-field-unsupported": "A linked custom field was not imported",
+      "totp-invalid": "The TOTP could not be parsed and was dropped, the rest of the entry was imported",
+      "tag-limit-exceeded": "An entry can have at most 10 tags, the extra ones were not imported",
+      "tag-name-invalid": "The tag name is longer than 50 characters and was not imported",
+      "folder-name-truncated": "The folder path is longer than 50 characters, so its last part is used as the name",
+      "custom-field-name-empty": "A custom field has no name and was dropped",
+      "unparsable-field-line": "A line in the custom fields is not in the form name: value and was not imported"
+    },
+    "failure": {
+      "vault-locked": "The vault is locked. Unlock it and try again.",
+      "unexpected-error": "The import failed and nothing was changed. Try again, and if it keeps failing close the app and retry.",
+      "invalid-input": "The request was not valid. Choose the file again.",
+      "busy": "Another import is in progress. Wait a moment.",
+      "no-pending-import": "There is no import waiting for confirmation. Choose the file again.",
+      "file-unreadable": "This file cannot be read.",
+      "file-empty": "This file is empty.",
+      "file-too-large": "The file is larger than {limit} MiB and cannot be imported.",
+      "encoding-unsupported": "The file is not UTF-8 encoded. Export it again or save it as UTF-8.",
+      "format-mismatch": "The file does not match the chosen source format. Check the source and the file.",
+      "encrypted-file": "This is an encrypted export. Use an unencrypted export instead.",
+      "organization-export-unsupported": "This is an organization export, which is not supported yet. Use a personal vault export instead.",
+      "malformed-file": "The file is malformed and cannot be parsed.",
+      "malformed-file-at-line": "The file is malformed and cannot be parsed (near line {line}).",
+      "too-many-entries": "The file has more than {limit} entries and cannot be imported.",
+      "no-importable-entries": "There are no entries to import in this file.",
+      "save-failed": "The file could not be saved. Try another location.",
+      "reveal-failed": "The folder could not be opened."
+    }
+  },
   "settings": {
     "open": "Settings"
   },

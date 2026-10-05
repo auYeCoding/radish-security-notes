@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { isSameName } from "./is-same-name";
+import { foldForComparison, isSameName } from "./is-same-name";
+
+describe("foldForComparison", () => {
+  it("去首尾空格并只把 A-Z 折成小写, 同名判断与按名称建索引共用它", () => {
+    expect(foldForComparison("  Work ")).toBe("work");
+    expect(foldForComparison("École")).toBe("École");
+    expect(foldForComparison("Ａ")).toBe("Ａ");
+    expect(isSameName("Work", "work")).toBe(
+      foldForComparison("Work") === foldForComparison("work"),
+    );
+  });
+});
 
 describe("isSameName", () => {
   it("去首尾空格后忽略英文大小写, 相同即同名", () => {

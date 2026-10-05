@@ -1,6 +1,7 @@
 import type { AttachmentBridge } from "@shared/attachments/attachment-bridge";
 import type { BatchBridge } from "@shared/batch/batch-bridge";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
+import type { ImportBridge } from "@shared/import/import-bridge";
 import type { LinkBridge } from "@shared/links/link-bridge";
 import type { ReactNode } from "react";
 
@@ -14,6 +15,7 @@ import type { EntryTypeStore } from "@renderer/stores/entry-type-store";
 import { EntryTypeStoreProvider } from "@renderer/stores/entry-type-store-provider";
 import type { FolderStore } from "@renderer/stores/folder-store";
 import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
+import { ImportBridgeProvider } from "@renderer/stores/import-bridge-provider";
 import { LinkBridgeProvider } from "@renderer/stores/link-bridge-provider";
 import type { TagStore } from "@renderer/stores/tag-store";
 import { TagStoreProvider } from "@renderer/stores/tag-store-provider";
@@ -72,6 +74,10 @@ export interface EntryTestProviderValues {
    */
   readonly attachmentBridge: AttachmentBridge;
   /**
+   * 导入桥.
+   */
+  readonly importBridge: ImportBridge;
+  /**
    * 链接桥.
    */
   readonly linkBridge: LinkBridge;
@@ -102,9 +108,11 @@ export function createEntryTestProviders(
                       <AttachmentBridgeProvider
                         bridge={values.attachmentBridge}
                       >
-                        <LinkBridgeProvider bridge={values.linkBridge}>
-                          {props.children}
-                        </LinkBridgeProvider>
+                        <ImportBridgeProvider bridge={values.importBridge}>
+                          <LinkBridgeProvider bridge={values.linkBridge}>
+                            {props.children}
+                          </LinkBridgeProvider>
+                        </ImportBridgeProvider>
                       </AttachmentBridgeProvider>
                     </TotpBridgeProvider>
                   </BatchBridgeProvider>

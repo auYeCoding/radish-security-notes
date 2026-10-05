@@ -480,6 +480,149 @@
       "unexpected": "操作失败, 没有任何改动. 请重试, 仍失败请关闭应用后重试."
     }
   },
+  "import": {
+    "trigger": {
+      "label": "导入数据"
+    },
+    "dialog": {
+      "title": "导入数据",
+      "description": "把其他密码管理器导出的文件导入到这里. 文件在本机读取和解析, 内容不会离开应用.",
+      "openTitle": "选择导出文件",
+      "saveTitle": "保存未能带入清单",
+      "reportFileName": "未能带入清单.txt",
+      "filter": {
+        "json": "JSON 文件",
+        "csv": "CSV 文件"
+      }
+    },
+    "source": {
+      "heading": "选择来源与文件格式",
+      "options": {
+        "bitwardenJson": {
+          "label": "Bitwarden (JSON)",
+          "hint": "导出时选 .json, 不要选加密导出. 能带入登录, 安全笔记, 银行卡, 身份, SSH 密钥, 文件夹, TOTP 与自定义字段."
+        },
+        "bitwardenCsv": {
+          "label": "Bitwarden (CSV)",
+          "hint": "只含登录与安全笔记, 银行卡与身份请用 JSON 导出."
+        },
+        "browserCsv": {
+          "label": "浏览器密码 (CSV)",
+          "hint": "Chrome, Edge, Firefox 导出的密码文件, 只含登录."
+        },
+        "keepassxcCsv": {
+          "label": "KeePassXC (CSV)",
+          "hint": "在 KeePassXC 里导出为 CSV, 含分组与 TOTP."
+        }
+      },
+      "plaintextWarning": {
+        "title": "导出文件是明文",
+        "description": "文件里包含全部密码. 导入完成后请立即删除它."
+      },
+      "choose": "选择文件..."
+    },
+    "progress": {
+      "idle": "正在处理...",
+      "reading": "正在读取文件...",
+      "parsing": "正在解析...",
+      "planning": "正在检查条目...",
+      "writing": "正在写入...",
+      "counts": "{processed} / {total}",
+      "cancel": "取消"
+    },
+    "preview": {
+      "heading": "导入预览",
+      "description": "确认下面的内容, 点 \"确认导入\" 才会写入.",
+      "total": "文件里的条目",
+      "importable": "能导入的条目",
+      "skipped": "整条跳过的条目",
+      "newFolders": "将新建的文件夹",
+      "newTags": "将新建的标签",
+      "duplicates": "与已有条目重复",
+      "notImported": "将带不进的内容",
+      "notImportedHint": "导入结束后会给出清单.",
+      "typesHeading": "条目类型",
+      "duplicatePolicy": {
+        "heading": "重复的条目怎么处理?",
+        "description": "名称, 账号, 网址都相同才算重复, 只与导入前已有的条目比对.",
+        "skip": "跳过, 不导入",
+        "import": "仍然导入"
+      },
+      "back": "重新选择",
+      "confirm": "确认导入"
+    },
+    "result": {
+      "heading": "导入完成",
+      "imported": "已导入的条目",
+      "skippedDuplicates": "因重复跳过",
+      "skippedEntries": "整条跳过",
+      "createdFolders": "新建的文件夹",
+      "createdTags": "新建的标签",
+      "deleteWarning": {
+        "title": "请删除导出文件",
+        "description": "导出文件是明文, 含全部密码, 导入已经完成, 不再需要它了."
+      },
+      "revealFile": "打开所在文件夹",
+      "notImported": {
+        "heading": "未能带入的内容 ({count})",
+        "empty": "没有未能带入的内容.",
+        "field": "字段 {field}",
+        "truncated": "只显示前 {shown} 项, 完整清单请保存为文本文件.",
+        "save": "保存为文本文件",
+        "saved": "清单已保存."
+      },
+      "done": "完成"
+    },
+    "report": {
+      "title": "未能带入清单",
+      "total": "共 {count} 项",
+      "field": " (字段 {field})",
+      "line": "{scope} {name}{field}: {reason}",
+      "scope": {
+        "entry": "条目",
+        "folder": "文件夹",
+        "row": "文件行"
+      }
+    },
+    "reasons": {
+      "type-unsupported": "本应用没有对应的条目类型, 整条没有导入",
+      "name-invalid": "名称为空或超过 100 个字符, 整条没有导入",
+      "field-too-long": "字段内容超过长度上限, 整条没有导入",
+      "row-malformed": "这一行的列数与表头不一致, 没有导入",
+      "favorite-unsupported": "来源里标为收藏, 本应用没有收藏功能",
+      "reprompt-unsupported": "来源里要求再次输入主密码才能查看, 本应用不支持",
+      "password-history-unsupported": "来源里的密码历史没有带入",
+      "passkey-unsupported": "来源里的通行密钥没有带入",
+      "archived-unsupported": "来源里是归档状态, 导入后是普通条目",
+      "linked-field-unsupported": "关联类型的自定义字段没有带入",
+      "totp-invalid": "TOTP 无法解析, 已丢弃, 其余内容照常导入",
+      "tag-limit-exceeded": "一个条目最多 10 个标签, 超出的没有带入",
+      "tag-name-invalid": "标签名超过 50 个字符, 没有带入",
+      "folder-name-truncated": "文件夹路径超过 50 个字符, 已取尾部作名称",
+      "custom-field-name-empty": "自定义字段没有名称, 已丢弃",
+      "unparsable-field-line": "自定义字段的某一行不是 \"名称: 值\" 的形式, 没有带入"
+    },
+    "failure": {
+      "vault-locked": "保险库已锁定, 请重新解锁后再试.",
+      "unexpected-error": "导入失败, 没有任何改动. 请重试, 仍失败请关闭应用后重试.",
+      "invalid-input": "参数不合规, 请重新选择文件.",
+      "busy": "正在处理另一次导入, 请稍候.",
+      "no-pending-import": "没有等待确认的导入, 请重新选择文件.",
+      "file-unreadable": "无法读取这个文件.",
+      "file-empty": "这个文件是空的.",
+      "file-too-large": "文件超过 {limit} MiB, 无法导入.",
+      "encoding-unsupported": "文件不是 UTF-8 编码. 请用 UTF-8 重新导出或另存.",
+      "format-mismatch": "文件内容与所选的来源格式不符, 请检查来源与文件.",
+      "encrypted-file": "这是加密的导出文件, 请改用未加密的导出.",
+      "organization-export-unsupported": "这是组织库的导出, 暂不支持, 请改用个人库导出.",
+      "malformed-file": "文件格式有误, 无法解析.",
+      "malformed-file-at-line": "文件格式有误, 无法解析 (第 {line} 行附近).",
+      "too-many-entries": "条目超过 {limit} 个, 无法导入.",
+      "no-importable-entries": "文件里没有可导入的条目.",
+      "save-failed": "无法保存文件, 请换一个位置重试.",
+      "reveal-failed": "无法打开所在文件夹."
+    }
+  },
   "settings": {
     "open": "设置"
   },

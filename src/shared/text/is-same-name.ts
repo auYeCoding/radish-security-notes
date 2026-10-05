@@ -4,11 +4,12 @@
 const ENGLISH_UPPERCASE_LETTERS = /[A-Z]/g;
 
 /**
- * 把名称整理成比较用的形式: 去首尾空格, 并把 A-Z 折成小写, 别的字母保持原样.
+ * 把名称整理成比较用的形式: 去首尾空格, 并把 A-Z 折成小写, 别的字母保持原样. 同名判断与需要
+ * 按名称建索引的调用方 (例如导入时的重复判定) 共用这一个折叠规则.
  * @param name 用户填写的名称.
  * @returns 比较用的名称.
  */
-function foldForComparison(name: string): string {
+export function foldForComparison(name: string): string {
   return name
     .trim()
     .replace(ENGLISH_UPPERCASE_LETTERS, (letter) => letter.toLowerCase());

@@ -28,12 +28,15 @@ const SHARED_ALIAS = { "@shared": resolve("src/shared") };
  * 要打进主进程产物而不是外置的依赖. 主进程产物是 CommonJS: electron-store 与
  * pseudo-localization 只提供 ESM 入口, 运行时无法 require; i18next-icu 的默认导出
  * 在外置 require 时拿到的是带 default 属性的命名空间对象, 打包后才按预期解析;
- * @scure/bip39 同样只提供 ESM 入口.
+ * intl-messageformat 被 i18next-icu 当构造函数使用, 外置 require 时拿到的是只带
+ * 命名导出 IntlMessageFormat 的命名空间对象, 带占位符的主进程文案会原样输出,
+ * 需要一并打包; @scure/bip39 同样只提供 ESM 入口.
  */
 const BUNDLED_MAIN_DEPENDENCIES = [
   "electron-store",
   "pseudo-localization",
   "i18next-icu",
+  "intl-messageformat",
   "@scure/bip39",
 ];
 

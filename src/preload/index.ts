@@ -7,6 +7,7 @@ import { createBatchBridge } from "./create-batch-bridge";
 import { createEntryBridge } from "./create-entry-bridge";
 import { createEntryTypeBridge } from "./create-entry-type-bridge";
 import { createFolderBridge } from "./create-folder-bridge";
+import { createImportBridge } from "./create-import-bridge";
 import { createLinkBridge } from "./create-link-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
 import { createRecoveryBridge } from "./create-recovery-bridge";
@@ -31,6 +32,7 @@ const api: RendererApi = {
     ipcRenderer,
     getPathForFile: (file) => webUtils.getPathForFile(file),
   }),
+  importer: createImportBridge(ipcRenderer),
   links: createLinkBridge(ipcRenderer),
 };
 

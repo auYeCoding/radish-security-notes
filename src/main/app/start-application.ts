@@ -7,6 +7,7 @@ import { registerBatchIpc } from "../ipc/batch-ipc";
 import { registerCustomEntryTypeIpc } from "../ipc/custom-entry-type-ipc";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
+import { registerImportIpc } from "../ipc/import-ipc";
 import { registerLinkIpc } from "../ipc/link-ipc";
 import type { ExternalLinkOpener } from "../links/external-link-opener";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
@@ -26,6 +27,7 @@ import { createBatchService } from "./batch-runtime";
 import { createEntryRuntime } from "./entry-runtime";
 import { createCustomEntryTypeService } from "./entry-type-runtime";
 import { createFolderService } from "./folder-runtime";
+import { createImportRuntime } from "./import-runtime";
 import { createLinkRuntime } from "./link-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
 import { createTagService } from "./tag-runtime";
@@ -102,6 +104,10 @@ export async function startApplication(): Promise<void> {
   registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
   const attachments = createAttachmentRuntime(vault.service, runtime.i18n);
   registerAttachmentIpc(ipcMain, attachments);
+  registerImportIpc(
+    ipcMain,
+    createImportRuntime(vault.service, runtime.i18n).service,
+  );
   const openExternalLink = createLinkRuntime();
   registerLinkIpc(ipcMain, openExternalLink);
   app.on("will-quit", () => {
