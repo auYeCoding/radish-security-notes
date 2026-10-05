@@ -66,7 +66,7 @@ export function describeCustomTypeError(
 }
 
 /**
- * 把新建类型失败的原因换成当前语言的文案.
+ * 把新建, 修改与删除类型失败的原因换成当前语言的文案.
  * @param reason 主进程报告的失败原因.
  * @param translate 翻译函数.
  * @returns 文案.
@@ -84,6 +84,8 @@ export function describeCustomTypeFailure(
       return translate("entryCreate.customType.error.limitReached", {
         maxCount: CUSTOM_ENTRY_TYPE_MAX_COUNT,
       });
+    case "not-found":
+      return translate("entryCreate.customType.error.notFound");
     default:
       return translate("entryCreate.customType.error.unexpected");
   }

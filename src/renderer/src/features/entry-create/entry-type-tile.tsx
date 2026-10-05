@@ -5,6 +5,7 @@ import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import { EntryTypeIcon } from "@renderer/components/entry-type-icon";
 import { entryTypeName } from "@renderer/components/entry-type-naming";
 import { Button } from "@renderer/components/ui/button";
+import { cn } from "@renderer/lib/class-names";
 
 /**
  * 类型格的属性.
@@ -18,6 +19,10 @@ interface EntryTypeTileProps {
    * 点击格子时的回调, 参数是被选中的类型.
    */
   readonly onSelect: (type: EntryTypeDefinition) => void;
+  /**
+   * 追加到按钮上的类样式, 例如让格子在带菜单的容器里撑满.
+   */
+  readonly className?: string;
 }
 
 /**
@@ -32,7 +37,7 @@ export function EntryTypeTile(props: EntryTypeTileProps): React.JSX.Element {
     <Button
       type="button"
       variant="outline"
-      className="h-auto flex-col gap-2 px-2 py-4"
+      className={cn("h-auto flex-col gap-2 px-2 py-4", props.className)}
       onClick={() => props.onSelect(type)}
     >
       <EntryTypeIcon typeKey={type.key} className="size-6" />

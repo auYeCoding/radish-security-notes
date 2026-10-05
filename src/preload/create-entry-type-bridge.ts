@@ -25,5 +25,19 @@ export function createEntryTypeBridge(
       );
       return result as CustomEntryTypeResult<CustomEntryType>;
     },
+    update: async (input) => {
+      const result = await ipcRenderer.invoke(
+        IPC_CHANNELS.entryTypesUpdate,
+        input,
+      );
+      return result as CustomEntryTypeResult<CustomEntryType>;
+    },
+    remove: async (input) => {
+      const result = await ipcRenderer.invoke(
+        IPC_CHANNELS.entryTypesRemove,
+        input,
+      );
+      return result as CustomEntryTypeResult<undefined>;
+    },
   };
 }

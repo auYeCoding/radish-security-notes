@@ -204,6 +204,7 @@ function createEntryTestBridges(
       undefined,
       options.entryTypeBridgeOverrides,
       customTypes,
+      details,
     ),
     batchBridge: createFakeBatchBridge(details, options.batchBridgeOverrides),
     totpBridge: createFakeTotpBridge(options.totpBridgeOverrides),

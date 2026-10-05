@@ -1,4 +1,8 @@
 import type { CustomEntryTypeBridge } from "@shared/entries/custom-types/custom-entry-type-bridge";
+import type {
+  RemoveCustomEntryTypeInput,
+  UpdateCustomEntryTypeInput,
+} from "@shared/entries/custom-types/custom-entry-type-edit-types";
 import type { CustomEntryTypeResult } from "@shared/entries/custom-types/custom-entry-type-result";
 import type {
   CustomEntryType,
@@ -8,12 +12,16 @@ import { createStore, type StoreApi } from "zustand/vanilla";
 
 import { createCustomType, loadCustomTypes } from "./entry-type-store-actions";
 import {
+  removeCustomType,
+  updateCustomType,
+} from "./entry-type-store-edit-actions";
+import {
   INITIAL_ENTRY_TYPE_STATE,
   type EntryTypeState,
 } from "./entry-type-state";
 
 /**
- * 自定义条目类型动作: 经主进程读取与新建自定义类型.
+ * 自定义条目类型动作: 经主进程读取, 新建, 修改与删除自定义类型.
  */
 export interface EntryTypeActions {
   /**
@@ -29,6 +37,22 @@ export interface EntryTypeActions {
   create: (
     input: NewCustomEntryTypeInput,
   ) => Promise<CustomEntryTypeResult<CustomEntryType>>;
+  /**
+   * 修改一个自定义类型, 成功后列表里的这个类型换成修改后的.
+   * @param input 要修改的类型编号, 修改后的名称与字段, 以及用户是否已确认影响.
+   * @returns 修改结果.
+   */
+  update: (
+    input: UpdateCustomEntryTypeInput,
+  ) => Promise<CustomEntryTypeResult<CustomEntryType>>;
+  /**
+   * 删除一个自定义类型, 成功后它从列表里移除.
+   * @param input 要删除的类型编号, 以及用户是否已确认影响.
+   * @returns 删除结果.
+   */
+  remove: (
+    input: RemoveCustomEntryTypeInput,
+  ) => Promise<CustomEntryTypeResult<undefined>>;
 }
 
 /**
@@ -61,6 +85,8 @@ export function createEntryTypeStore(
       ...INITIAL_ENTRY_TYPE_STATE,
       load: () => loadCustomTypes(access),
       create: (input) => createCustomType(access, input),
+      update: (input) => updateCustomType(access, input),
+      remove: (input) => removeCustomType(access, input),
     };
   });
 }

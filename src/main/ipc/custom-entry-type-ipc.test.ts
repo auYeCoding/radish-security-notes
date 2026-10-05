@@ -25,6 +25,8 @@ function createFakeService(): CustomEntryTypeService {
   return {
     list: vi.fn(() => ({ ok: true, value: [] })),
     create: vi.fn(() => ({ ok: true, value: { id: "t-1" } })),
+    update: vi.fn(() => ({ ok: true, value: { id: "t-1" } })),
+    remove: vi.fn(() => ({ ok: true, value: undefined })),
   } as unknown as CustomEntryTypeService;
 }
 
@@ -72,6 +74,103 @@ describe("registerCustomEntryTypeIpc 转发", () => {
     });
 
     expect(service.create).toHaveBeenCalledWith(VALID_INPUT);
+  });
+});
+
+/**
+ * 一份类型都正确的修改类型输入: 第一个字段是已有字段, 带字段键, 第二个是新增字段.
+ */
+const VALID_UPDATE_INPUT = {
+  id: "t-1",
+  name: "路由器",
+  fields: [
+    {
+      key: "account",
+      name: "地址",
+      kind: "singleLine",
+      isSensitive: false,
+      isSummary: true,
+    },
+    { name: "口令", kind: "singleLine", isSensitive: true, isSummary: false },
+  ],
+  isImpactConfirmed: false,
+};
+
+describe("registerCustomEntryTypeIpc 修改与删除转发", () => {
+  it("修改通道把校验过的输入交给服务, 多余的属性被丢弃, 省略字段键的字段不带键", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    ipcMain.invoke(IPC_CHANNELS.entryTypesUpdate, {
+      ...VALID_UPDATE_INPUT,
+      extra: "ignored",
+    });
+
+    expect(service.update).toHaveBeenCalledWith(VALID_UPDATE_INPUT);
+    const [received] = vi.mocked(service.update).mock.calls[0];
+    expect("key" in received.fields[1]).toBe(false);
+  });
+
+  it("删除通道把校验过的输入交给服务, 多余的属性被丢弃", () => {
+    const { ipcMain, service } = registerWithFakes();
+
+    ipcMain.invoke(IPC_CHANNELS.entryTypesRemove, {
+      id: "t-1",
+      isImpactConfirmed: true,
+      extra: "ignored",
+    });
+
+    expect(service.remove).toHaveBeenCalledWith({
+      id: "t-1",
+      isImpactConfirmed: true,
+    });
+  });
+});
+
+describe("registerCustomEntryTypeIpc 修改与删除的边界校验", () => {
+  it.each([
+    ["不是对象", "text"],
+    ["缺少类型编号", { ...VALID_UPDATE_INPUT, id: undefined }],
+    ["类型编号不是字符串", { ...VALID_UPDATE_INPUT, id: 1 }],
+    ["名称不是字符串", { ...VALID_UPDATE_INPUT, name: 1 }],
+    ["字段不是数组", { ...VALID_UPDATE_INPUT, fields: "text" }],
+    [
+      "字段键不是字符串",
+      {
+        ...VALID_UPDATE_INPUT,
+        fields: [{ ...VALID_UPDATE_INPUT.fields[0], key: 1 }],
+      },
+    ],
+    [
+      "取值形态未知",
+      {
+        ...VALID_UPDATE_INPUT,
+        fields: [{ ...VALID_UPDATE_INPUT.fields[0], kind: "date" }],
+      },
+    ],
+    ["确认标记缺失", { ...VALID_UPDATE_INPUT, isImpactConfirmed: undefined }],
+    ["确认标记不是布尔值", { ...VALID_UPDATE_INPUT, isImpactConfirmed: "yes" }],
+  ])("修改时%s抛出错误, 不交给服务", (_title, input) => {
+    const { ipcMain, service } = registerWithFakes();
+
+    expect(() => ipcMain.invoke(IPC_CHANNELS.entryTypesUpdate, input)).toThrow(
+      "无效的条目内容",
+    );
+    expect(service.update).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["不是对象", null],
+    ["缺少类型编号", { isImpactConfirmed: true }],
+    ["类型编号不是字符串", { id: 1, isImpactConfirmed: true }],
+    ["确认标记缺失", { id: "t-1" }],
+    ["确认标记不是布尔值", { id: "t-1", isImpactConfirmed: 1 }],
+  ])("删除时%s抛出错误, 不交给服务", (_title, input) => {
+    const { ipcMain, service } = registerWithFakes();
+
+    expect(() => ipcMain.invoke(IPC_CHANNELS.entryTypesRemove, input)).toThrow(
+      "无效的条目内容",
+    );
+    expect(service.remove).not.toHaveBeenCalled();
   });
 });
 

@@ -59,6 +59,11 @@ function textsOfStep(step: NewEntryStep, translate: TFunction): StepTexts {
         title: translate("entryCreate.customType.title"),
         description: translate("entryCreate.customType.description"),
       };
+    case "typeEdit":
+      return {
+        title: translate("entryCreate.customType.edit.title"),
+        description: translate("entryCreate.customType.edit.description"),
+      };
     default:
       return {
         title: translate("entryCreate.title"),

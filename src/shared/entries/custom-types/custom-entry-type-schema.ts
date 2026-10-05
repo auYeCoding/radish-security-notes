@@ -31,6 +31,10 @@ export const CUSTOM_ENTRY_TYPE_ERROR_CODES = {
  */
 export interface CustomEntryTypeFieldFormValues {
   /**
+   * 已保存字段的字段键, 编辑类型时用它认出是哪个已有字段; 新建类型与新增的字段没有这一项.
+   */
+  key?: string;
+  /**
    * 字段名.
    */
   name: string;
@@ -96,7 +100,8 @@ function createNameSchema(
 }
 
 /**
- * 一个字段的校验方案: 字段名去首尾空格后不能为空且不超过最多字符数, 取值形态必须在形态清单里.
+ * 一个字段的校验方案: 字段名去首尾空格后不能为空且不超过最多字符数, 取值形态必须在形态清单里,
+ * 字段键可以省略, 给出时必须是字符串.
  * @returns 字段的校验方案.
  */
 function createFieldSchema(): z.ZodType<
@@ -104,6 +109,7 @@ function createFieldSchema(): z.ZodType<
   CustomEntryTypeFieldFormValues
 > {
   return z.object({
+    key: z.string().optional(),
     name: createNameSchema(CUSTOM_ENTRY_TYPE_FIELD_NAME_MAX_LENGTH, {
       required: CUSTOM_ENTRY_TYPE_ERROR_CODES.fieldNameRequired,
       tooLong: CUSTOM_ENTRY_TYPE_ERROR_CODES.fieldNameTooLong,
@@ -186,10 +192,10 @@ function createFieldsSchema(): z.ZodType<
 }
 
 /**
- * 新建自定义类型的校验方案, 渲染端表单与主进程共用: 类型名称去首尾空格后不能为空且不超过最多
- * 字符数, 字段规则见 `createFieldsSchema`, 校验消息是 `CUSTOM_ENTRY_TYPE_ERROR_CODES` 里的错误
- * 代码. 与已有类型重名与类型个数上限由主进程的类型服务判定.
- * @returns 新建类型的校验方案.
+ * 自定义类型的校验方案, 新建与编辑, 渲染端表单与主进程共用: 类型名称去首尾空格后不能为空且不
+ * 超过最多字符数, 字段规则见 `createFieldsSchema`, 校验消息是 `CUSTOM_ENTRY_TYPE_ERROR_CODES`
+ * 里的错误代码. 与已有类型重名与类型个数上限由主进程的类型服务判定.
+ * @returns 自定义类型的校验方案.
  */
 export function createCustomEntryTypeSchema(): z.ZodType<
   CustomEntryTypeFormValues,

@@ -1,4 +1,8 @@
 import { admitNewCustomEntryType } from "@shared/entries/custom-types/custom-entry-type-admission";
+import type {
+  RemoveCustomEntryTypeInput,
+  UpdateCustomEntryTypeInput,
+} from "@shared/entries/custom-types/custom-entry-type-edit-types";
 import {
   customEntryTypeSucceeded,
   type CustomEntryTypeResult,
@@ -17,6 +21,8 @@ import { toCustomEntryType } from "./custom-entry-type-mapper";
 import { listCustomEntryTypes } from "./custom-entry-type-reader";
 import { buildCustomEntryTypeRows } from "./custom-entry-type-record-builder";
 import { insertCustomEntryType } from "./custom-entry-type-repository";
+import { removeCustomEntryType } from "./remove-custom-entry-type";
+import { updateCustomEntryType } from "./update-custom-entry-type";
 
 /**
  * 自定义类型服务的依赖.
@@ -33,8 +39,8 @@ export interface CustomEntryTypeServiceDependencies extends DatabaseAccess {
 }
 
 /**
- * 自定义类型服务: 在已解锁的加密数据库里新建与列出自定义条目类型. 类型名称与字段名只在方法
- * 执行期间经过内存, 不写入日志.
+ * 自定义类型服务: 在已解锁的加密数据库里新建, 列出, 修改与删除自定义条目类型. 类型名称与字段名
+ * 只在方法执行期间经过内存, 不写入日志.
  */
 export class CustomEntryTypeService {
   /**
@@ -78,6 +84,32 @@ export class CustomEntryTypeService {
       insertCustomEntryType(orm, rows);
       return customEntryTypeSucceeded(toCustomEntryType(rows));
     });
+  }
+
+  /**
+   * 修改一个自定义类型: 改名, 改字段, 增删字段, 改摘要字段. 类型与已有条目在同一个事务里改写, 会
+   * 丢失取值或把保密字段改成非保密而用户没有确认时拒绝, 详见 `updateCustomEntryType`.
+   * @param input 用户提交的类型编号, 名称, 字段与是否已确认影响.
+   * @returns 修改后的自定义类型, 未解锁, 没有这个类型, 输入不合规, 重名或需要确认而未确认时为
+   * 失败结果.
+   */
+  update(
+    input: UpdateCustomEntryTypeInput,
+  ): CustomEntryTypeResult<CustomEntryType> {
+    return this.withDatabase((orm) =>
+      updateCustomEntryType(orm, this.dependencies, input),
+    );
+  }
+
+  /**
+   * 删除一个自定义类型, 类型下已有的条目在同一个事务里改归安全笔记, 详见 `removeCustomEntryType`.
+   * @param input 用户提交的类型编号与是否已确认影响.
+   * @returns 删除结果, 未解锁, 没有这个类型或类型下有条目而未确认时为失败结果.
+   */
+  remove(input: RemoveCustomEntryTypeInput): CustomEntryTypeResult<undefined> {
+    return this.withDatabase((orm) =>
+      removeCustomEntryType(orm, this.dependencies, input),
+    );
   }
 
   /**

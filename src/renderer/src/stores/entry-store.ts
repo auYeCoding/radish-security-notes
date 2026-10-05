@@ -30,6 +30,7 @@ import { removeEntry, updateEntry } from "./entry-store-mutations";
 import { refreshEntries } from "./entry-store-refresh";
 import { applyQuery, runEntrySearch } from "./entry-store-search";
 import { releaseTag, toggleTag } from "./entry-store-tag-mutations";
+import { reloadAfterTypeChange } from "./entry-store-type-change";
 import { INITIAL_ENTRY_STATE, type EntryState } from "./entry-state";
 
 /**
@@ -156,6 +157,12 @@ export interface EntryActions {
    * @returns 读取完成后兑现.
    */
   refresh: () => Promise<void>;
+  /**
+   * 自定义类型被修改或删除之后让条目一侧跟上: 重新读取列表摘要, 选中的条目重新读取详情, 搜索关键字
+   * 不为空时重新搜索.
+   * @returns 全部读取完成后兑现.
+   */
+  reloadAfterTypeChange: () => Promise<void>;
 }
 
 /**
@@ -207,6 +214,7 @@ export function createEntryStore(
         applyBatchFolder(access, ids, folderId),
       applyBatchTags: (assignments) => applyBatchTags(access, assignments),
       refresh: () => refreshEntries(access),
+      reloadAfterTypeChange: () => reloadAfterTypeChange(access),
     };
   });
 }

@@ -91,6 +91,23 @@ describe("createCustomEntryTypeSchema 合法输入", () => {
       ],
     });
   });
+});
+
+describe("createCustomEntryTypeSchema 字段键与保密多行字段", () => {
+  it("字段键可以省略, 给出时原样保留, 不是字符串时不通过", () => {
+    const schema = createCustomEntryTypeSchema();
+    const keyed = schema.safeParse(
+      typeOf({ fields: [fieldOf({ key: "field-a" })] }),
+    );
+
+    expect(keyed.data?.fields[0]?.key).toBe("field-a");
+    expect(
+      schema.safeParse({
+        name: "类型",
+        fields: [{ ...fieldOf(), key: 1 }],
+      }).success,
+    ).toBe(false);
+  });
 
   it("保密的多行字段合法", () => {
     expect(

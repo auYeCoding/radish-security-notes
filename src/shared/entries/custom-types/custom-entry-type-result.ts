@@ -8,10 +8,16 @@ import {
 } from "../../result/operation-result";
 
 /**
- * 自定义类型操作失败的原因: 数据库原因, 内容不合规, 与已有类型重名, 自定义类型个数已达上限.
+ * 自定义类型操作失败的原因: 数据库原因, 内容不合规, 与已有类型重名, 自定义类型个数已达上限,
+ * 没有这个类型, 改动会丢失取值或降低保护但用户还没有确认.
  */
 export type CustomEntryTypeFailureReason =
-  DatabaseFailureReason | "invalid-input" | "name-taken" | "limit-reached";
+  | DatabaseFailureReason
+  | "invalid-input"
+  | "name-taken"
+  | "limit-reached"
+  | "not-found"
+  | "confirmation-required";
 
 /**
  * 自定义类型操作成功的结果.

@@ -34,7 +34,7 @@ function readFieldKind(source: object): CustomFieldKind {
  * @returns 校验通过的字段输入, 多余的属性被丢弃.
  * @throws Error 当类型不符时.
  */
-function requireFieldInput(input: unknown): CustomEntryTypeFieldInput {
+export function requireFieldInput(input: unknown): CustomEntryTypeFieldInput {
   const source = requireObject(input);
   return {
     name: readString(source, "name"),

@@ -301,6 +301,34 @@
       "cancel": "取消",
       "submit": "保存类型",
       "submitting": "正在保存...",
+      "menu": {
+        "label": "{name} 的更多操作",
+        "edit": "编辑类型",
+        "delete": "删除类型"
+      },
+      "edit": {
+        "title": "编辑条目类型",
+        "description": "可以改类型名称, 字段, 增删字段和换列表摘要. 删除字段会清除条目里它的取值, 保密字段改成非保密前会请你确认.",
+        "submit": "保存修改",
+        "submitting": "正在保存...",
+        "impact": {
+          "title": "确认保存对类型的修改?",
+          "removed": "将删除字段 {names}, 该类型下 {count} 个条目里这些字段的取值会被清除, 无法恢复.",
+          "unsensitized": "字段 {names} 将不再保密, 它的取值不再默认遮掩, 并且可以被搜索到.",
+          "generic": "这次修改会影响已有条目里保存的取值. 确认后才保存.",
+          "cancel": "返回修改",
+          "confirm": "确认并保存",
+          "saving": "正在保存..."
+        }
+      },
+      "delete": {
+        "title": "删除这个类型?",
+        "description": "类型 \"{name}\" 将被删除, 无法恢复.",
+        "descriptionWithEntries": "类型 \"{name}\" 将被删除, 无法恢复. 它名下的 {count} 个条目不会被删除, 会改归 \"{target}\", 字段取值转成条目的自定义字段 (保密字段转成隐藏字段).",
+        "cancel": "取消",
+        "confirm": "删除类型",
+        "deleting": "正在删除..."
+      },
       "error": {
         "nameRequired": "请填写类型名称.",
         "nameTooLong": "类型名称最多 {maxLength} 个字符.",
@@ -314,6 +342,7 @@
         "invalid": "内容不符合要求. 请检查后重试.",
         "nameTaken": "已有同名的类型. 请换一个名称.",
         "limitReached": "自定义类型已达 {maxCount} 个上限.",
+        "notFound": "这个类型已不存在. 请返回类型选择后重试.",
         "unexpected": "保存失败. 请关闭应用后重试."
       }
     },

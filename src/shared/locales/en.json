@@ -301,6 +301,34 @@
       "cancel": "Cancel",
       "submit": "Save type",
       "submitting": "Saving...",
+      "menu": {
+        "label": "More actions for {name}",
+        "edit": "Edit type",
+        "delete": "Delete type"
+      },
+      "edit": {
+        "title": "Edit entry type",
+        "description": "You can rename the type, change its fields, add or remove fields and change the list summary. Removing a field clears its values in your entries, and you are asked to confirm before a sensitive field becomes non-sensitive.",
+        "submit": "Save changes",
+        "submitting": "Saving...",
+        "impact": {
+          "title": "Save these changes to the type?",
+          "removed": "The field(s) {names} will be removed. Their values in {count, plural, one {# entry} other {# entries}} of this type will be cleared and cannot be recovered.",
+          "unsensitized": "The field(s) {names} will no longer be sensitive. Their values will not be masked by default and can be found by search.",
+          "generic": "This change affects values stored in your entries. It is saved only after you confirm.",
+          "cancel": "Back to editing",
+          "confirm": "Confirm and save",
+          "saving": "Saving..."
+        }
+      },
+      "delete": {
+        "title": "Delete this type?",
+        "description": "The type \"{name}\" will be deleted and this cannot be undone.",
+        "descriptionWithEntries": "The type \"{name}\" will be deleted and this cannot be undone. Its {count, plural, one {# entry is} other {# entries are}} not deleted but moved to \"{target}\", and the field values become custom fields (sensitive fields become hidden fields).",
+        "cancel": "Cancel",
+        "confirm": "Delete type",
+        "deleting": "Deleting..."
+      },
       "error": {
         "nameRequired": "Enter a type name.",
         "nameTooLong": "The type name can have at most {maxLength} characters.",
@@ -314,6 +342,7 @@
         "invalid": "The content is not valid. Check it and try again.",
         "nameTaken": "A type with this name already exists. Choose another name.",
         "limitReached": "You have reached the limit of {maxCount} custom types.",
+        "notFound": "This type no longer exists. Go back to the type list and try again.",
         "unexpected": "Saving failed. Close the app and try again."
       }
     },
