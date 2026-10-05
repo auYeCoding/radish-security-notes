@@ -5,6 +5,10 @@ import { app, safeStorage } from "electron";
 import { DEFAULT_ARGON2_PARAMETERS } from "../vault/argon2-parameters";
 import { KeyFileStore } from "../vault/key-file-store";
 import {
+  createMasterPasswordVerifier,
+  type MasterPasswordVerifier,
+} from "../vault/master-password-verifier";
+import {
   SYSTEM_KEY_PERSISTENCE_POLL_INTERVAL_MILLISECONDS,
   SYSTEM_KEY_PERSISTENCE_TIMEOUT_MILLISECONDS,
   createLocalStatePersistence,
@@ -32,6 +36,10 @@ export interface VaultRuntime {
    * 保险库服务.
    */
   readonly service: VaultService;
+  /**
+   * 主密码校验器, 只校验不改保险库状态, 导出前重新确认主密码时用.
+   */
+  readonly masterPasswordVerifier: MasterPasswordVerifier;
 }
 
 /**
@@ -55,9 +63,10 @@ function reportVaultFailure(error: unknown): void {
 export async function createVaultRuntime(): Promise<VaultRuntime> {
   const userDataDirectory = app.getPath("userData");
   const paths = resolveVaultPaths(userDataDirectory);
+  const keyFileStore = new KeyFileStore(paths);
   const service = new VaultService({
     paths,
-    keyFileStore: new KeyFileStore(paths),
+    keyFileStore,
     safeStorage,
     systemKeyPersistence: createLocalStatePersistence({
       localStateFile: join(userDataDirectory, LOCAL_STATE_FILE_NAME),
@@ -70,5 +79,8 @@ export async function createVaultRuntime(): Promise<VaultRuntime> {
     onFailure: reportVaultFailure,
   });
   await service.initialize();
-  return { service };
+  return {
+    service,
+    masterPasswordVerifier: createMasterPasswordVerifier(keyFileStore),
+  };
 }

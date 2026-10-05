@@ -5,6 +5,7 @@ import type { CustomEntryType } from "@shared/entries/custom-types/custom-entry-
 import type { EntryBridge } from "@shared/entries/entry-bridge";
 import type { EntryDetail } from "@shared/entries/entry-types";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
+import type { ExportBridge } from "@shared/export/export-bridge";
 import type { FolderBridge } from "@shared/folders/folder-bridge";
 import type { FolderSummary } from "@shared/folders/folder-types";
 import type { ImportBridge } from "@shared/import/import-bridge";
@@ -38,6 +39,7 @@ import {
 import { createFakeBatchBridge } from "./fake-batch-bridge";
 import { createFakeEntryBridge } from "./fake-entry-bridge";
 import { createFakeEntryTypeBridge } from "./fake-entry-type-bridge";
+import { createFakeExportBridge } from "./fake-export-bridge";
 import { createFakeFolderBridge } from "./fake-folder-bridge";
 import { createFakeImportBridge } from "./fake-import-bridge";
 import { createFakeLinkBridge } from "./fake-link-bridge";
@@ -81,6 +83,10 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    * 覆盖假导入桥上的方法, 例如让选择文件失败.
    */
   readonly importBridgeOverrides?: Partial<ImportBridge>;
+  /**
+   * 覆盖假导出桥上的方法, 例如让导出失败.
+   */
+  readonly exportBridgeOverrides?: Partial<ExportBridge>;
   /**
    * 覆盖假链接桥上的方法, 例如让打开失败.
    */
@@ -151,6 +157,10 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
    */
   readonly importBridge: ImportBridge;
   /**
+   * 带间谍方法的假导出桥.
+   */
+  readonly exportBridge: ExportBridge;
+  /**
    * 带间谍方法的假链接桥.
    */
   readonly linkBridge: LinkBridge;
@@ -187,6 +197,7 @@ type EntryTestBridges = Pick<
   | "totpBridge"
   | "attachmentBridge"
   | "importBridge"
+  | "exportBridge"
   | "linkBridge"
   | "folderBridge"
   | "tagBridge"
@@ -224,6 +235,7 @@ function createEntryTestBridges(
       options.attachmentBridgeOverrides,
     ),
     importBridge: createFakeImportBridge(options.importBridgeOverrides),
+    exportBridge: createFakeExportBridge(options.exportBridgeOverrides),
     linkBridge: createFakeLinkBridge(options.linkBridgeOverrides),
     folderBridge: createFakeFolderBridge(
       options.folders,
@@ -285,6 +297,7 @@ export async function createEntryTestEnvironment(
     totpBridge: bridges.totpBridge,
     attachmentBridge: bridges.attachmentBridge,
     importBridge: bridges.importBridge,
+    exportBridge: bridges.exportBridge,
     linkBridge: bridges.linkBridge,
   });
   return { ...vault, ...bridges, ...stores, Providers };

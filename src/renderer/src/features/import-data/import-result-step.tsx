@@ -3,17 +3,17 @@ import { useTranslation } from "react-i18next";
 
 import type { ImportOutcome } from "@shared/import/import-types";
 
+import {
+  SummaryList,
+  type SummaryRow,
+} from "@renderer/components/summary-list";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
+import { WarningAlert } from "@renderer/components/warning-alert";
 
 import type { ResultNotice } from "./import-flow-state";
-import {
-  ImportSummaryList,
-  type ImportSummaryRow,
-} from "./import-summary-list";
 import { describeImportFailure } from "./describe-import-failure";
-import { ImportWarningAlert } from "./import-warning-alert";
 import { NotImportedList } from "./not-imported-list";
 
 /**
@@ -61,7 +61,7 @@ type OutcomeLabelKey =
 function toSummaryRows(
   outcome: ImportOutcome,
   translate: (key: OutcomeLabelKey) => string,
-): readonly ImportSummaryRow[] {
+): readonly SummaryRow[] {
   return [
     {
       label: translate("import.result.imported"),
@@ -139,8 +139,8 @@ export function ImportResultStep(
     <>
       <div className="flex flex-col gap-4">
         <p className="text-sm font-medium">{t("import.result.heading")}</p>
-        <ImportSummaryList rows={toSummaryRows(props.outcome, t)} />
-        <ImportWarningAlert
+        <SummaryList rows={toSummaryRows(props.outcome, t)} />
+        <WarningAlert
           title={t("import.result.deleteWarning.title")}
           description={t("import.result.deleteWarning.description")}
         />

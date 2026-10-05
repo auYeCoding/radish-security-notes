@@ -623,6 +623,171 @@
       "reveal-failed": "无法打开所在文件夹."
     }
   },
+  "export": {
+    "trigger": {
+      "label": "导出数据"
+    },
+    "dialog": {
+      "title": "导出数据",
+      "description": "把保险库里的条目导出成一个文件, 保存到你选定的位置. 文件在本机生成, 内容不会离开应用.",
+      "saveTitle": "保存导出文件",
+      "filter": {
+        "native": "本应用导出文件 (ZIP)",
+        "bitwardenJson": "JSON 文件",
+        "browserCsv": "CSV 文件",
+        "encrypted": "加密的导出文件"
+      }
+    },
+    "options": {
+      "format": {
+        "heading": "导出格式",
+        "native": {
+          "label": "本应用完整格式 (ZIP)",
+          "hint": "含全部条目, 类型, 文件夹, 标签, 备注格式, TOTP, 自定义字段与附件, 可以原样还原. 用任意解压软件都能打开查看."
+        },
+        "bitwardenJson": {
+          "label": "Bitwarden (JSON)",
+          "hint": "多数密码管理器都能导入, 适合换软件."
+        },
+        "browserCsv": {
+          "label": "浏览器密码 (CSV)",
+          "hint": "Chrome 格式, 只含有账号和密码的条目, 适合换浏览器或在表格里核对."
+        }
+      },
+      "exclusionsHeading": "这种格式带不出:",
+      "csvFormulaNotice": "用表格软件打开时, 以 = + - @ 开头的值可能被当作公式执行, 建议用文本编辑器查看.",
+      "scope": {
+        "heading": "导出范围",
+        "all": "全部条目",
+        "current": "当前列表",
+        "currentHint": "左侧栏所选的文件夹与标签, 以及搜索筛出的条目.",
+        "checked": "已勾选的条目",
+        "checkedHint": "在条目列表里勾选的条目.",
+        "count": "{count} 条",
+        "summary": "将导出 {entries} 条条目",
+        "attachmentsSummary": "其中附件 {count} 个, 共 {size}",
+        "empty": "这个范围里没有条目.",
+        "tooMany": "一次最多导出 {limit} 条条目, 请缩小范围后分批导出.",
+        "loading": "正在统计...",
+        "loadFailed": "无法统计导出范围, 请关闭对话框后重试."
+      },
+      "content": {
+        "heading": "导出内容",
+        "secrets": "包含保密字段与 TOTP 密钥",
+        "secretsHint": "关闭后, 密码等保密字段与 TOTP 密钥在文件里留空, 文件里也会写明.",
+        "attachments": "包含附件",
+        "attachmentsHint": "附件原样放进文件, 文件会变大.",
+        "attachmentsUnsupported": "这种格式不能带附件."
+      },
+      "encryption": {
+        "heading": "口令加密",
+        "enable": "用口令加密导出文件",
+        "enableHint": "不加密时文件是明文, 含全部密码.",
+        "passphraseLabel": "加密口令",
+        "confirmationLabel": "确认口令",
+        "hint": "至少 {minLength} 个字符. 忘记口令后文件无法找回, 本应用也无法重置, 请自己保管好.",
+        "error": {
+          "tooShort": "口令至少需要 {minLength} 个字符.",
+          "mismatch": "两次输入的口令不一致."
+        }
+      },
+      "next": "下一步"
+    },
+    "confirm": {
+      "heading": "确认导出",
+      "description": "确认下面的内容, 点 \"导出\" 后选择保存位置.",
+      "plaintextWarning": {
+        "title": "导出文件是明文",
+        "description": "文件里包含这个范围内的全部密码与密钥, 任何拿到文件的人都能读取. 请保管在安全的位置, 用完立即删除."
+      },
+      "acknowledge": "我了解导出文件是明文, 含全部密码",
+      "encryptedNotice": {
+        "title": "忘记口令无法找回",
+        "description": "导出文件只能用刚才设置的口令打开. 忘记口令后无法找回文件内容, 本应用也无法重置."
+      },
+      "masterPassword": {
+        "label": "主密码",
+        "hint": "导出会交出全部凭据, 请重新输入主密码确认是你本人操作."
+      },
+      "back": "返回修改",
+      "submit": "导出..."
+    },
+    "summary": {
+      "format": "格式",
+      "scope": "范围",
+      "entries": "已导出的条目",
+      "attachmentCount": "已导出的附件",
+      "fileSize": "文件大小",
+      "secrets": "保密字段与 TOTP",
+      "attachments": "附件",
+      "encryption": "加密",
+      "yes": "包含",
+      "no": "不含",
+      "encrypted": "口令加密",
+      "plain": "不加密 (明文)"
+    },
+    "progress": {
+      "idle": "正在处理...",
+      "preparing": "正在准备...",
+      "writing": "正在写出...",
+      "finishing": "正在完成...",
+      "counts": "{processed} / {total}",
+      "cancel": "取消"
+    },
+    "result": {
+      "heading": "导出完成",
+      "plaintextReminder": {
+        "title": "请妥善保管并及时删除导出文件",
+        "description": "导出文件是明文, 含全部密码. 用完请立即删除, 不要上传到网盘或发给别人."
+      },
+      "encryptedReminder": {
+        "title": "请记住加密口令",
+        "description": "没有口令无法打开这个文件, 忘记口令后无法找回."
+      },
+      "lossesHeading": "这种格式没能带出的内容",
+      "revealFile": "打开所在文件夹",
+      "done": "完成"
+    },
+    "exclusion": {
+      "tags": "标签",
+      "folders": "文件夹",
+      "attachments": "附件",
+      "customEntryTypes": "自定义类型的定义",
+      "markdownNotes": "备注的 Markdown 格式 (按纯文本带出)",
+      "mergedTypes": "条目类型 (登录, 安全笔记, 银行卡, 身份, SSH 密钥以外的类型并入登录)",
+      "unsupportedEntries": "没有账号和密码的条目",
+      "totp": "TOTP",
+      "customFields": "自定义字段",
+      "extraFields": "类型里账号, 密码, 网址以外的字段"
+    },
+    "loss": {
+      "tags": "标签: {count} 个条目带的标签没有带出",
+      "folders": "文件夹: {count} 个条目所属的文件夹没有带出",
+      "attachments": "附件: {count} 个附件没有带出",
+      "customEntryTypes": "自定义类型的定义: {count} 种没有带出",
+      "markdownNotes": "备注格式: {count} 条 Markdown 备注按纯文本带出",
+      "mergedTypes": "条目类型: {count} 条条目的类型并入了登录",
+      "unsupportedEntries": "没有账号和密码的条目: {count} 条整条没有导出",
+      "totp": "TOTP: {count} 个条目的 TOTP 没有带出",
+      "customFields": "自定义字段: {count} 个条目的自定义字段没有带出",
+      "extraFields": "其余字段: {count} 个条目的其余类型字段没有带出"
+    },
+    "failure": {
+      "vault-locked": "保险库已锁定, 请重新解锁后再试.",
+      "unexpected-error": "导出失败, 没有留下任何文件. 请重试, 仍失败请关闭应用后重试.",
+      "invalid-input": "参数不合规, 请重新选择后再试.",
+      "busy": "正在处理另一次导出, 请稍候.",
+      "too-many-entries": "一次最多导出 {limit} 条条目, 请缩小范围后分批导出.",
+      "no-entries": "这个范围里没有条目.",
+      "wrong-master-password": "主密码不正确, 请重新输入.",
+      "invalid-passphrase": "加密口令不合规, 请返回修改.",
+      "plaintext-not-acknowledged": "请先确认已了解导出文件是明文.",
+      "write-failed": "无法写出文件, 没有留下任何文件. 请换一个位置重试.",
+      "attachment-missing": "导出途中有附件已被删除, 没有留下任何文件. 请重试.",
+      "no-finished-export": "没有可定位的导出文件.",
+      "reveal-failed": "无法打开所在文件夹."
+    }
+  },
   "settings": {
     "open": "设置"
   },

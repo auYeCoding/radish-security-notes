@@ -2,12 +2,13 @@ import { useTranslation } from "react-i18next";
 
 import type { AttachmentMeta } from "@shared/attachments/attachment-types";
 
+import { formatByteSize } from "@renderer/components/format-byte-size";
+
 import { AttachmentKindIcon } from "./attachment-kind-icon";
 import {
   AttachmentRowActions,
   type AttachmentRowActionsProps,
 } from "./attachment-row-actions";
-import { formatByteSize } from "./format-byte-size";
 
 /**
  * 附件行的属性: 这一行的附件与各个操作的回调.

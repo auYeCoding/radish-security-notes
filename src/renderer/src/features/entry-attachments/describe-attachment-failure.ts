@@ -10,7 +10,7 @@ import type {
   AttachmentFailureReason,
 } from "@shared/attachments/attachment-result";
 
-import { formatByteSize } from "./format-byte-size";
+import { formatByteSize } from "@renderer/components/format-byte-size";
 
 /**
  * 每种失败原因对应的文案键.

@@ -3,6 +3,7 @@ import type { BatchBridge } from "../batch/batch-bridge";
 import type { CustomEntryTypeBridge } from "../entries/custom-types/custom-entry-type-bridge";
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
+import type { ExportBridge } from "../export/export-bridge";
 import type { FolderBridge } from "../folders/folder-bridge";
 import type { ImportBridge } from "../import/import-bridge";
 import type { LinkBridge } from "../links/link-bridge";
@@ -59,6 +60,10 @@ export interface RendererApi {
    * 导入接口: 选择其他管理器的导出文件, 看解析概要, 确认导入, 取得未能带入清单.
    */
   readonly importer: ImportBridge;
+  /**
+   * 导出接口: 统计范围, 选好格式与选项后导出成文件, 取得导出摘要, 打开所在文件夹.
+   */
+  readonly exporter: ExportBridge;
   /**
    * 链接接口: 请主进程用系统默认程序打开外部链接.
    */

@@ -40,6 +40,17 @@ describe("AppShell 布局", () => {
     expect(screen.getByRole("button", { name: "设置" })).toBeDefined();
   });
 
+  it("侧栏底部导出入口在导入入口之后, 设置按钮之前", async () => {
+    await renderShell();
+
+    const sidebar = within(screen.getByRole("complementary"));
+    const importTrigger = sidebar.getByRole("button", { name: "导入数据" });
+    const exportTrigger = sidebar.getByRole("button", { name: "导出数据" });
+    const settings = sidebar.getByRole("button", { name: "设置" });
+    expect(isFollowing(importTrigger, exportTrigger)).toBe(true);
+    expect(isFollowing(exportTrigger, settings)).toBe(true);
+  });
+
   it("侧栏里标签在文件夹之上, 且没有主题与语言切换控件", async () => {
     await renderShell();
 

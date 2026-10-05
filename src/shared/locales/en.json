@@ -623,6 +623,171 @@
       "reveal-failed": "The folder could not be opened."
     }
   },
+  "export": {
+    "trigger": {
+      "label": "Export data"
+    },
+    "dialog": {
+      "title": "Export data",
+      "description": "Export the entries in the vault to a file saved at a location you choose. The file is created on this computer and its content never leaves the app.",
+      "saveTitle": "Save the export file",
+      "filter": {
+        "native": "App export file (ZIP)",
+        "bitwardenJson": "JSON file",
+        "browserCsv": "CSV file",
+        "encrypted": "Encrypted export file"
+      }
+    },
+    "options": {
+      "format": {
+        "heading": "Export format",
+        "native": {
+          "label": "Full app format (ZIP)",
+          "hint": "Contains all entries, types, folders, tags, notes formats, TOTP, custom fields and attachments, and can be restored as is. Any unzip tool can open it."
+        },
+        "bitwardenJson": {
+          "label": "Bitwarden (JSON)",
+          "hint": "Most password managers can import it, handy for switching apps."
+        },
+        "browserCsv": {
+          "label": "Browser passwords (CSV)",
+          "hint": "Chrome format with only the entries that have an account and a password, handy for switching browsers or checking in a spreadsheet."
+        }
+      },
+      "exclusionsHeading": "This format leaves out:",
+      "csvFormulaNotice": "When opened in a spreadsheet app, values starting with = + - @ may be run as formulas. Open the file in a text editor instead.",
+      "scope": {
+        "heading": "What to export",
+        "all": "All entries",
+        "current": "Current list",
+        "currentHint": "The entries of the folder and tags selected in the sidebar and filtered by the search.",
+        "checked": "Checked entries",
+        "checkedHint": "The entries checked in the entry list.",
+        "count": "{count}",
+        "summary": "{entries} entries will be exported",
+        "attachmentsSummary": "Including {count} attachments, {size} in total",
+        "empty": "There are no entries in this range.",
+        "tooMany": "At most {limit} entries can be exported at once. Narrow the range and export in batches.",
+        "loading": "Counting...",
+        "loadFailed": "Could not count the export range. Close the dialog and try again."
+      },
+      "content": {
+        "heading": "What to include",
+        "secrets": "Include secret fields and TOTP keys",
+        "secretsHint": "When off, secret fields such as passwords and TOTP keys are left blank in the file, and the file says so.",
+        "attachments": "Include attachments",
+        "attachmentsHint": "Attachments are put into the file as they are, which makes the file larger.",
+        "attachmentsUnsupported": "This format cannot carry attachments."
+      },
+      "encryption": {
+        "heading": "Passphrase encryption",
+        "enable": "Encrypt the export file with a passphrase",
+        "enableHint": "Without encryption the file is plain text and contains every password.",
+        "passphraseLabel": "Encryption passphrase",
+        "confirmationLabel": "Confirm passphrase",
+        "hint": "At least {minLength} characters. If you forget it the file cannot be recovered and this app cannot reset it, so keep it safe yourself.",
+        "error": {
+          "tooShort": "The passphrase needs at least {minLength} characters.",
+          "mismatch": "The two passphrases do not match."
+        }
+      },
+      "next": "Next"
+    },
+    "confirm": {
+      "heading": "Confirm the export",
+      "description": "Check the content below, then choose \"Export\" and pick where to save.",
+      "plaintextWarning": {
+        "title": "The export file is plain text",
+        "description": "The file contains every password and key in this range, and anyone who gets the file can read them. Keep it somewhere safe and delete it as soon as you are done."
+      },
+      "acknowledge": "I understand the export file is plain text and contains all passwords",
+      "encryptedNotice": {
+        "title": "A forgotten passphrase cannot be recovered",
+        "description": "The export file can only be opened with the passphrase you just set. If you forget it the content cannot be recovered and this app cannot reset it."
+      },
+      "masterPassword": {
+        "label": "Master password",
+        "hint": "An export hands over every credential, so enter the master password again to confirm it is you."
+      },
+      "back": "Back to edit",
+      "submit": "Export..."
+    },
+    "summary": {
+      "format": "Format",
+      "scope": "Range",
+      "entries": "Entries exported",
+      "attachmentCount": "Attachments exported",
+      "fileSize": "File size",
+      "secrets": "Secret fields and TOTP",
+      "attachments": "Attachments",
+      "encryption": "Encryption",
+      "yes": "Included",
+      "no": "Not included",
+      "encrypted": "Passphrase encrypted",
+      "plain": "Not encrypted (plain text)"
+    },
+    "progress": {
+      "idle": "Working...",
+      "preparing": "Preparing...",
+      "writing": "Writing...",
+      "finishing": "Finishing...",
+      "counts": "{processed} / {total}",
+      "cancel": "Cancel"
+    },
+    "result": {
+      "heading": "Export finished",
+      "plaintextReminder": {
+        "title": "Keep the export file safe and delete it soon",
+        "description": "The export file is plain text and contains all passwords. Delete it as soon as you are done, and do not upload it to cloud storage or send it to anyone."
+      },
+      "encryptedReminder": {
+        "title": "Remember the encryption passphrase",
+        "description": "The file cannot be opened without the passphrase, and a forgotten passphrase cannot be recovered."
+      },
+      "lossesHeading": "What this format could not carry",
+      "revealFile": "Show in folder",
+      "done": "Done"
+    },
+    "exclusion": {
+      "tags": "Tags",
+      "folders": "Folders",
+      "attachments": "Attachments",
+      "customEntryTypes": "Definitions of custom types",
+      "markdownNotes": "The Markdown format of notes (carried as plain text)",
+      "mergedTypes": "Entry types (types other than login, secure note, card, identity and SSH key become logins)",
+      "unsupportedEntries": "Entries without an account and a password",
+      "totp": "TOTP",
+      "customFields": "Custom fields",
+      "extraFields": "Fields of the type other than account, password and URL"
+    },
+    "loss": {
+      "tags": "Tags: the tags of {count} entries were not carried",
+      "folders": "Folders: the folders of {count} entries were not carried",
+      "attachments": "Attachments: {count} attachments were not carried",
+      "customEntryTypes": "Definitions of custom types: {count} were not carried",
+      "markdownNotes": "Notes format: {count} Markdown notes were carried as plain text",
+      "mergedTypes": "Entry types: {count} entries became logins",
+      "unsupportedEntries": "Entries without an account and a password: {count} were left out entirely",
+      "totp": "TOTP: the TOTP of {count} entries was not carried",
+      "customFields": "Custom fields: the custom fields of {count} entries were not carried",
+      "extraFields": "Other fields: the other type fields of {count} entries were not carried"
+    },
+    "failure": {
+      "vault-locked": "The vault is locked. Unlock it again and retry.",
+      "unexpected-error": "The export failed and left no file behind. Retry, and if it still fails close the app and try again.",
+      "invalid-input": "The parameters are invalid. Choose again and retry.",
+      "busy": "Another export is in progress. Please wait.",
+      "too-many-entries": "At most {limit} entries can be exported at once. Narrow the range and export in batches.",
+      "no-entries": "There are no entries in this range.",
+      "wrong-master-password": "The master password is wrong. Enter it again.",
+      "invalid-passphrase": "The encryption passphrase is not valid. Go back and edit it.",
+      "plaintext-not-acknowledged": "Confirm first that you understand the export file is plain text.",
+      "write-failed": "The file could not be written and no file was left behind. Try another location.",
+      "attachment-missing": "An attachment was deleted during the export and no file was left behind. Retry.",
+      "no-finished-export": "There is no exported file to show.",
+      "reveal-failed": "Could not open the folder."
+    }
+  },
   "settings": {
     "open": "Settings"
   },

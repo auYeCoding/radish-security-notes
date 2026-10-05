@@ -57,5 +57,10 @@ export const IPC_CHANNELS = {
   importCancel: "import:cancel",
   importSaveReport: "import:save-report",
   importRevealFile: "import:reveal-file",
+  exportDescribeScope: "export:describe-scope",
+  exportRun: "export:run",
+  exportProgress: "export:progress",
+  exportCancel: "export:cancel",
+  exportRevealFile: "export:reveal-file",
   linksOpenExternal: "links:open-external",
 } as const;

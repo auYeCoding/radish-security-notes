@@ -9,7 +9,7 @@ import {
 /**
  * 警示提示条的属性.
  */
-interface ImportWarningAlertProps {
+interface WarningAlertProps {
   /**
    * 提示的标题.
    */
@@ -21,14 +21,12 @@ interface ImportWarningAlertProps {
 }
 
 /**
- * 导入对话框里的警示提示条: 警示图标, 标题与说明. 选择来源时的明文风险提示与导入结束后的删除
- * 导出文件提示共用.
+ * 对话框里的警示提示条: 警示图标, 标题与说明. 导入选择来源时的明文风险提示与导入结束后的删除
+ * 导出文件提示, 导出的明文风险, 忘记口令与保管提醒共用.
  * @param props 组件属性.
  * @returns 提示条元素.
  */
-export function ImportWarningAlert(
-  props: ImportWarningAlertProps,
-): React.JSX.Element {
+export function WarningAlert(props: WarningAlertProps): React.JSX.Element {
   return (
     <Alert>
       <TriangleAlertIcon aria-hidden="true" />

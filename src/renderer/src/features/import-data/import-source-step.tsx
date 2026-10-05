@@ -7,14 +7,14 @@ import {
   type ImportSourceKey,
 } from "@shared/import/import-source-keys";
 
+import { ChoiceOption } from "@renderer/components/choice-option";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
 import { RadioGroup } from "@renderer/components/ui/radio-group";
+import { WarningAlert } from "@renderer/components/warning-alert";
 
 import { describeImportFailure } from "./describe-import-failure";
-import { ImportChoiceOption } from "./import-choice-option";
-import { ImportWarningAlert } from "./import-warning-alert";
 
 /**
  * 选择来源步骤的属性.
@@ -63,7 +63,7 @@ export function ImportSourceStep(
           onValueChange={handleChange}
         >
           {IMPORT_SOURCES.map((source) => (
-            <ImportChoiceOption
+            <ChoiceOption
               key={source.key}
               id={`import-source-${source.key}`}
               value={source.key}
@@ -72,7 +72,7 @@ export function ImportSourceStep(
             />
           ))}
         </RadioGroup>
-        <ImportWarningAlert
+        <WarningAlert
           title={t("import.source.plaintextWarning.title")}
           description={t("import.source.plaintextWarning.description")}
         />

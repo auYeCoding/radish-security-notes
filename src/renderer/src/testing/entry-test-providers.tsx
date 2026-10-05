@@ -1,6 +1,7 @@
 import type { AttachmentBridge } from "@shared/attachments/attachment-bridge";
 import type { BatchBridge } from "@shared/batch/batch-bridge";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
+import type { ExportBridge } from "@shared/export/export-bridge";
 import type { ImportBridge } from "@shared/import/import-bridge";
 import type { LinkBridge } from "@shared/links/link-bridge";
 import type { ReactNode } from "react";
@@ -13,6 +14,7 @@ import type { EntryStore } from "@renderer/stores/entry-store";
 import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
 import type { EntryTypeStore } from "@renderer/stores/entry-type-store";
 import { EntryTypeStoreProvider } from "@renderer/stores/entry-type-store-provider";
+import { ExportBridgeProvider } from "@renderer/stores/export-bridge-provider";
 import type { FolderStore } from "@renderer/stores/folder-store";
 import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { ImportBridgeProvider } from "@renderer/stores/import-bridge-provider";
@@ -78,6 +80,10 @@ export interface EntryTestProviderValues {
    */
   readonly importBridge: ImportBridge;
   /**
+   * 导出桥.
+   */
+  readonly exportBridge: ExportBridge;
+  /**
    * 链接桥.
    */
   readonly linkBridge: LinkBridge;
@@ -109,9 +115,11 @@ export function createEntryTestProviders(
                         bridge={values.attachmentBridge}
                       >
                         <ImportBridgeProvider bridge={values.importBridge}>
-                          <LinkBridgeProvider bridge={values.linkBridge}>
-                            {props.children}
-                          </LinkBridgeProvider>
+                          <ExportBridgeProvider bridge={values.exportBridge}>
+                            <LinkBridgeProvider bridge={values.linkBridge}>
+                              {props.children}
+                            </LinkBridgeProvider>
+                          </ExportBridgeProvider>
                         </ImportBridgeProvider>
                       </AttachmentBridgeProvider>
                     </TotpBridgeProvider>

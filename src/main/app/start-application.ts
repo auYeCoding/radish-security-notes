@@ -6,6 +6,7 @@ import { registerAttachmentIpc } from "../ipc/attachment-ipc";
 import { registerBatchIpc } from "../ipc/batch-ipc";
 import { registerCustomEntryTypeIpc } from "../ipc/custom-entry-type-ipc";
 import { registerEntryIpc } from "../ipc/entry-ipc";
+import { registerExportIpc } from "../ipc/export-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
 import { registerImportIpc } from "../ipc/import-ipc";
 import { registerLinkIpc } from "../ipc/link-ipc";
@@ -25,6 +26,7 @@ import {
 import { createAttachmentRuntime } from "./attachment-runtime";
 import { createBatchService } from "./batch-runtime";
 import { createEntryRuntime } from "./entry-runtime";
+import { createExportRuntime } from "./export-runtime";
 import { createCustomEntryTypeService } from "./entry-type-runtime";
 import { createFolderService } from "./folder-runtime";
 import { createImportRuntime } from "./import-runtime";
@@ -108,6 +110,7 @@ export async function startApplication(): Promise<void> {
     ipcMain,
     createImportRuntime(vault.service, runtime.i18n).service,
   );
+  registerExportIpc(ipcMain, createExportRuntime(vault, runtime.i18n).service);
   const openExternalLink = createLinkRuntime();
   registerLinkIpc(ipcMain, openExternalLink);
   app.on("will-quit", () => {

@@ -5,14 +5,14 @@ import type {
   ImportPreview,
 } from "@shared/import/import-types";
 
+import {
+  SummaryList,
+  type SummaryRow,
+} from "@renderer/components/summary-list";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
 
 import { ImportDuplicatePolicyField } from "./import-duplicate-policy";
-import {
-  ImportSummaryList,
-  type ImportSummaryRow,
-} from "./import-summary-list";
 import { ImportTypeCounts } from "./import-type-counts";
 
 /**
@@ -50,7 +50,7 @@ interface ImportPreviewStepProps {
 function toSummaryRows(
   preview: ImportPreview,
   translate: (key: SummaryLabelKey) => string,
-): readonly ImportSummaryRow[] {
+): readonly SummaryRow[] {
   return [
     {
       label: translate("import.preview.total"),
@@ -111,7 +111,7 @@ export function ImportPreviewStep(
         <p className="text-sm text-muted-foreground">
           {t("import.preview.description")}
         </p>
-        <ImportSummaryList rows={toSummaryRows(preview, t)} />
+        <SummaryList rows={toSummaryRows(preview, t)} />
         <ImportTypeCounts typeCounts={preview.typeCounts} />
         {preview.notImportedCount > 0 && (
           <p className="text-sm text-muted-foreground">

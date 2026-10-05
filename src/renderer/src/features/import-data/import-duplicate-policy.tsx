@@ -5,9 +5,8 @@ import {
   type ImportDuplicatePolicy,
 } from "@shared/import/import-types";
 
+import { ChoiceOption } from "@renderer/components/choice-option";
 import { RadioGroup } from "@renderer/components/ui/radio-group";
-
-import { ImportChoiceOption } from "./import-choice-option";
 
 /**
  * 重复条目处理方式选择的属性.
@@ -50,12 +49,12 @@ export function ImportDuplicatePolicyField(
         value={props.value}
         onValueChange={handleChange}
       >
-        <ImportChoiceOption
+        <ChoiceOption
           id="import-duplicate-skip"
           value="skip"
           title={t("import.preview.duplicatePolicy.skip")}
         />
-        <ImportChoiceOption
+        <ChoiceOption
           id="import-duplicate-import"
           value="import"
           title={t("import.preview.duplicatePolicy.import")}
