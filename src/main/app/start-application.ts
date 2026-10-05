@@ -5,6 +5,7 @@ import icon from "../../../resources/icon.png?asset";
 import { registerAttachmentIpc } from "../ipc/attachment-ipc";
 import { registerBatchIpc } from "../ipc/batch-ipc";
 import { registerCustomEntryTypeIpc } from "../ipc/custom-entry-type-ipc";
+import { registerEmailBackupIpc } from "../ipc/email-backup-ipc";
 import { registerEntryIpc } from "../ipc/entry-ipc";
 import { registerExportIpc } from "../ipc/export-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
@@ -25,6 +26,7 @@ import {
 } from "./preferences-runtime";
 import { createAttachmentRuntime } from "./attachment-runtime";
 import { createBatchService } from "./batch-runtime";
+import { createEmailBackupRuntime } from "./email-backup-runtime";
 import { createEntryRuntime } from "./entry-runtime";
 import { createExportRuntime } from "./export-runtime";
 import { createCustomEntryTypeService } from "./entry-type-runtime";
@@ -111,10 +113,14 @@ export async function startApplication(): Promise<void> {
     createImportRuntime(vault.service, runtime.i18n).service,
   );
   registerExportIpc(ipcMain, createExportRuntime(vault, runtime.i18n).service);
+  const emailBackup = createEmailBackupRuntime(vault, runtime.i18n);
+  registerEmailBackupIpc(ipcMain, emailBackup.service);
+  emailBackup.discardTemporaryFiles();
   const openExternalLink = createLinkRuntime();
   registerLinkIpc(ipcMain, openExternalLink);
   app.on("will-quit", () => {
     attachments.discardTemporaryCopies();
+    emailBackup.discardTemporaryFiles();
     vault.service.close();
   });
   keepWindowsInSync(runtime);

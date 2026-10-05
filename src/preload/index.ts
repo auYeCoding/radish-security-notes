@@ -4,6 +4,7 @@ import { contextBridge, ipcRenderer, webUtils } from "electron";
 
 import { createAttachmentBridge } from "./create-attachment-bridge";
 import { createBatchBridge } from "./create-batch-bridge";
+import { createEmailBackupBridge } from "./create-email-backup-bridge";
 import { createEntryBridge } from "./create-entry-bridge";
 import { createEntryTypeBridge } from "./create-entry-type-bridge";
 import { createExportBridge } from "./create-export-bridge";
@@ -35,6 +36,7 @@ const api: RendererApi = {
   }),
   importer: createImportBridge(ipcRenderer),
   exporter: createExportBridge(ipcRenderer),
+  emailBackup: createEmailBackupBridge(ipcRenderer),
   links: createLinkBridge(ipcRenderer),
 };
 

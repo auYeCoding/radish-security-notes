@@ -3,6 +3,7 @@ import type { BatchBridge } from "../batch/batch-bridge";
 import type { CustomEntryTypeBridge } from "../entries/custom-types/custom-entry-type-bridge";
 import type { EntryBridge } from "../entries/entry-bridge";
 import type { TotpBridge } from "../entries/totp-bridge";
+import type { EmailBackupBridge } from "../email-backup/email-backup-bridge";
 import type { ExportBridge } from "../export/export-bridge";
 import type { FolderBridge } from "../folders/folder-bridge";
 import type { ImportBridge } from "../import/import-bridge";
@@ -64,6 +65,10 @@ export interface RendererApi {
    * 导出接口: 统计范围, 选好格式与选项后导出成文件, 取得导出摘要, 打开所在文件夹.
    */
   readonly exporter: ExportBridge;
+  /**
+   * 邮箱备份接口: 保存邮箱设置, 发送测试邮件, 立即把备份发到自己的邮箱, 读取上次结果.
+   */
+  readonly emailBackup: EmailBackupBridge;
   /**
    * 链接接口: 请主进程用系统默认程序打开外部链接.
    */

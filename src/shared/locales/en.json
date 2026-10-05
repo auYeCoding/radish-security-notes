@@ -790,6 +790,178 @@
       "reveal-failed": "Could not open the folder."
     }
   },
+  "emailBackup": {
+    "trigger": {
+      "label": "Email backup"
+    },
+    "dialog": {
+      "title": "Email backup",
+      "description": "Send all of your data to your own mailbox as an attachment in the full format of this app. The backup is created on this computer and is sent only to the mail server you enter.",
+      "loading": "Loading settings...",
+      "loadFailed": "The email backup settings could not be loaded. Close the dialog and try again."
+    },
+    "saved": "The settings were saved.",
+    "account": {
+      "heading": "Mail account",
+      "provider": {
+        "label": "Mail provider",
+        "qq": "QQ Mail",
+        "netease163": "163 Mail",
+        "gmail": "Gmail",
+        "outlook": "Outlook",
+        "custom": "Custom SMTP"
+      },
+      "outlookNotice": {
+        "title": "Outlook personal accounts are not supported yet",
+        "description": "Outlook personal accounts require modern authentication (OAuth2), and this version only supports authorization codes and app passwords. Use another mailbox or a custom SMTP server."
+      },
+      "host": {
+        "label": "SMTP server"
+      },
+      "port": {
+        "label": "Port"
+      },
+      "security": {
+        "label": "Encrypted connection",
+        "ssl": "SSL (encrypted from the start)",
+        "starttls": "STARTTLS (upgraded to encrypted)",
+        "hint": "Neither mode falls back to plain text when encryption fails."
+      },
+      "sender": {
+        "label": "Email address",
+        "hint": "Also the user name used to sign in to the mail server."
+      },
+      "authorizationCode": {
+        "label": "Authorization code or app password",
+        "hint": "QQ and 163 Mail use an authorization code and Gmail uses an app password. Neither is your mailbox login password. It is stored only in the encrypted vault on this computer.",
+        "savedHint": "An authorization code is saved. Leave this empty to keep it. Enter it again after changing the provider, server or email address.",
+        "reenter": "Authentication failed. Enter the authorization code again."
+      },
+      "recipient": {
+        "label": "Recipient mailbox",
+        "hint": "Leave empty to send to the email address above."
+      },
+      "sizeLimit": {
+        "label": "Size limit per email (MB)",
+        "hint": "Follow what your mail provider currently allows. A backup over the limit is not sent."
+      }
+    },
+    "error": {
+      "required": "This field is required.",
+      "invalid": "The format is not valid.",
+      "outOfRange": "The value is out of the allowed range."
+    },
+    "content": {
+      "heading": "Backup content",
+      "description": "The backup uses the full format of this app (ZIP) and contains every entry, secret field, TOTP secret and attachment.",
+      "encryption": {
+        "enable": "Encrypt the backup with a passphrase",
+        "enableHint": "Without encryption the backup is plain text and contains all of your passwords.",
+        "passphraseLabel": "Backup passphrase",
+        "confirmationLabel": "Confirm passphrase",
+        "hint": "At least {minLength} characters. A forgotten passphrase cannot be recovered and this app cannot reset it, so keep it safe.",
+        "savedHint": "A backup passphrase is saved. Leave this empty to keep it. To change it, fill in both fields. At least {minLength} characters.",
+        "error": {
+          "tooShort": "The passphrase needs at least {minLength} characters.",
+          "mismatch": "The two passphrases do not match."
+        }
+      },
+      "plaintextWarning": {
+        "title": "The backup will be sent as plain text",
+        "description": "It contains every password and key, so if your mail account is taken over, all of your credentials are exposed. Encrypting it with a passphrase is recommended."
+      },
+      "acknowledge": "I understand that if my mail account is taken over, all of my credentials are exposed"
+    },
+    "authorization": {
+      "label": "Master password",
+      "hint": "Saving the settings and backing up hand over every credential, so enter the master password again to confirm it is you."
+    },
+    "actions": {
+      "save": "Save settings",
+      "saving": "Saving...",
+      "sendTest": "Send test email",
+      "runBackup": "Back up now",
+      "unsavedHint": "There are unsaved changes. Save the settings first."
+    },
+    "progress": {
+      "idle": "Working...",
+      "preparing": "Preparing...",
+      "writing": "Creating the backup...",
+      "finishing": "Finishing...",
+      "sending": "Sending the email...",
+      "counts": "{processed} / {total}"
+    },
+    "testSent": {
+      "title": "The test email was sent",
+      "description": "Check your inbox. The test email contains no entry data."
+    },
+    "result": {
+      "heading": "The backup was sent",
+      "notice": "The mail server accepted the email and the temporary backup file on this computer was deleted. Check your inbox to confirm.",
+      "time": "Finished at",
+      "entries": "Entries backed up",
+      "attachmentCount": "Attachments backed up",
+      "fileSize": "Backup size",
+      "attachments": "Attachments",
+      "encryption": "Encryption",
+      "included": "Included",
+      "excluded": "Not included",
+      "encrypted": "Passphrase encrypted",
+      "plain": "Not encrypted (plain text)"
+    },
+    "oversize": {
+      "title": "The backup is over the mailbox limit and was not sent",
+      "description": "This backup is about {size}, which is over the limit of {limit} per email that you set.",
+      "dropAttachments": "Send without attachments",
+      "cancel": "Cancel",
+      "cannotDrop": "This backup already has no attachments and is still over the limit. Raise the limit (follow what your mail provider currently allows) or reduce the entries."
+    },
+    "lastResult": {
+      "heading": "Last backup",
+      "none": "No backup yet.",
+      "success": "{time} succeeded",
+      "failure": "{time} failed: {reason}"
+    },
+    "failure": {
+      "vault-locked": "The vault is locked. Unlock it again and retry.",
+      "unexpected-error": "The operation failed. Retry, and if it still fails close the app and try again.",
+      "invalid-input": "The parameters are invalid. Check them and retry.",
+      "invalid-settings": "Some settings are not valid. Check them and retry.",
+      "busy": "Another send is in progress. Wait a moment.",
+      "not-configured": "The email settings have not been saved yet. Save the settings first.",
+      "unsupported-provider": "This mail provider is not supported yet. Choose another mailbox or a custom SMTP server.",
+      "wrong-master-password": "The master password is incorrect. Enter it again.",
+      "authorization-code-required": "Enter the authorization code. It must be entered again after changing the provider, server or email address.",
+      "invalid-passphrase": "The backup passphrase is not valid. Check it and retry.",
+      "passphrase-missing": "No backup passphrase is saved. Enter one and save the settings.",
+      "plaintext-not-acknowledged": "Confirm that you understand the risk of a plain text backup first.",
+      "no-entries": "There are no entries in the vault, so there is nothing to back up.",
+      "too-many-entries": "There are more than {limit} entries, so the backup cannot be made.",
+      "attachment-missing": "An attachment was deleted during the backup and nothing was sent. Retry.",
+      "write-failed": "The backup file could not be created on this computer and nothing was sent. Check the free disk space and retry.",
+      "too-large": "The backup is over the mailbox limit and was not sent.",
+      "authentication-failed": "Authentication failed: the email address or authorization code is wrong, or the code has expired (for example, QQ Mail codes expire after the mailbox password is changed). Enter the authorization code again above, save, and retry.",
+      "connection-failed": "The mail server could not be reached. Check the network, the server address and the port, then retry.",
+      "server-rejected-size": "The mail server rejected the email because it is too large. Lower the size limit and send again, or send without attachments.",
+      "send-failed": "The send failed and the mail server did not accept the email. Retry later."
+    },
+    "mail": {
+      "backup": {
+        "subject": "Security Notes backup {date}",
+        "body": "This is the backup email you set up in Security Notes. The backup file is attached, in the full format of this app (ZIP).\n\nBackup time: {time}\nBackup size: {size}\nEntries: {entries}\nAttachments: {attachments}\nEncryption: {encryption}\n\nThis message does not contain any entry content. An encrypted backup can only be opened with its passphrase, and a forgotten passphrase cannot be recovered."
+      },
+      "test": {
+        "subject": "Security Notes test email",
+        "body": "This is a test email to confirm that the email settings work. It contains no entry data."
+      },
+      "value": {
+        "encrypted": "Passphrase encrypted",
+        "plain": "Not encrypted (plain text)",
+        "withAttachments": "{count} attached",
+        "withoutAttachments": "None"
+      }
+    }
+  },
   "settings": {
     "open": "Settings"
   },

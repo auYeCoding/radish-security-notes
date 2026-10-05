@@ -3,7 +3,10 @@ import {
   DEFAULT_EXPORT_FORMAT,
   type ExportFormatKey,
 } from "@shared/export/export-format-keys";
-import { isExportPassphraseLongEnough } from "@shared/export/export-limits";
+import {
+  findPassphrasePairProblem,
+  type PassphrasePairProblem,
+} from "@shared/export/export-limits";
 import type { ExportScope } from "@shared/export/export-request";
 
 /**
@@ -77,7 +80,7 @@ export const INITIAL_EXPORT_DRAFT: ExportDraft = {
 /**
  * 加密口令的问题: 太短, 或两次输入不一致.
  */
-export type PassphraseProblem = "too-short" | "mismatch";
+export type PassphraseProblem = PassphrasePairProblem;
 
 /**
  * 找出加密口令现在的问题. 没勾选加密时没有问题.
@@ -87,15 +90,9 @@ export type PassphraseProblem = "too-short" | "mismatch";
 export function findPassphraseProblem(
   draft: ExportDraft,
 ): PassphraseProblem | undefined {
-  if (!draft.isEncrypted) {
-    return undefined;
-  }
-  if (!isExportPassphraseLongEnough(draft.passphrase)) {
-    return "too-short";
-  }
-  return draft.passphrase === draft.passphraseConfirmation
-    ? undefined
-    : "mismatch";
+  return draft.isEncrypted
+    ? findPassphrasePairProblem(draft.passphrase, draft.passphraseConfirmation)
+    : undefined;
 }
 
 /**

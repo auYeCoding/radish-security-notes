@@ -790,6 +790,178 @@
       "reveal-failed": "无法打开所在文件夹."
     }
   },
+  "emailBackup": {
+    "trigger": {
+      "label": "邮箱备份"
+    },
+    "dialog": {
+      "title": "邮箱备份",
+      "description": "把全部数据按本应用的完整格式作为附件发到你自己的邮箱. 备份在本机生成, 只会发往你填写的邮箱服务器.",
+      "loading": "正在读取设置...",
+      "loadFailed": "无法读取邮箱备份设置, 请关闭对话框后重试."
+    },
+    "saved": "设置已保存.",
+    "account": {
+      "heading": "邮箱账号",
+      "provider": {
+        "label": "邮箱类型",
+        "qq": "QQ 邮箱",
+        "netease163": "163 邮箱",
+        "gmail": "Gmail",
+        "outlook": "Outlook",
+        "custom": "自定义 SMTP"
+      },
+      "outlookNotice": {
+        "title": "暂不支持 Outlook 个人账户",
+        "description": "Outlook 个人账户要求现代认证 (OAuth2), 本版本只支持授权码或应用专用密码. 请改用其他邮箱或自定义 SMTP."
+      },
+      "host": {
+        "label": "SMTP 服务器"
+      },
+      "port": {
+        "label": "端口"
+      },
+      "security": {
+        "label": "加密连接",
+        "ssl": "SSL (连接时加密)",
+        "starttls": "STARTTLS (升级为加密)",
+        "hint": "两种方式在加密失败时都不会退回明文发送."
+      },
+      "sender": {
+        "label": "邮箱地址",
+        "hint": "同时是登录邮箱服务器的用户名."
+      },
+      "authorizationCode": {
+        "label": "授权码或应用专用密码",
+        "hint": "QQ 与 163 邮箱用授权码, Gmail 用应用专用密码, 都不是邮箱登录密码. 只保存在本机的加密库里.",
+        "savedHint": "已保存授权码, 留空则保持不变. 更换邮箱类型, 服务器或邮箱地址后要重新填写.",
+        "reenter": "认证没有通过, 请重新填写授权码."
+      },
+      "recipient": {
+        "label": "收件邮箱",
+        "hint": "不填则发到上面的邮箱地址."
+      },
+      "sizeLimit": {
+        "label": "单封邮件上限 (MB)",
+        "hint": "以邮箱厂商当前规定为准. 备份超过上限时不会发送."
+      }
+    },
+    "error": {
+      "required": "请填写这一项.",
+      "invalid": "格式不正确.",
+      "outOfRange": "超出允许的范围."
+    },
+    "content": {
+      "heading": "备份内容",
+      "description": "备份是本应用的完整格式 (ZIP), 含全部条目, 保密字段, TOTP 与附件.",
+      "encryption": {
+        "enable": "用口令加密备份",
+        "enableHint": "不加密时备份是明文, 含全部密码.",
+        "passphraseLabel": "备份口令",
+        "confirmationLabel": "确认口令",
+        "hint": "至少 {minLength} 个字符. 忘记口令后备份无法找回, 本应用也无法重置, 请自己保管好.",
+        "savedHint": "已保存备份口令, 留空则保持不变. 要换口令时两个框都填. 至少 {minLength} 个字符.",
+        "error": {
+          "tooShort": "口令至少需要 {minLength} 个字符.",
+          "mismatch": "两次输入的口令不一致."
+        }
+      },
+      "plaintextWarning": {
+        "title": "备份将以明文发送",
+        "description": "备份里包含全部密码与密钥, 邮箱账号被盗即全部凭据泄露. 建议用口令加密."
+      },
+      "acknowledge": "我了解邮箱账号被盗即全部凭据泄露"
+    },
+    "authorization": {
+      "label": "主密码",
+      "hint": "保存设置与立即备份会交出全部凭据, 请重新输入主密码确认是你本人操作."
+    },
+    "actions": {
+      "save": "保存设置",
+      "saving": "正在保存...",
+      "sendTest": "发送测试邮件",
+      "runBackup": "立即备份",
+      "unsavedHint": "有未保存的修改, 请先保存设置."
+    },
+    "progress": {
+      "idle": "正在处理...",
+      "preparing": "正在准备...",
+      "writing": "正在生成备份...",
+      "finishing": "正在完成...",
+      "sending": "正在发送邮件...",
+      "counts": "{processed} / {total}"
+    },
+    "testSent": {
+      "title": "测试邮件已发出",
+      "description": "请到收件箱查看. 测试邮件不含任何条目数据."
+    },
+    "result": {
+      "heading": "备份已发出",
+      "notice": "邮箱服务器已接受邮件, 本机生成的临时备份文件已删除. 请到收件箱确认.",
+      "time": "完成时间",
+      "entries": "备份的条目",
+      "attachmentCount": "备份的附件",
+      "fileSize": "备份大小",
+      "attachments": "附件",
+      "encryption": "加密",
+      "included": "包含",
+      "excluded": "不含",
+      "encrypted": "口令加密",
+      "plain": "不加密 (明文)"
+    },
+    "oversize": {
+      "title": "备份超出邮箱上限, 没有发送",
+      "description": "这份备份约 {size}, 超过了你设置的单封上限 {limit}.",
+      "dropAttachments": "去掉附件后再发",
+      "cancel": "取消",
+      "cannotDrop": "这份备份已不含附件, 仍超出上限. 请调高上限 (以邮箱厂商当前规定为准) 或减少条目."
+    },
+    "lastResult": {
+      "heading": "上次备份",
+      "none": "还没有备份过.",
+      "success": "{time} 成功",
+      "failure": "{time} 失败: {reason}"
+    },
+    "failure": {
+      "vault-locked": "保险库已锁定, 请重新解锁后再试.",
+      "unexpected-error": "操作失败, 请重试, 仍失败请关闭应用后重试.",
+      "invalid-input": "参数不合规, 请检查后重试.",
+      "invalid-settings": "设置里有不合规的项, 请检查后重试.",
+      "busy": "正在处理另一次发送, 请稍候.",
+      "not-configured": "还没有保存邮箱设置, 请先保存设置.",
+      "unsupported-provider": "暂不支持这种邮箱, 请选择其他邮箱或自定义 SMTP.",
+      "wrong-master-password": "主密码不正确, 请重新输入.",
+      "authorization-code-required": "请填写授权码. 更换邮箱类型, 服务器或邮箱地址后要重新填写.",
+      "invalid-passphrase": "备份口令不合规, 请检查后重试.",
+      "passphrase-missing": "还没有保存备份口令, 请填写口令并保存设置.",
+      "plaintext-not-acknowledged": "请先确认已了解明文备份的风险.",
+      "no-entries": "保险库里没有条目, 无需备份.",
+      "too-many-entries": "条目超过 {limit} 个, 无法备份.",
+      "attachment-missing": "备份途中有附件已被删除, 没有发送. 请重试.",
+      "write-failed": "无法在本机生成备份文件, 没有发送. 请检查磁盘空间后重试.",
+      "too-large": "备份超出邮箱上限, 没有发送.",
+      "authentication-failed": "认证失败: 邮箱地址或授权码不正确, 或授权码已失效 (例如 QQ 邮箱修改密码后授权码会失效). 请在上面重新填写授权码, 保存后再试.",
+      "connection-failed": "无法连接邮箱服务器, 请检查网络, 服务器地址与端口后重试.",
+      "server-rejected-size": "邮箱服务器拒收: 邮件过大. 请调低单封上限后重发, 或去掉附件.",
+      "send-failed": "发送失败, 邮箱服务器没有接受邮件. 请稍后重试."
+    },
+    "mail": {
+      "backup": {
+        "subject": "安全笔记备份 {date}",
+        "body": "这是你在安全笔记里设置的备份邮件, 备份文件在附件里, 是本应用的完整格式 (ZIP).\n\n备份时间: {time}\n备份大小: {size}\n条目数: {entries}\n附件: {attachments}\n加密: {encryption}\n\n邮件正文不含任何条目内容. 加密的备份只有输入备份口令才能打开, 忘记口令无法找回."
+      },
+      "test": {
+        "subject": "安全笔记测试邮件",
+        "body": "这是一封测试邮件, 用来确认邮箱设置可用. 邮件不含任何条目数据."
+      },
+      "value": {
+        "encrypted": "口令加密",
+        "plain": "不加密 (明文)",
+        "withAttachments": "含 {count} 个附件",
+        "withoutAttachments": "不含附件"
+      }
+    }
+  },
   "settings": {
     "open": "设置"
   },

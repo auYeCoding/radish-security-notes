@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 
 import type { ExportProgressSnapshot } from "@shared/export/export-types";
 
+import { usePolledValue } from "@renderer/components/use-polled-value";
 import { useExportBridge } from "@renderer/stores/use-export-bridge";
 
 /**
@@ -18,30 +19,6 @@ export function useExportProgress(
   isActive: boolean,
 ): ExportProgressSnapshot | undefined {
   const bridge = useExportBridge();
-  const [snapshot, setSnapshot] = useState<ExportProgressSnapshot | undefined>(
-    undefined,
-  );
-  useEffect(() => {
-    if (!isActive) {
-      return undefined;
-    }
-    let isCurrent = true;
-    const poll = async (): Promise<void> => {
-      const next = await bridge.getProgress();
-      if (isCurrent) {
-        setSnapshot(next);
-      }
-    };
-    void poll();
-    const timer = setInterval(
-      () => void poll(),
-      EXPORT_PROGRESS_POLL_MILLISECONDS,
-    );
-    return () => {
-      isCurrent = false;
-      clearInterval(timer);
-      setSnapshot(undefined);
-    };
-  }, [bridge, isActive]);
-  return isActive ? snapshot : undefined;
+  const read = useCallback(() => bridge.getProgress(), [bridge]);
+  return usePolledValue(isActive, read, EXPORT_PROGRESS_POLL_MILLISECONDS);
 }

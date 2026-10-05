@@ -4,9 +4,9 @@ import type { ExportFormatKey } from "@shared/export/export-format-keys";
 import { formatLocalIsoDate } from "../recovery/local-iso-date";
 
 /**
- * 导出文件默认名称的前缀.
+ * 导出文件默认名称的前缀, 邮箱备份的文件名沿用同一个前缀.
  */
-const EXPORT_FILE_NAME_PREFIX = "radish-security-notes";
+export const EXPORT_FILE_NAME_PREFIX = "radish-security-notes";
 
 /**
  * 保存对话框里预填的默认文件名: 应用名, 本地日期与格式的扩展名, 加密时再追加加密扩展名, 如

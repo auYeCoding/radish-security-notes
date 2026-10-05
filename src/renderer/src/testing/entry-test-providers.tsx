@@ -1,6 +1,7 @@
 import type { AttachmentBridge } from "@shared/attachments/attachment-bridge";
 import type { BatchBridge } from "@shared/batch/batch-bridge";
 import type { TotpBridge } from "@shared/entries/totp-bridge";
+import type { EmailBackupBridge } from "@shared/email-backup/email-backup-bridge";
 import type { ExportBridge } from "@shared/export/export-bridge";
 import type { ImportBridge } from "@shared/import/import-bridge";
 import type { LinkBridge } from "@shared/links/link-bridge";
@@ -14,6 +15,7 @@ import type { EntryStore } from "@renderer/stores/entry-store";
 import { EntryStoreProvider } from "@renderer/stores/entry-store-provider";
 import type { EntryTypeStore } from "@renderer/stores/entry-type-store";
 import { EntryTypeStoreProvider } from "@renderer/stores/entry-type-store-provider";
+import { EmailBackupBridgeProvider } from "@renderer/stores/email-backup-bridge-provider";
 import { ExportBridgeProvider } from "@renderer/stores/export-bridge-provider";
 import type { FolderStore } from "@renderer/stores/folder-store";
 import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
@@ -84,6 +86,10 @@ export interface EntryTestProviderValues {
    */
   readonly exportBridge: ExportBridge;
   /**
+   * 邮箱备份桥.
+   */
+  readonly emailBackupBridge: EmailBackupBridge;
+  /**
    * 链接桥.
    */
   readonly linkBridge: LinkBridge;
@@ -116,9 +122,13 @@ export function createEntryTestProviders(
                       >
                         <ImportBridgeProvider bridge={values.importBridge}>
                           <ExportBridgeProvider bridge={values.exportBridge}>
-                            <LinkBridgeProvider bridge={values.linkBridge}>
-                              {props.children}
-                            </LinkBridgeProvider>
+                            <EmailBackupBridgeProvider
+                              bridge={values.emailBackupBridge}
+                            >
+                              <LinkBridgeProvider bridge={values.linkBridge}>
+                                {props.children}
+                              </LinkBridgeProvider>
+                            </EmailBackupBridgeProvider>
                           </ExportBridgeProvider>
                         </ImportBridgeProvider>
                       </AttachmentBridgeProvider>

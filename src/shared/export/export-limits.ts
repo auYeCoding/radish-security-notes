@@ -30,6 +30,27 @@ export function isExportPassphraseLongEnough(passphrase: string): boolean {
 }
 
 /**
+ * 口令与确认口令的问题: 口令太短, 或两次输入不一致.
+ */
+export type PassphrasePairProblem = "too-short" | "mismatch";
+
+/**
+ * 找出口令与确认口令现在的问题, 导出与邮箱备份的口令输入共用这一条规则.
+ * @param passphrase 第一次输入的口令.
+ * @param confirmation 第二次输入的确认口令.
+ * @returns 先看长度再看两次是否一致, 都没问题时为 undefined.
+ */
+export function findPassphrasePairProblem(
+  passphrase: string,
+  confirmation: string,
+): PassphrasePairProblem | undefined {
+  if (!isExportPassphraseLongEnough(passphrase)) {
+    return "too-short";
+  }
+  return passphrase === confirmation ? undefined : "mismatch";
+}
+
+/**
  * 判断加密口令是否在允许的长度范围内: 不少于最少字符数, 不超过进程边界的上限.
  * @param passphrase 待判断的口令.
  * @returns 长度合规返回 true.

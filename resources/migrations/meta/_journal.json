@@ -78,6 +78,13 @@
       "when": 1791131614847,
       "tag": "0010_add-custom-entry-types",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1791234759860,
+      "tag": "0011_add-email-backup",
+      "breakpoints": true
     }
   ]
 }

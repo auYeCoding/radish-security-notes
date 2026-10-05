@@ -1,24 +1,16 @@
 import { isExportFormatKey } from "@shared/export/export-format-keys";
 import {
-  EXPORT_SECRET_MAX_LENGTH,
   MAX_EXPORT_ENTRY_ID_LENGTH,
   MAX_EXPORT_SCOPE_IDS,
 } from "@shared/export/export-limits";
 import type { ExportRequest, ExportScope } from "@shared/export/export-request";
 
+import { isOptionalSecret, isRecord } from "./ipc-input-checks";
+
 /**
  * 导出参数不合规时的错误信息.
  */
 const INVALID_EXPORT_ARGUMENT_MESSAGE = "无效的导出参数";
-
-/**
- * 判断一个值是否是普通对象.
- * @param value 待判断的值.
- * @returns 是非 null 的对象时返回 true.
- */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
 
 /**
  * 判断一个值是否是长度合规的非空条目编号.
@@ -30,18 +22,6 @@ function isEntryId(value: unknown): value is string {
     typeof value === "string" &&
     value.length > 0 &&
     value.length <= MAX_EXPORT_ENTRY_ID_LENGTH
-  );
-}
-
-/**
- * 判断一个值是否是没给, 或长度不超过上限的字符串, 口令与主密码用.
- * @param value 待判断的值.
- * @returns 合规时返回 true.
- */
-function isOptionalSecret(value: unknown): value is string | undefined {
-  return (
-    value === undefined ||
-    (typeof value === "string" && value.length <= EXPORT_SECRET_MAX_LENGTH)
   );
 }
 

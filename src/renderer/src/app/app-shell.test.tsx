@@ -51,6 +51,17 @@ describe("AppShell 布局", () => {
     expect(isFollowing(exportTrigger, settings)).toBe(true);
   });
 
+  it("侧栏底部邮箱备份入口在导出入口之后, 设置按钮之前", async () => {
+    await renderShell();
+
+    const sidebar = within(screen.getByRole("complementary"));
+    const exportTrigger = sidebar.getByRole("button", { name: "导出数据" });
+    const emailBackup = sidebar.getByRole("button", { name: "邮箱备份" });
+    const settings = sidebar.getByRole("button", { name: "设置" });
+    expect(isFollowing(exportTrigger, emailBackup)).toBe(true);
+    expect(isFollowing(emailBackup, settings)).toBe(true);
+  });
+
   it("侧栏里标签在文件夹之上, 且没有主题与语言切换控件", async () => {
     await renderShell();
 

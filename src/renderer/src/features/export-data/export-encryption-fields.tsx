@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { EXPORT_PASSPHRASE_MIN_LENGTH } from "@shared/export/export-limits";
 
 import { CheckboxField } from "@renderer/components/checkbox-field";
-import { PasswordField } from "@renderer/components/password-field";
+import { PassphraseFields } from "@renderer/components/passphrase-fields";
 
 import { findPassphraseProblem, type ExportDraft } from "./export-draft";
 
@@ -32,36 +32,24 @@ function PassphraseInputs(
 ): React.JSX.Element {
   const { t } = useTranslation();
   const { draft } = props;
-  const problem = findPassphraseProblem(draft);
   const minLength = EXPORT_PASSPHRASE_MIN_LENGTH;
   return (
-    <>
-      <PasswordField
-        label={t("export.options.encryption.passphraseLabel")}
-        description={t("export.options.encryption.hint", { minLength })}
-        autoComplete="off"
-        value={draft.passphrase}
-        onChange={(event) => props.onChange({ passphrase: event.target.value })}
-        error={
-          problem === "too-short" && draft.passphrase !== ""
-            ? t("export.options.encryption.error.tooShort", { minLength })
-            : undefined
-        }
-      />
-      <PasswordField
-        label={t("export.options.encryption.confirmationLabel")}
-        autoComplete="off"
-        value={draft.passphraseConfirmation}
-        onChange={(event) =>
-          props.onChange({ passphraseConfirmation: event.target.value })
-        }
-        error={
-          problem === "mismatch" && draft.passphraseConfirmation !== ""
-            ? t("export.options.encryption.error.mismatch")
-            : undefined
-        }
-      />
-    </>
+    <PassphraseFields
+      passphrase={draft.passphrase}
+      confirmation={draft.passphraseConfirmation}
+      problem={findPassphraseProblem(draft)}
+      labels={{
+        passphrase: t("export.options.encryption.passphraseLabel"),
+        confirmation: t("export.options.encryption.confirmationLabel"),
+        hint: t("export.options.encryption.hint", { minLength }),
+        tooShort: t("export.options.encryption.error.tooShort", { minLength }),
+        mismatch: t("export.options.encryption.error.mismatch"),
+      }}
+      onPassphraseChange={(passphrase) => props.onChange({ passphrase })}
+      onConfirmationChange={(passphraseConfirmation) =>
+        props.onChange({ passphraseConfirmation })
+      }
+    />
   );
 }
 

@@ -4,6 +4,7 @@ import { MAX_TRANSFER_ENTRIES } from "../data-transfer/transfer-limits";
 import {
   EXPORT_PASSPHRASE_MIN_LENGTH,
   EXPORT_SECRET_MAX_LENGTH,
+  findPassphrasePairProblem,
   isExportPassphraseLongEnough,
   isExportPassphraseValid,
   MAX_EXPORT_SCOPE_IDS,
@@ -24,6 +25,17 @@ describe("导出的限制", () => {
     expect(isExportPassphraseLongEnough("口令".repeat(6))).toBe(true);
     expect(isExportPassphraseLongEnough("😀".repeat(12))).toBe(true);
     expect(isExportPassphraseLongEnough("😀".repeat(11))).toBe(false);
+  });
+
+  it("口令与确认口令的问题: 先看长度, 再看两次是否一致", () => {
+    expect(findPassphrasePairProblem("short", "short")).toBe("too-short");
+    expect(findPassphrasePairProblem("short", "")).toBe("too-short");
+    expect(findPassphrasePairProblem("a".repeat(12), "b".repeat(12))).toBe(
+      "mismatch",
+    );
+    expect(
+      findPassphrasePairProblem("a".repeat(12), "a".repeat(12)),
+    ).toBeUndefined();
   });
 
   it("口令超过进程边界上限时不合规", () => {
