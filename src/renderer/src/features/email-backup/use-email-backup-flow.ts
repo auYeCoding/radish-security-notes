@@ -13,6 +13,7 @@ import {
   INITIAL_EMAIL_BACKUP_FLOW_STATE,
   type EmailBackupFlowState,
 } from "./email-backup-flow-state";
+import { useAutoBackupWork, type AutoBackupWork } from "./use-auto-backup-work";
 import { useEmailBackupProgress } from "./use-email-backup-progress";
 import { useLoadEmailBackupSettings } from "./use-email-backup-settings";
 import {
@@ -23,7 +24,7 @@ import {
 /**
  * 邮箱备份对话框的流程: 状态, 备份进度与全部操作.
  */
-export interface EmailBackupFlow extends EmailBackupWork {
+export interface EmailBackupFlow extends EmailBackupWork, AutoBackupWork {
   /**
    * 当前流程状态.
    */
@@ -59,8 +60,10 @@ export function useEmailBackupFlow(): EmailBackupFlow {
   useLoadEmailBackupSettings(bridge, setState);
   const progress = useEmailBackupProgress(state.activity === "backing-up");
   const work = useEmailBackupWork({ bridge, state, setState });
+  const autoWork = useAutoBackupWork({ bridge, state, setState });
   return {
     ...work,
+    ...autoWork,
     state,
     progress,
     changeDraft: (changes) =>

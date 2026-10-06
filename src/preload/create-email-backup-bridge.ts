@@ -1,3 +1,4 @@
+import type { AutoBackupStatus } from "@shared/email-backup/auto-backup-status";
 import type { EmailBackupBridge } from "@shared/email-backup/email-backup-bridge";
 import type { EmailBackupProgressSnapshot } from "@shared/email-backup/email-backup-progress";
 import type {
@@ -66,6 +67,17 @@ export function createEmailBackupBridge(
       invokeEmailBackup<EmailBackupLastResult | undefined>(
         ipcRenderer,
         IPC_CHANNELS.emailBackupGetLastResult,
+      ),
+    getAutoBackup: () =>
+      invokeEmailBackup<AutoBackupStatus>(
+        ipcRenderer,
+        IPC_CHANNELS.emailBackupGetAutoBackup,
+      ),
+    saveAutoBackup: (request) =>
+      invokeEmailBackup<AutoBackupStatus>(
+        ipcRenderer,
+        IPC_CHANNELS.emailBackupSaveAutoBackup,
+        request,
       ),
   };
 }

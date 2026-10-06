@@ -792,7 +792,8 @@
   },
   "emailBackup": {
     "trigger": {
-      "label": "Email backup"
+      "label": "Email backup",
+      "failureBadge": "Auto backup failed"
     },
     "dialog": {
       "title": "Email backup",
@@ -919,8 +920,39 @@
     "lastResult": {
       "heading": "Last backup",
       "none": "No backup yet.",
-      "success": "{time} succeeded",
-      "failure": "{time} failed: {reason}"
+      "success": "{time} ({trigger}) succeeded",
+      "failure": "{time} ({trigger}) failed: {reason}"
+    },
+    "triggerKind": {
+      "manual": "manual",
+      "scheduled": "scheduled",
+      "catch-up": "catch-up after start"
+    },
+    "auto": {
+      "heading": "Automatic backup",
+      "description": "While the app is running and unlocked, a full backup is sent to your mailbox at the chosen interval. A backup missed while the app was closed is sent after the next start and unlock. The content, encryption and sending are the same as for Back up now.",
+      "switch": {
+        "label": "Turn on automatic backup",
+        "hint": "Once on, the app checks about every 5 minutes whether a backup is due. Nothing is sent right away."
+      },
+      "interval": {
+        "label": "Backup interval",
+        "daily": "Every day",
+        "every-3-days": "Every 3 days",
+        "weekly": "Every week"
+      },
+      "blocked": "Automatic backup cannot be turned on yet: {reason}",
+      "needMasterPassword": "Enter the master password below before turning on automatic backup or changing the interval.",
+      "phase": {
+        "off": "Off.",
+        "scheduled": "Next backup: {time}.",
+        "due": "A backup is due and will be sent at the next check.",
+        "backingOff": "The last automatic backup failed. It will be retried after {time}.",
+        "exhausted": "It failed repeatedly in this interval, so no more attempts are made. It starts over after {time}.",
+        "paused": "Automatic backup is paused: the authorization code may have expired. Save the authorization code again and it resumes automatically."
+      },
+      "lastFailure": "The last automatic backup failed ({time}): {reason}",
+      "tooLargeHint": "Automatic backup never drops attachments on its own. Raise the size limit, or choose Back up now and then Send without attachments to handle it manually."
     },
     "failure": {
       "vault-locked": "The vault is locked. Unlock it again and retry.",

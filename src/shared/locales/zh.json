@@ -792,7 +792,8 @@
   },
   "emailBackup": {
     "trigger": {
-      "label": "邮箱备份"
+      "label": "邮箱备份",
+      "failureBadge": "自动备份失败"
     },
     "dialog": {
       "title": "邮箱备份",
@@ -919,8 +920,39 @@
     "lastResult": {
       "heading": "上次备份",
       "none": "还没有备份过.",
-      "success": "{time} 成功",
-      "failure": "{time} 失败: {reason}"
+      "success": "{time} ({trigger}) 成功",
+      "failure": "{time} ({trigger}) 失败: {reason}"
+    },
+    "triggerKind": {
+      "manual": "手动",
+      "scheduled": "定时",
+      "catch-up": "启动补发"
+    },
+    "auto": {
+      "heading": "自动备份",
+      "description": "应用运行且已解锁期间, 按间隔把完整备份发到邮箱; 应用关闭期间错过的备份, 会在下次启动并解锁后补发. 备份的内容, 加密与发送方式和立即备份相同.",
+      "switch": {
+        "label": "开启自动备份",
+        "hint": "开启后约每 5 分钟检查一次是否到点, 不会立即发送."
+      },
+      "interval": {
+        "label": "备份间隔",
+        "daily": "每天",
+        "every-3-days": "每 3 天",
+        "weekly": "每周"
+      },
+      "blocked": "现在还不能开启自动备份: {reason}",
+      "needMasterPassword": "开启自动备份或更改间隔前, 请先在下方输入主密码.",
+      "phase": {
+        "off": "未开启.",
+        "scheduled": "下次计划备份: {time}.",
+        "due": "已到备份时间, 将在下一次检查时发送.",
+        "backingOff": "上次自动备份失败, {time} 之后重试.",
+        "exhausted": "本间隔内连续失败, 不再尝试, {time} 之后重新开始.",
+        "paused": "自动备份已暂停: 授权码可能失效, 请重新保存授权码, 保存后自动恢复."
+      },
+      "lastFailure": "最近一次自动备份失败 ({time}): {reason}",
+      "tooLargeHint": "自动备份不会擅自去掉附件. 请调高单封上限, 或点击 \"立即备份\" 后选择 \"去掉附件后再发\" 手动处理."
     },
     "failure": {
       "vault-locked": "保险库已锁定, 请重新解锁后再试.",

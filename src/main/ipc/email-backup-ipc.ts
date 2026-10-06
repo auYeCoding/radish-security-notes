@@ -2,6 +2,7 @@ import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 
 import type { EmailBackupService } from "../email-backup/email-backup-service";
 import {
+  requireAutoBackupSaveRequest,
   requireEmailBackupRunRequest,
   requireEmailBackupSettingsInput,
 } from "./email-backup-input-guard";
@@ -31,5 +32,11 @@ export function registerEmailBackupIpc(
   ipcMain.handle(IPC_CHANNELS.emailBackupProgress, () => service.getProgress());
   ipcMain.handle(IPC_CHANNELS.emailBackupGetLastResult, () =>
     service.getLastResult(),
+  );
+  ipcMain.handle(IPC_CHANNELS.emailBackupGetAutoBackup, () =>
+    service.getAutoBackup(),
+  );
+  ipcMain.handle(IPC_CHANNELS.emailBackupSaveAutoBackup, (_event, request) =>
+    service.saveAutoBackup(requireAutoBackupSaveRequest(request)),
   );
 }

@@ -1,5 +1,10 @@
 import { vi } from "vitest";
 
+import {
+  DEFAULT_AUTO_BACKUP_STATUS,
+  type AutoBackupSaveRequest,
+  type AutoBackupStatus,
+} from "@shared/email-backup/auto-backup-status";
 import type { EmailBackupBridge } from "@shared/email-backup/email-backup-bridge";
 import {
   emailBackupFailed,
@@ -71,8 +76,22 @@ function viewOfInput(input: EmailBackupSettingsInput): EmailBackupSettingsView {
 }
 
 /**
+ * 由保存自动备份的请求得出假桥返回的状态: 开关与间隔原样带回, 打开时阶段是已到点.
+ * @param request 保存自动备份的请求.
+ * @returns 保存后的自动备份状态.
+ */
+function statusOfRequest(request: AutoBackupSaveRequest): AutoBackupStatus {
+  return {
+    isEnabled: request.isEnabled,
+    interval: request.interval,
+    phase: request.isEnabled ? "due" : "off",
+  };
+}
+
+/**
  * 创建组件测试用的假邮箱备份桥: 每个方法都是间谍, 读取设置返回未保存过的默认值, 保存设置把设置带
- * 回, 发送测试与立即备份成功, 进度是空闲, 没有上次结果.
+ * 回, 发送测试与立即备份成功, 进度是空闲, 没有上次结果, 自动备份关闭, 保存自动备份把开关与间隔
+ * 带回.
  * @param overrides 覆盖假桥上的方法, 例如让发送失败.
  * @returns 假邮箱备份桥.
  */
@@ -100,6 +119,12 @@ export function createFakeEmailBackupBridge(
     ),
     getLastResult: vi.fn(() =>
       Promise.resolve(emailBackupSucceeded(undefined)),
+    ),
+    getAutoBackup: vi.fn(() =>
+      Promise.resolve(emailBackupSucceeded(DEFAULT_AUTO_BACKUP_STATUS)),
+    ),
+    saveAutoBackup: vi.fn((request: AutoBackupSaveRequest) =>
+      Promise.resolve(emailBackupSucceeded(statusOfRequest(request))),
     ),
     ...overrides,
   };

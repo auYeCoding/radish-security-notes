@@ -53,7 +53,7 @@ function labelKeyOf(
   | "emailBackup.actions.saving"
   | "emailBackup.progress.sending"
   | `emailBackup.progress.${"idle" | "preparing" | "writing" | "finishing"}` {
-  if (props.activity === "saving") {
+  if (props.activity === "saving" || props.activity === "saving-auto") {
     return "emailBackup.actions.saving";
   }
   if (props.activity === "testing") {

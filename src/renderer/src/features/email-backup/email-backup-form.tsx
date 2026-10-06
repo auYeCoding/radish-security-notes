@@ -1,5 +1,6 @@
 import { findEmailBackupSettingsProblems } from "@shared/email-backup/email-backup-settings-rules";
 
+import { AutoBackupSection } from "./auto-backup-section";
 import { EmailAccountSection } from "./email-account-section";
 import { EmailBackupAuthorizationField } from "./email-backup-authorization-field";
 import { EmailBackupContentSection } from "./email-backup-content-section";
@@ -17,7 +18,7 @@ interface EmailBackupFormProps {
 }
 
 /**
- * 邮箱备份表单: 邮箱账号区, 备份内容区, 设了主密码时的主密码字段. 处理期间整个表单不可编辑. 表单
+ * 邮箱备份表单: 邮箱账号区, 备份内容区, 自动备份区, 设了主密码时的主密码字段. 处理期间整个表单不可编辑. 表单
  * 不提交, 保存, 测试与备份都由操作区的按钮触发.
  * @param props 组件属性.
  * @returns 表单元素.
@@ -47,6 +48,7 @@ export function EmailBackupForm(
           view={view}
           onChange={flow.changeDraft}
         />
+        <AutoBackupSection flow={flow} />
         {view.requiresMasterPassword && (
           <EmailBackupAuthorizationField
             value={draft.masterPassword}

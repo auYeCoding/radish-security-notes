@@ -137,7 +137,11 @@ describe("邮箱备份流程状态: 备份结果", () => {
   });
 
   it("刷新上次结果, 关掉提示", () => {
-    const last = { completedAt: 1, outcome: "success" as const };
+    const last = {
+      completedAt: 1,
+      outcome: "success" as const,
+      triggerKind: "manual" as const,
+    };
     expect(applyLastResult(READY, last).lastResult).toEqual(last);
     expect(dismissNotice(applyTestSent(READY)).notice.kind).toBe("none");
   });

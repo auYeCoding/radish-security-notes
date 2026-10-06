@@ -18,6 +18,8 @@ function createFakeService(): EmailBackupService {
     runBackup: vi.fn(async () => ({ ok: true, value: { status: "sent" } })),
     getProgress: vi.fn(() => ({ stage: "idle", processed: 0, total: 0 })),
     getLastResult: vi.fn(() => ({ ok: true, value: undefined })),
+    getAutoBackup: vi.fn(() => ({ ok: true, value: {} })),
+    saveAutoBackup: vi.fn(async () => ({ ok: true, value: {} })),
   } as unknown as EmailBackupService;
 }
 
@@ -111,5 +113,42 @@ describe("registerEmailBackupIpc 进程边界校验", () => {
       ).toThrow("无效的邮箱备份参数");
     }
     expect(service.runBackup).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerEmailBackupIpc 自动备份", () => {
+  it("读取通道转发给服务, 保存通道把校验过的参数交给服务并丢弃多余的键", async () => {
+    const { ipcMain, service } = registerWithFakes();
+    ipcMain.invoke(IPC_CHANNELS.emailBackupGetAutoBackup);
+    await ipcMain.invoke(IPC_CHANNELS.emailBackupSaveAutoBackup, {
+      isEnabled: true,
+      interval: "weekly",
+      masterPassword: "m",
+      extra: 1,
+    });
+    expect(service.getAutoBackup).toHaveBeenCalledTimes(1);
+    expect(service.saveAutoBackup).toHaveBeenCalledWith({
+      isEnabled: true,
+      interval: "weekly",
+      masterPassword: "m",
+    });
+  });
+
+  it("保存请求不合规时抛错, 不交给服务", () => {
+    const { ipcMain, service } = registerWithFakes();
+    const bad = [
+      undefined,
+      {},
+      { isEnabled: "yes", interval: "daily" },
+      { isEnabled: true, interval: "hourly" },
+      { isEnabled: true, interval: "daily", masterPassword: 1 },
+      { isEnabled: true, interval: "daily", masterPassword: "x".repeat(1025) },
+    ];
+    for (const request of bad) {
+      expect(() =>
+        ipcMain.invoke(IPC_CHANNELS.emailBackupSaveAutoBackup, request),
+      ).toThrow("无效的邮箱备份参数");
+    }
+    expect(service.saveAutoBackup).not.toHaveBeenCalled();
   });
 });

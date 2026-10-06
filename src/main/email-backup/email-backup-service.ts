@@ -1,3 +1,7 @@
+import type {
+  AutoBackupSaveRequest,
+  AutoBackupStatus,
+} from "@shared/email-backup/auto-backup-status";
 import type { EmailBackupProgressSnapshot } from "@shared/email-backup/email-backup-progress";
 import {
   emailBackupFailed,
@@ -12,11 +16,14 @@ import type {
   EmailBackupSettingsInput,
   EmailBackupSettingsView,
 } from "@shared/email-backup/email-backup-settings";
+import type { UnattendedTriggerKind } from "@shared/email-backup/email-backup-trigger-kind";
 
 import {
   runWithDatabase,
   type DatabaseAccess,
 } from "../vault/database/database-access";
+import { isAutoBackupDue } from "./auto-backup-decision";
+import type { AutoBackupSettingsService } from "./auto-backup-settings-service";
 import { readLastResult } from "./email-backup-last-result-repository";
 import type { EmailBackupProgressTracker } from "./email-backup-progress-tracker";
 import type { EmailBackupRunner } from "./email-backup-runner";
@@ -47,11 +54,19 @@ export interface EmailBackupServiceDependencies {
    * 进度记录器.
    */
   readonly progress: EmailBackupProgressTracker;
+  /**
+   * 自动备份设置服务.
+   */
+  readonly autoBackup: AutoBackupSettingsService;
+  /**
+   * 取当前时刻, 判断自动备份是否到点时用.
+   */
+  readonly now: () => Date;
 }
 
 /**
- * 邮箱备份服务: 渲染端能调用的全部入口. 同一时间只处理一次发送 (测试邮件或立即备份), 第二次返回
- * `busy`. 数据库未解锁时全部入口都返回 `vault-locked`.
+ * 邮箱备份服务: 渲染端与自动备份调度器能调用的全部入口. 同一时间只处理一次发送 (测试邮件, 立即
+ * 备份或自动备份), 第二次返回 `busy`. 数据库未解锁时全部入口都返回 `vault-locked`.
  */
 export class EmailBackupService {
   /**
@@ -101,6 +116,42 @@ export class EmailBackupService {
     request: EmailBackupRunRequest,
   ): Promise<EmailBackupResult<EmailBackupRunOutcome>> {
     return this.runExclusively(() => this.dependencies.runner.run(request));
+  }
+
+  /**
+   * 读取自动备份状态.
+   * @returns 自动备份状态, 未解锁时为失败结果.
+   */
+  getAutoBackup(): EmailBackupResult<AutoBackupStatus> {
+    return this.dependencies.autoBackup.getStatus();
+  }
+
+  /**
+   * 保存自动备份的开关与间隔.
+   * @param request 保存请求.
+   * @returns 保存后的自动备份状态.
+   */
+  saveAutoBackup(
+    request: AutoBackupSaveRequest,
+  ): Promise<EmailBackupResult<AutoBackupStatus>> {
+    return this.dependencies.autoBackup.save(request);
+  }
+
+  /**
+   * 自动备份检查一次: 与手动备份共用单飞锁, 没到点时什么也不做.
+   * @param triggerKind 触发方式, 定时或启动补发.
+   * @returns 没到点时为成功且没有值; 到点备份的结果; 手动备份进行中为 `busy`.
+   */
+  runScheduled(
+    triggerKind: UnattendedTriggerKind,
+  ): Promise<EmailBackupResult<EmailBackupRunOutcome | undefined>> {
+    return this.runExclusively(async () => {
+      const { database, now, runner } = this.dependencies;
+      if (!isAutoBackupDue(database, now())) {
+        return emailBackupSucceeded(undefined);
+      }
+      return runner.runUnattended(triggerKind);
+    });
   }
 
   /**

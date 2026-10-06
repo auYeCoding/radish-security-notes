@@ -89,7 +89,11 @@ describe("立即备份: 摘要与上次结果", () => {
     expect(await leftoverFiles(fixture)).toEqual([]);
     expect(fixture.service.getLastResult()).toEqual({
       ok: true,
-      value: { completedAt: COMPLETED_AT, outcome: "success" },
+      value: {
+        completedAt: COMPLETED_AT,
+        outcome: "success",
+        triggerKind: "manual",
+      },
     });
   });
 });

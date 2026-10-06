@@ -12,11 +12,12 @@ import {
   startActivity,
   type EmailBackupFlowState,
 } from "./email-backup-flow-state";
+import { refreshAutoBackup } from "./refresh-auto-backup";
 
 /**
  * 邮箱备份动作需要的依赖.
  */
-interface EmailBackupWorkParameters {
+export interface EmailBackupWorkParameters {
   /**
    * 邮箱备份桥.
    */
@@ -72,6 +73,9 @@ export function useEmailBackupWork(
           ? applySaved(current, result.value)
           : applyFailed(current, result.reason),
       );
+      if (result.ok) {
+        await refreshAutoBackup(bridge, setState);
+      }
     },
     sendTest: async () => {
       setState((current) => startActivity(current, "testing"));
@@ -98,6 +102,7 @@ export function useEmailBackupWork(
       if (lastResult.ok) {
         setState((current) => applyLastResult(current, lastResult.value));
       }
+      await refreshAutoBackup(bridge, setState);
     },
   };
 }

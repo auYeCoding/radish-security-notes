@@ -116,10 +116,12 @@ export async function startApplication(): Promise<void> {
   const emailBackup = createEmailBackupRuntime(vault, runtime.i18n);
   registerEmailBackupIpc(ipcMain, emailBackup.service);
   emailBackup.discardTemporaryFiles();
+  emailBackup.startAutoBackup();
   const openExternalLink = createLinkRuntime();
   registerLinkIpc(ipcMain, openExternalLink);
   app.on("will-quit", () => {
     attachments.discardTemporaryCopies();
+    emailBackup.stopAutoBackup();
     emailBackup.discardTemporaryFiles();
     vault.service.close();
   });

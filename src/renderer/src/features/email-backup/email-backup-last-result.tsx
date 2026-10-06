@@ -17,7 +17,8 @@ interface EmailBackupLastResultLineProps {
 }
 
 /**
- * 把上次结果写成给用户看的一句话: 时间, 成功或失败, 失败时带原因.
+ * 把上次结果写成给用户看的一句话: 时间, 触发方式 (手动, 定时, 启动补发), 成功或失败, 失败时带
+ * 原因.
  * @param lastResult 上次备份的结果.
  * @param translate 翻译函数.
  * @param language 当前界面语言.
@@ -29,14 +30,21 @@ function describeLastResult(
   language: string,
 ): string {
   const time = formatBackupTime(lastResult.completedAt, language);
+  const trigger = translate(
+    `emailBackup.triggerKind.${lastResult.triggerKind}`,
+  );
   if (lastResult.outcome === "success") {
-    return translate("emailBackup.lastResult.success", { time });
+    return translate("emailBackup.lastResult.success", { time, trigger });
   }
   const reason = describeEmailBackupFailure(
     lastResult.reason ?? "unexpected-error",
     translate,
   );
-  return translate("emailBackup.lastResult.failure", { time, reason });
+  return translate("emailBackup.lastResult.failure", {
+    time,
+    trigger,
+    reason,
+  });
 }
 
 /**

@@ -16,10 +16,14 @@ import {
   openVaultDatabase,
   type VaultDatabase,
 } from "../vault/database/open-vault-database";
+import { afterScheduledFailure } from "./auto-backup-backoff";
+import { DEFAULT_AUTO_BACKUP_SCHEDULE } from "./auto-backup-schedule";
+import { readSchedule, writeSchedule } from "./auto-backup-schedule-repository";
 import { createEmailBackupAuthorization } from "./email-backup-authorization";
 import { readCredentials } from "./email-backup-credentials-repository";
 import {
   readLastResult,
+  readLastSuccessAt,
   writeLastResult,
 } from "./email-backup-last-result-repository";
 import { EmailBackupSettingsService } from "./email-backup-settings-service";
@@ -69,6 +73,7 @@ describe("邮箱备份: 重启后保留", () => {
       completedAt: 1234,
       outcome: "failure",
       reason: "authentication-failed",
+      triggerKind: "scheduled",
     });
     first.close();
     const second = openWith(getDirectory(), dataKey);
@@ -82,6 +87,7 @@ describe("邮箱备份: 重启后保留", () => {
     expect(readLastResult(second.orm)).toMatchObject({
       outcome: "failure",
       reason: "authentication-failed",
+      triggerKind: "scheduled",
     });
     second.close();
   });
@@ -98,5 +104,36 @@ describe("邮箱备份: 重启后保留", () => {
     ]) {
       expect(raw.includes(Buffer.from(plain))).toBe(false);
     }
+  });
+});
+
+describe("自动备份: 重启后保留", () => {
+  const getDirectory = useTemporaryDirectory("auto-backup-persistence");
+
+  it("关闭再用同一密钥打开后, 开关, 间隔, 失败状态与上次成功时间都还在", () => {
+    const dataKey = randomBytes(32);
+    const first = openWith(getDirectory(), dataKey);
+    const schedule = afterScheduledFailure(
+      { ...DEFAULT_AUTO_BACKUP_SCHEDULE, isEnabled: true, interval: "weekly" },
+      "connection-failed",
+      5000,
+    );
+    writeSchedule(first.orm, schedule);
+    writeLastResult(first.orm, {
+      completedAt: 1000,
+      outcome: "success",
+      triggerKind: "catch-up",
+    });
+    writeLastResult(first.orm, {
+      completedAt: 5000,
+      outcome: "failure",
+      reason: "connection-failed",
+      triggerKind: "scheduled",
+    });
+    first.close();
+    const second = openWith(getDirectory(), dataKey);
+    expect(readSchedule(second.orm)).toEqual(schedule);
+    expect(readLastSuccessAt(second.orm)).toBe(1000);
+    second.close();
   });
 });

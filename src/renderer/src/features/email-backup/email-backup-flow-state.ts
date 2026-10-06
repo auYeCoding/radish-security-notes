@@ -1,4 +1,8 @@
 import {
+  DEFAULT_AUTO_BACKUP_STATUS,
+  type AutoBackupStatus,
+} from "@shared/email-backup/auto-backup-status";
+import {
   DEFAULT_EMAIL_BACKUP_SETTINGS,
   type EmailBackupSettingsView,
 } from "@shared/email-backup/email-backup-settings";
@@ -17,9 +21,10 @@ import {
 } from "./email-backup-draft";
 
 /**
- * 对话框当前正在做的事: 空闲, 保存设置, 发送测试邮件, 立即备份.
+ * 对话框当前正在做的事: 空闲, 保存设置, 保存自动备份的开关与间隔, 发送测试邮件, 立即备份.
  */
-export type EmailBackupActivity = "idle" | "saving" | "testing" | "backing-up";
+export type EmailBackupActivity =
+  "idle" | "saving" | "saving-auto" | "testing" | "backing-up";
 
 /**
  * 不带内容的提示: 没有提示, 设置已保存, 测试邮件已发出.
@@ -104,6 +109,10 @@ export interface EmailBackupFlowState {
    */
   readonly lastResult: EmailBackupLastResult | undefined;
   /**
+   * 自动备份的状态.
+   */
+  readonly autoBackup: AutoBackupStatus;
+  /**
    * 用户正在填写的内容.
    */
   readonly draft: EmailBackupDraft;
@@ -135,6 +144,7 @@ export const INITIAL_EMAIL_BACKUP_FLOW_STATE: EmailBackupFlowState = {
   loadStatus: "loading",
   view: INITIAL_VIEW,
   lastResult: undefined,
+  autoBackup: DEFAULT_AUTO_BACKUP_STATUS,
   draft: draftFromView(INITIAL_VIEW),
   activity: "idle",
   notice: { kind: "none" },

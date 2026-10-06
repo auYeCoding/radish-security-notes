@@ -1,3 +1,5 @@
+import { isAutoBackupInterval } from "@shared/email-backup/auto-backup-interval";
+import type { AutoBackupSaveRequest } from "@shared/email-backup/auto-backup-status";
 import {
   EMAIL_ADDRESS_MAX_LENGTH,
   SMTP_HOST_MAX_LENGTH,
@@ -129,6 +131,33 @@ export function requireEmailBackupRunRequest(
   }
   return {
     withoutAttachments: value["withoutAttachments"],
+    ...(value["masterPassword"] === undefined
+      ? {}
+      : { masterPassword: value["masterPassword"] }),
+  };
+}
+
+/**
+ * 校验渲染进程传来的保存自动备份请求: 开关是布尔值, 间隔是登记过的取值, 主密码是没给或长度不超过
+ * 上限的字符串. 多余的键被丢弃. 能不能开启, 主密码对不对由服务判断.
+ * @param value 渲染进程传来的值.
+ * @returns 校验通过的请求.
+ * @throws Error 当参数不是合规的请求时.
+ */
+export function requireAutoBackupSaveRequest(
+  value: unknown,
+): AutoBackupSaveRequest {
+  if (
+    !isRecord(value) ||
+    typeof value["isEnabled"] !== "boolean" ||
+    !isAutoBackupInterval(value["interval"]) ||
+    !isOptionalSecret(value["masterPassword"])
+  ) {
+    throw new Error(INVALID_EMAIL_BACKUP_ARGUMENT_MESSAGE);
+  }
+  return {
+    isEnabled: value["isEnabled"],
+    interval: value["interval"],
     ...(value["masterPassword"] === undefined
       ? {}
       : { masterPassword: value["masterPassword"] }),

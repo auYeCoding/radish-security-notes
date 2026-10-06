@@ -2,6 +2,7 @@ import { useEffect, type Dispatch, type SetStateAction } from "react";
 
 import type { EmailBackupBridge } from "@shared/email-backup/email-backup-bridge";
 
+import { applyLoadedAutoBackup } from "./email-backup-auto-state";
 import {
   applyLoadFailed,
   applyLoaded,
@@ -21,19 +22,23 @@ export function useLoadEmailBackupSettings(
   useEffect(() => {
     let isCurrent = true;
     const load = async (): Promise<void> => {
-      const [settings, lastResult] = await Promise.all([
+      const [settings, lastResult, autoBackup] = await Promise.all([
         bridge.getSettings(),
         bridge.getLastResult(),
+        bridge.getAutoBackup(),
       ]);
       if (!isCurrent) {
         return;
       }
       setState((state) =>
         settings.ok
-          ? applyLoaded(
-              state,
-              settings.value,
-              lastResult.ok ? lastResult.value : undefined,
+          ? applyLoadedAutoBackup(
+              applyLoaded(
+                state,
+                settings.value,
+                lastResult.ok ? lastResult.value : undefined,
+              ),
+              autoBackup,
             )
           : applyLoadFailed(state),
       );

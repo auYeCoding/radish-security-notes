@@ -68,5 +68,7 @@ export const IPC_CHANNELS = {
   emailBackupRunBackup: "email-backup:run-backup",
   emailBackupProgress: "email-backup:progress",
   emailBackupGetLastResult: "email-backup:get-last-result",
+  emailBackupGetAutoBackup: "email-backup:get-auto-backup",
+  emailBackupSaveAutoBackup: "email-backup:save-auto-backup",
   linksOpenExternal: "links:open-external",
 } as const;

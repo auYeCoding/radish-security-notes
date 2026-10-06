@@ -72,15 +72,42 @@ describe("createEmailBackupBridge: 进度与接口形状", () => {
     expect(invoke).toHaveBeenCalledWith(IPC_CHANNELS.emailBackupProgress);
   });
 
-  it("桥上只有六个方法, 没有任何返回授权码, 口令或文件路径的方法", () => {
+  it("桥上只有八个方法, 没有任何返回授权码, 口令或文件路径的方法", () => {
     const bridge = createEmailBackupBridge({ invoke: vi.fn() });
     expect(Object.keys(bridge).sort()).toEqual([
+      "getAutoBackup",
       "getLastResult",
       "getProgress",
       "getSettings",
       "runBackup",
+      "saveAutoBackup",
       "saveSettings",
       "sendTest",
     ]);
+  });
+});
+
+describe("createEmailBackupBridge: 自动备份", () => {
+  it("读取与保存自动备份调用对应通道, 保存带上请求, 返回主进程的结果", async () => {
+    const invoke = vi.fn(() => Promise.resolve({ ok: true, value: "x" }));
+    const bridge = createEmailBackupBridge({ invoke });
+    const request = {
+      isEnabled: true,
+      interval: "weekly",
+      masterPassword: "m",
+    } as const;
+    const status = await bridge.getAutoBackup();
+    const saved = await bridge.saveAutoBackup(request);
+    expect(invoke).toHaveBeenNthCalledWith(
+      1,
+      IPC_CHANNELS.emailBackupGetAutoBackup,
+    );
+    expect(invoke).toHaveBeenNthCalledWith(
+      2,
+      IPC_CHANNELS.emailBackupSaveAutoBackup,
+      request,
+    );
+    expect(status).toEqual({ ok: true, value: "x" });
+    expect(saved).toEqual({ ok: true, value: "x" });
   });
 });

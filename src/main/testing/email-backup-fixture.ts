@@ -9,6 +9,7 @@ import type { EmailBackupSettingsInput } from "@shared/email-backup/email-backup
 import type { SmtpConnection } from "@shared/email-backup/smtp-connection";
 
 import { BackupFileGenerator } from "../email-backup/backup-file-generator";
+import { AutoBackupSettingsService } from "../email-backup/auto-backup-settings-service";
 import {
   BackupTemporaryStore,
   NODE_BACKUP_TEMPORARY_FILE_SYSTEM,
@@ -17,6 +18,7 @@ import {
   createEmailBackupAuthorization,
   type EmailBackupAuthorization,
 } from "../email-backup/email-backup-authorization";
+import { EmailBackupLedger } from "../email-backup/email-backup-ledger";
 import { createEmailBackupProgressTracker } from "../email-backup/email-backup-progress-tracker";
 import { EmailBackupRunner } from "../email-backup/email-backup-runner";
 import { EmailBackupService } from "../email-backup/email-backup-service";
@@ -101,6 +103,10 @@ export interface EmailBackupFixtureState {
    * 每次发送开始时调用, 测试里用来在发送进行中读取进度.
    */
   onSend: (() => void) | undefined;
+  /**
+   * 假系统时钟的当前时刻, 测试里改它来模拟时间流逝, 不真等.
+   */
+  now: Date;
 }
 
 /**
@@ -197,6 +203,10 @@ interface ServiceWiring {
    * 备份临时目录的路径.
    */
   readonly temporaryDirectory: string;
+  /**
+   * 取假系统时钟的当前时刻.
+   */
+  readonly now: () => Date;
 }
 
 /**
@@ -209,7 +219,7 @@ function createServiceParts(
   wiring: ServiceWiring,
   sender: MailSenderPort,
 ): Pick<EmailBackupFixture, "service" | "settings" | "generator"> {
-  const { database, authorization } = wiring;
+  const { database, authorization, now } = wiring;
   const progress = createEmailBackupProgressTracker();
   const temporaryStore = new BackupTemporaryStore({
     fileSystem: NODE_BACKUP_TEMPORARY_FILE_SYSTEM,
@@ -224,7 +234,7 @@ function createServiceParts(
     temporaryStore,
     tracker: progress.generation,
     translate: (key) => key,
-    now: () => SAMPLE_NOW,
+    now,
     yieldToEventLoop: () => Promise.resolve(),
   });
   const runner = new EmailBackupRunner({
@@ -234,20 +244,22 @@ function createServiceParts(
     temporaryStore,
     sender,
     progress,
+    ledger: new EmailBackupLedger({ database, now }),
     translate: translateForTest,
-    now: () => SAMPLE_NOW,
-  });
-  const testSender = new EmailTestSender({
-    database,
-    sender,
-    translate: translateForTest,
+    now,
   });
   const service = new EmailBackupService({
     database,
     settings,
     runner,
-    testSender,
+    testSender: new EmailTestSender({
+      database,
+      sender,
+      translate: translateForTest,
+    }),
     progress,
+    autoBackup: new AutoBackupSettingsService({ database, authorization, now }),
+    now,
   });
   return { service, settings, generator };
 }
@@ -268,6 +280,7 @@ export function createEmailBackupFixture(
     sendError: undefined,
     hasMasterPassword: false,
     onSend: undefined,
+    now: SAMPLE_NOW,
   };
   const sent: RecordedMail[] = [];
   const failures: unknown[] = [];
@@ -283,7 +296,7 @@ export function createEmailBackupFixture(
   });
   const temporaryDirectory = join(directory, TEMPORARY_DIRECTORY_NAME);
   const parts = createServiceParts(
-    { database, authorization, file, temporaryDirectory },
+    { database, authorization, file, temporaryDirectory, now: () => state.now },
     createRecordingSender(sent, state),
   );
   return {

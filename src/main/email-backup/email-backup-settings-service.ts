@@ -13,9 +13,12 @@ import {
   runWithDatabase,
   type DatabaseAccess,
 } from "../vault/database/database-access";
+import { afterAuthorizationCodeSaved } from "./auto-backup-backoff";
+import { updateExistingSchedule } from "./auto-backup-schedule-repository";
 import type { EmailBackupAuthorization } from "./email-backup-authorization";
 import {
   findSaveRejection,
+  hasNewAuthorizationCode,
   mergeCredentials,
   normalizeSettings,
 } from "./email-backup-save-rules";
@@ -95,6 +98,9 @@ export class EmailBackupSettingsService {
       database,
       (orm) => {
         saveStoredState(orm, settings, credentials);
+        if (hasNewAuthorizationCode(input)) {
+          updateExistingSchedule(orm, afterAuthorizationCodeSaved);
+        }
         return emailBackupSucceeded(undefined);
       },
     );

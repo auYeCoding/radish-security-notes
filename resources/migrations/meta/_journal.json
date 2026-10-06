@@ -85,6 +85,13 @@
       "when": 1791234759860,
       "tag": "0011_add-email-backup",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1791280352902,
+      "tag": "0012_add-email-backup-schedule",
+      "breakpoints": true
     }
   ]
 }

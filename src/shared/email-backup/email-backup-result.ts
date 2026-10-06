@@ -4,6 +4,7 @@ import {
   type OperationFailure,
   type OperationSuccess,
 } from "../result/operation-result";
+import type { EmailBackupTriggerKind } from "./email-backup-trigger-kind";
 
 /**
  * 邮箱备份操作失败的原因, 除了数据库都可能遇到的两种, 还有设置与前置检查不通过, 备份文件生成
@@ -176,4 +177,8 @@ export interface EmailBackupLastResult {
    * 失败的原因代码, 成功时没有这一项.
    */
   readonly reason?: EmailBackupFailureReason;
+  /**
+   * 这次备份是怎么触发的.
+   */
+  readonly triggerKind: EmailBackupTriggerKind;
 }

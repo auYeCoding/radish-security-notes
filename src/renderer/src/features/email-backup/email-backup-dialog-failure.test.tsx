@@ -110,6 +110,7 @@ describe("邮箱备份对话框: 发送测试邮件与上次结果", () => {
               completedAt: new Date(2026, 9, 5, 20, 30).getTime(),
               outcome: "failure" as const,
               reason: "connection-failed" as const,
+              triggerKind: "scheduled" as const,
             }),
           ),
         ),
@@ -117,6 +118,7 @@ describe("邮箱备份对话框: 发送测试邮件与上次结果", () => {
     });
 
     expect(screen.getByText(/失败: 无法连接邮箱服务器/)).toBeDefined();
+    expect(screen.getByText(/\(定时\) 失败/)).toBeDefined();
     expect(FAKE_SAVED_EMAIL_BACKUP_VIEW.isSaved).toBe(true);
   });
 });

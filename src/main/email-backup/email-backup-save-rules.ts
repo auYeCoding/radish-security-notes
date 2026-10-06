@@ -24,6 +24,17 @@ function presentOf(value: string | undefined): string | undefined {
 }
 
 /**
+ * 判断保存请求是否带了新的授权码, 空串与没给都表示保持不变.
+ * @param input 保存设置的请求.
+ * @returns 带了新的授权码时为 true.
+ */
+export function hasNewAuthorizationCode(
+  input: EmailBackupSettingsInput,
+): boolean {
+  return presentOf(input.authorizationCode) !== undefined;
+}
+
+/**
  * 由保存请求得出要保存的设置: 地址去首尾空格, 预置类型的服务器取预置表, 加密时不保留明文风险确认
  * (改回明文时要重新确认).
  * @param input 保存设置的请求.

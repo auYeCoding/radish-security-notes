@@ -1,3 +1,7 @@
+import type {
+  AutoBackupSaveRequest,
+  AutoBackupStatus,
+} from "./auto-backup-status";
 import type { EmailBackupProgressSnapshot } from "./email-backup-progress";
 import type {
   EmailBackupLastResult,
@@ -54,4 +58,17 @@ export interface EmailBackupBridge {
   getLastResult: () => Promise<
     EmailBackupResult<EmailBackupLastResult | undefined>
   >;
+  /**
+   * 读取自动备份的状态: 开关, 间隔, 下次计划时间, 开启受阻的原因与最近一次自动备份失败的原因.
+   * @returns 自动备份状态, 未解锁时为失败结果.
+   */
+  getAutoBackup: () => Promise<EmailBackupResult<AutoBackupStatus>>;
+  /**
+   * 保存自动备份的开关与间隔. 开启时邮箱设置要已能备份, 设了主密码时要校验重输的主密码.
+   * @param request 开关, 间隔与主密码.
+   * @returns 保存后的自动备份状态, 不满足开启条件或主密码错误等为失败结果.
+   */
+  saveAutoBackup: (
+    request: AutoBackupSaveRequest,
+  ) => Promise<EmailBackupResult<AutoBackupStatus>>;
 }

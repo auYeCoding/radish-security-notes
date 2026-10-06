@@ -1,6 +1,10 @@
 import { randomBytes } from "node:crypto";
 import { readdir } from "node:fs/promises";
 
+import type {
+  AutoBackupSaveRequest,
+  AutoBackupStatus,
+} from "@shared/email-backup/auto-backup-status";
 import type { EmailBackupRunRequest } from "@shared/email-backup/email-backup-result";
 
 import { insertEntry } from "../entries/entry-repository";
@@ -41,6 +45,41 @@ export async function saveSettings(
   if (!result.ok) {
     throw new Error(`保存设置失败: ${result.reason}`);
   }
+}
+
+/**
+ * 开启自动备份, 默认每天一次, 失败时抛错.
+ * @param fixture 测试环境.
+ * @param overrides 要覆盖的请求字段.
+ * @returns 开启之后兑现.
+ */
+export async function enableAutoBackup(
+  fixture: EmailBackupFixture,
+  overrides: Partial<AutoBackupSaveRequest> = {},
+): Promise<void> {
+  const result = await fixture.service.saveAutoBackup({
+    isEnabled: true,
+    interval: "daily",
+    ...overrides,
+  });
+  if (!result.ok) {
+    throw new Error(`开启自动备份失败: ${result.reason}`);
+  }
+}
+
+/**
+ * 读出自动备份状态, 失败时抛错.
+ * @param fixture 测试环境.
+ * @returns 自动备份状态.
+ */
+export function readAutoBackupStatus(
+  fixture: EmailBackupFixture,
+): AutoBackupStatus {
+  const result = fixture.service.getAutoBackup();
+  if (!result.ok) {
+    throw new Error(`读取自动备份状态失败: ${result.reason}`);
+  }
+  return result.value;
 }
 
 /**

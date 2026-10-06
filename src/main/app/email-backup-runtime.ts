@@ -5,18 +5,28 @@ import type { i18n } from "i18next";
 
 import type { EmailBackupTranslate } from "@shared/email-backup/email-backup-message-keys";
 
+import { AutoBackupScheduler } from "../email-backup/auto-backup-scheduler";
+import { AutoBackupSettingsService } from "../email-backup/auto-backup-settings-service";
 import { BackupFileGenerator } from "../email-backup/backup-file-generator";
 import {
   BackupTemporaryStore,
   NODE_BACKUP_TEMPORARY_FILE_SYSTEM,
 } from "../email-backup/backup-temp-store";
-import { createEmailBackupAuthorization } from "../email-backup/email-backup-authorization";
-import { createEmailBackupProgressTracker } from "../email-backup/email-backup-progress-tracker";
+import {
+  createEmailBackupAuthorization,
+  type EmailBackupAuthorization,
+} from "../email-backup/email-backup-authorization";
+import { EmailBackupLedger } from "../email-backup/email-backup-ledger";
+import {
+  createEmailBackupProgressTracker,
+  type EmailBackupProgressTracker,
+} from "../email-backup/email-backup-progress-tracker";
 import { EmailBackupRunner } from "../email-backup/email-backup-runner";
 import { EmailBackupService } from "../email-backup/email-backup-service";
 import { EmailBackupSettingsService } from "../email-backup/email-backup-settings-service";
 import { EmailTestSender } from "../email-backup/email-test-sender";
 import { createNodemailerMailSender } from "../email-backup/nodemailer-mail-sender";
+import { SYSTEM_SCHEDULER_CLOCK } from "../email-backup/scheduler-clock";
 import { NODE_EXPORT_FILE } from "../export/node-export-file-system";
 import { createDefaultExportSerializerRegistry } from "../export/serializers/default-serializer-registry";
 import { yieldToEventLoop } from "../import/import-progress";
@@ -46,6 +56,32 @@ export interface EmailBackupRuntime {
    * 清扫备份临时目录, 应用启动时清除上次崩溃的残留, 退出时清除本次的残留.
    */
   readonly discardTemporaryFiles: () => void;
+  /**
+   * 启动自动备份调度: 保险库解锁后立即检查一次补发错过的备份, 之后每五分钟检查一次.
+   */
+  readonly startAutoBackup: () => void;
+  /**
+   * 停止自动备份调度, 应用退出时调用.
+   */
+  readonly stopAutoBackup: () => void;
+}
+
+/**
+ * 备份文件的生成与临时存放: 进度, 临时目录与生成器.
+ */
+interface BackupPipeline {
+  /**
+   * 进度记录器.
+   */
+  readonly progress: EmailBackupProgressTracker;
+  /**
+   * 备份临时目录存储.
+   */
+  readonly temporaryStore: BackupTemporaryStore;
+  /**
+   * 备份文件生成器.
+   */
+  readonly generator: BackupFileGenerator;
 }
 
 /**
@@ -59,6 +95,74 @@ function createDatabaseAccess(vault: VaultRuntime): DatabaseAccess {
     getOrm: () => vault.service.getOrm(),
     onFailure: (error) => reportFailureName(EMAIL_BACKUP_FAILURE_SCOPE, error),
   };
+}
+
+/**
+ * 创建备份文件的生成与临时存放.
+ * @param database 取数据库与报告失败的依赖.
+ * @param translator 主进程的 i18next 实例.
+ * @returns 生成与临时存放的对象.
+ */
+function createBackupPipeline(
+  database: DatabaseAccess,
+  translator: i18n,
+): BackupPipeline {
+  const progress = createEmailBackupProgressTracker();
+  const temporaryStore = new BackupTemporaryStore({
+    fileSystem: NODE_BACKUP_TEMPORARY_FILE_SYSTEM,
+    directory: join(app.getPath("userData"), TEMPORARY_DIRECTORY_NAME),
+    onFailure: database.onFailure,
+  });
+  const generator = new BackupFileGenerator({
+    database,
+    serializers: createDefaultExportSerializerRegistry(),
+    file: NODE_EXPORT_FILE,
+    temporaryStore,
+    tracker: progress.generation,
+    translate: (key) => String(translator.t(key)),
+    now: () => new Date(),
+    yieldToEventLoop,
+  });
+  return { progress, temporaryStore, generator };
+}
+
+/**
+ * 创建邮箱备份服务, 手动备份与自动备份共用同一个服务与同一条备份流程.
+ * @param database 取数据库与报告失败的依赖.
+ * @param authorization 身份复核.
+ * @param pipeline 备份文件的生成与临时存放.
+ * @param translator 主进程的 i18next 实例, 邮件主题与正文随它的当前语言.
+ * @returns 邮箱备份服务.
+ */
+function createService(
+  database: DatabaseAccess,
+  authorization: EmailBackupAuthorization,
+  pipeline: BackupPipeline,
+  translator: i18n,
+): EmailBackupService {
+  const sender = createNodemailerMailSender();
+  const translate: EmailBackupTranslate = (key, parameters) =>
+    String(translator.t(key, parameters));
+  const now = (): Date => new Date();
+  return new EmailBackupService({
+    database,
+    settings: new EmailBackupSettingsService({ database, authorization }),
+    runner: new EmailBackupRunner({
+      database,
+      authorization,
+      generator: pipeline.generator,
+      temporaryStore: pipeline.temporaryStore,
+      sender,
+      progress: pipeline.progress,
+      ledger: new EmailBackupLedger({ database, now }),
+      translate,
+      now,
+    }),
+    testSender: new EmailTestSender({ database, sender, translate }),
+    progress: pipeline.progress,
+    autoBackup: new AutoBackupSettingsService({ database, authorization, now }),
+    now,
+  });
 }
 
 /**
@@ -76,43 +180,18 @@ export function createEmailBackupRuntime(
   const authorization = createEmailBackupAuthorization(
     vault.masterPasswordVerifier,
   );
-  const progress = createEmailBackupProgressTracker();
-  const temporaryStore = new BackupTemporaryStore({
-    fileSystem: NODE_BACKUP_TEMPORARY_FILE_SYSTEM,
-    directory: join(app.getPath("userData"), TEMPORARY_DIRECTORY_NAME),
+  const pipeline = createBackupPipeline(database, translator);
+  const service = createService(database, authorization, pipeline, translator);
+  const scheduler = new AutoBackupScheduler({
+    clock: SYSTEM_SCHEDULER_CLOCK,
+    isUnlocked: () => database.getOrm() !== undefined,
+    backup: service,
     onFailure: database.onFailure,
-  });
-  const sender = createNodemailerMailSender();
-  const translate: EmailBackupTranslate = (key, parameters) =>
-    String(translator.t(key, parameters));
-  const generator = new BackupFileGenerator({
-    database,
-    serializers: createDefaultExportSerializerRegistry(),
-    file: NODE_EXPORT_FILE,
-    temporaryStore,
-    tracker: progress.generation,
-    translate: (key) => String(translator.t(key)),
-    now: () => new Date(),
-    yieldToEventLoop,
-  });
-  const service = new EmailBackupService({
-    database,
-    settings: new EmailBackupSettingsService({ database, authorization }),
-    runner: new EmailBackupRunner({
-      database,
-      authorization,
-      generator,
-      temporaryStore,
-      sender,
-      progress,
-      translate,
-      now: () => new Date(),
-    }),
-    testSender: new EmailTestSender({ database, sender, translate }),
-    progress,
   });
   return {
     service,
-    discardTemporaryFiles: () => temporaryStore.discardAll(),
+    discardTemporaryFiles: () => pipeline.temporaryStore.discardAll(),
+    startAutoBackup: () => scheduler.start(),
+    stopAutoBackup: () => scheduler.stop(),
   };
 }
