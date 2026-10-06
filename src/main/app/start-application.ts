@@ -1,5 +1,6 @@
 import { electronApp, optimizer } from "@electron-toolkit/utils";
 import { BrowserWindow, app, ipcMain } from "electron";
+import type { i18n } from "i18next";
 
 import icon from "../../../resources/icon.png?asset";
 import { registerAttachmentIpc } from "../ipc/attachment-ipc";
@@ -14,6 +15,7 @@ import { registerLinkIpc } from "../ipc/link-ipc";
 import type { ExternalLinkOpener } from "../links/external-link-opener";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
 import { registerRecoveryIpc } from "../ipc/recovery-ipc";
+import { registerRestoreIpc } from "../ipc/restore-ipc";
 import { registerTagIpc } from "../ipc/tag-ipc";
 import { registerTotpIpc } from "../ipc/totp-ipc";
 import { registerVaultIpc } from "../ipc/vault-ipc";
@@ -34,8 +36,9 @@ import { createFolderService } from "./folder-runtime";
 import { createImportRuntime } from "./import-runtime";
 import { createLinkRuntime } from "./link-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
+import { createRestoreRuntime } from "./restore-runtime";
 import { createTagService } from "./tag-runtime";
-import { createVaultRuntime } from "./vault-runtime";
+import { createVaultRuntime, type VaultRuntime } from "./vault-runtime";
 
 /**
  * 应用的用户模型标识, Windows 用它归并任务栏与通知.
@@ -81,6 +84,21 @@ function openMainWindow(
 }
 
 /**
+ * 注册数据进出的 IPC: 从其他管理器导入, 导出, 从备份恢复. 它们都读写已解锁的加密数据库, 文件的
+ * 选择, 读取与写出都在主进程里完成.
+ * @param vault 保险库运行时对象.
+ * @param translator 主进程的 i18next 实例.
+ */
+function registerDataTransferIpc(vault: VaultRuntime, translator: i18n): void {
+  registerImportIpc(
+    ipcMain,
+    createImportRuntime(vault.service, translator).service,
+  );
+  registerExportIpc(ipcMain, createExportRuntime(vault, translator).service);
+  registerRestoreIpc(ipcMain, createRestoreRuntime(vault, translator).service);
+}
+
+/**
  * 启动应用: 先应用主题并建好 i18n, 判定保险库状态, 再注册 IPC, 最后创建主窗口.
  * 在 app ready 之后调用.
  * @returns 启动完成后兑现.
@@ -108,11 +126,7 @@ export async function startApplication(): Promise<void> {
   registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
   const attachments = createAttachmentRuntime(vault.service, runtime.i18n);
   registerAttachmentIpc(ipcMain, attachments);
-  registerImportIpc(
-    ipcMain,
-    createImportRuntime(vault.service, runtime.i18n).service,
-  );
-  registerExportIpc(ipcMain, createExportRuntime(vault, runtime.i18n).service);
+  registerDataTransferIpc(vault, runtime.i18n);
   const emailBackup = createEmailBackupRuntime(vault, runtime.i18n);
   registerEmailBackupIpc(ipcMain, emailBackup.service);
   emailBackup.discardTemporaryFiles();

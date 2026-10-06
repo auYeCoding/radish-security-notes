@@ -40,26 +40,26 @@ describe("AppShell 布局", () => {
     expect(screen.getByRole("button", { name: "设置" })).toBeDefined();
   });
 
-  it("侧栏底部导出入口在导入入口之后, 设置按钮之前", async () => {
+  it("侧栏底部导出入口在导入入口之后, 邮箱备份入口之前", async () => {
     await renderShell();
 
     const sidebar = within(screen.getByRole("complementary"));
     const importTrigger = sidebar.getByRole("button", { name: "导入数据" });
     const exportTrigger = sidebar.getByRole("button", { name: "导出数据" });
-    const settings = sidebar.getByRole("button", { name: "设置" });
+    const emailBackup = sidebar.getByRole("button", { name: "邮箱备份" });
     expect(isFollowing(importTrigger, exportTrigger)).toBe(true);
-    expect(isFollowing(exportTrigger, settings)).toBe(true);
+    expect(isFollowing(exportTrigger, emailBackup)).toBe(true);
   });
 
-  it("侧栏底部邮箱备份入口在导出入口之后, 设置按钮之前", async () => {
+  it("侧栏底部从备份恢复入口在邮箱备份入口之后, 设置按钮之前", async () => {
     await renderShell();
 
     const sidebar = within(screen.getByRole("complementary"));
-    const exportTrigger = sidebar.getByRole("button", { name: "导出数据" });
     const emailBackup = sidebar.getByRole("button", { name: "邮箱备份" });
+    const restore = sidebar.getByRole("button", { name: "从备份恢复" });
     const settings = sidebar.getByRole("button", { name: "设置" });
-    expect(isFollowing(exportTrigger, emailBackup)).toBe(true);
-    expect(isFollowing(emailBackup, settings)).toBe(true);
+    expect(isFollowing(emailBackup, restore)).toBe(true);
+    expect(isFollowing(restore, settings)).toBe(true);
   });
 
   it("侧栏里标签在文件夹之上, 且没有主题与语言切换控件", async () => {

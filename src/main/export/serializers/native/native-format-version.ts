@@ -36,8 +36,31 @@ const ATTACHMENT_ID_PATTERN = /^[A-Za-z0-9_-]+$/;
  * @throws Error 当编号含有不能用作文件名的字符时.
  */
 export function nativeAttachmentPath(attachmentId: string): string {
-  if (!ATTACHMENT_ID_PATTERN.test(attachmentId)) {
+  if (!isNativeAttachmentId(attachmentId)) {
     throw new Error("附件编号含有不能用作文件名的字符");
   }
   return `${NATIVE_ATTACHMENT_DIRECTORY}/${attachmentId}`;
+}
+
+/**
+ * 判断一个附件编号能否用作压缩包里的文件名.
+ * @param attachmentId 附件编号.
+ * @returns 编号只含字母, 数字, 下划线与连字符时为 true.
+ */
+export function isNativeAttachmentId(attachmentId: string): boolean {
+  return ATTACHMENT_ID_PATTERN.test(attachmentId);
+}
+
+/**
+ * 由压缩包里附件内容的路径取出附件编号, 是 `nativeAttachmentPath` 的逆运算.
+ * @param path 压缩包里的路径.
+ * @returns 附件编号; 路径不在附件目录下, 或编号含有不能用作文件名的字符时为 undefined.
+ */
+export function attachmentIdOfPath(path: string): string | undefined {
+  const prefix = `${NATIVE_ATTACHMENT_DIRECTORY}/`;
+  if (!path.startsWith(prefix)) {
+    return undefined;
+  }
+  const attachmentId = path.slice(prefix.length);
+  return isNativeAttachmentId(attachmentId) ? attachmentId : undefined;
 }

@@ -994,6 +994,142 @@
       }
     }
   },
+  "restore": {
+    "trigger": {
+      "label": "从备份恢复"
+    },
+    "dialog": {
+      "title": "从备份恢复",
+      "description": "选择从邮箱下载的备份文件, 预览内容并确认后恢复. 文件在本机读取与解密, 内容不会离开应用.",
+      "openTitle": "选择备份文件",
+      "filter": "备份文件"
+    },
+    "pick": {
+      "intro": "支持本应用的备份文件: .zip, 或用口令加密的 .age. 选择后先预览, 确认之前不会改动任何数据.",
+      "choose": "选择备份文件...",
+      "included": {
+        "title": "会恢复的内容",
+        "body": "全部条目, 附件, 文件夹, 标签与自定义类型."
+      }
+    },
+    "notIncluded": {
+      "title": "不在备份里的内容",
+      "body": "邮箱设置, 授权码, 备份口令, 自动备份计划, 主密码, 恢复密钥, 主题与语言不在备份里, 不会被恢复, 全新安装后需要重新设置."
+    },
+    "passphrase": {
+      "heading": "输入备份口令",
+      "description": "这个备份文件用口令加密 (约 {size}), 请输入创建备份时设置的口令.",
+      "label": "备份口令",
+      "wrong": "口令不对, 请重新输入.",
+      "submit": "解密并预览",
+      "back": "重新选择"
+    },
+    "preview": {
+      "heading": "确认恢复内容",
+      "description": "备份生成于 {createdAt}. 点下面的按钮之前不会改动任何数据.",
+      "emptyVault": "当前保险库是空的, 备份里的内容会按原样写入.",
+      "noSecrets": {
+        "title": "这个备份不含保密字段",
+        "description": "密码, 密钥, TOTP 密钥等保密字段在备份里是空的, 恢复后这些字段也是空的."
+      },
+      "noAttachments": {
+        "title": "这个备份不含附件内容",
+        "description": "恢复后条目上没有附件."
+      },
+      "back": "重新选择",
+      "submit": "开始恢复",
+      "submitReplace": "清空并恢复"
+    },
+    "rows": {
+      "createdAt": "备份时间",
+      "entries": "条目",
+      "folders": "文件夹",
+      "tags": "标签",
+      "customTypes": "自定义类型",
+      "attachments": "附件",
+      "secrets": "保密字段与 TOTP 密钥",
+      "attachmentContent": "附件内容",
+      "encryption": "文件加密"
+    },
+    "values": {
+      "included": "包含",
+      "notIncluded": "不包含",
+      "encrypted": "口令加密",
+      "plain": "未加密",
+      "attachments": "{count} 个, 共 {size}"
+    },
+    "replace": {
+      "title": "将清空当前保险库",
+      "description": "当前保险库里有 {entries} 条条目, {attachments} 个附件, {folders} 个文件夹, {tags} 个标签, {customTypes} 个自定义类型. 恢复会先永久删除这些数据, 再写入备份里的内容, 无法撤销. 建议先导出当前数据. 如果恢复失败, 当前数据保持原样.",
+      "acknowledge": "我明白这些数据将被永久删除"
+    },
+    "confirm": {
+      "masterPassword": {
+        "label": "主密码",
+        "hint": "恢复会写入大量数据, 请重新输入主密码确认是你本人操作."
+      }
+    },
+    "progress": {
+      "idle": "正在处理...",
+      "reading": "正在读取备份文件...",
+      "decrypting": "正在解密, 可能需要几秒...",
+      "unpacking": "正在解包...",
+      "validating": "正在校验内容...",
+      "writing": "正在写入保险库...",
+      "counts": "{processed} / {total}"
+    },
+    "result": {
+      "heading": "恢复完成",
+      "replaced": "已清空原有数据, 并替换为备份里的内容.",
+      "close": "完成"
+    },
+    "problem": {
+      "withPosition": "{section}, 第 {position} 项, {code}",
+      "withoutPosition": "{section}, {code}",
+      "section": {
+        "manifest": "清单",
+        "archive": "压缩包",
+        "folders": "文件夹",
+        "tags": "标签",
+        "customTypes": "自定义类型",
+        "entries": "条目",
+        "attachments": "附件"
+      },
+      "code": {
+        "wrong-shape": "结构不对",
+        "duplicate-id": "编号重复",
+        "duplicate-name": "名称重复",
+        "invalid-value": "取值不合规",
+        "unknown-reference": "引用了不存在的内容",
+        "count-mismatch": "个数与清单不符",
+        "unexpected-file": "含有不认识的文件",
+        "duplicate-file": "文件重名",
+        "missing-file": "缺少文件",
+        "size-mismatch": "附件大小与声明不符",
+        "too-many-files": "文件个数过多",
+        "too-large": "内容过大",
+        "too-many-entries": "条目过多"
+      }
+    },
+    "failure": {
+      "vault-locked": "保险库已锁定, 请重新解锁后再试.",
+      "unexpected-error": "恢复失败, 没有任何改动. 请重试, 仍失败请关闭应用后重试.",
+      "invalid-input": "参数不合规, 请重新选择文件.",
+      "busy": "正在处理另一次恢复, 请稍候.",
+      "no-pending-restore": "没有等待确认的备份, 请重新选择文件.",
+      "file-unreadable": "无法读取这个文件.",
+      "file-too-large": "这个文件超过恢复上限, 无法恢复.",
+      "not-a-backup": "不是本应用的备份文件.",
+      "wrong-passphrase": "口令不对, 请重新输入.",
+      "damaged-file": "备份文件已损坏或不完整, 没有改动任何数据.",
+      "newer-version": "备份来自更新版本的应用, 请先升级本应用再恢复.",
+      "invalid-content": "备份内容不合规, 已整体拒绝, 没有改动任何数据. 第一个问题: {problem}.",
+      "limit-exceeded": "备份超过恢复上限, 已整体拒绝, 没有改动任何数据. 第一个问题: {problem}.",
+      "wrong-master-password": "主密码不正确, 请重新输入.",
+      "replace-not-acknowledged": "请先确认将清空当前保险库.",
+      "back": "重新选择"
+    }
+  },
   "settings": {
     "open": "设置"
   },

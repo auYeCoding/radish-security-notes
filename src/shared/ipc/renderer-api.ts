@@ -9,6 +9,7 @@ import type { FolderBridge } from "../folders/folder-bridge";
 import type { ImportBridge } from "../import/import-bridge";
 import type { LinkBridge } from "../links/link-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
+import type { RestoreBridge } from "../restore/restore-bridge";
 import type { TagBridge } from "../tags/tag-bridge";
 import type { RecoveryBridge } from "../vault/recovery-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
@@ -69,6 +70,10 @@ export interface RendererApi {
    * 邮箱备份接口: 保存邮箱设置, 发送测试邮件, 立即把备份发到自己的邮箱, 读取上次结果.
    */
   readonly emailBackup: EmailBackupBridge;
+  /**
+   * 恢复接口: 选择备份文件, 输入口令, 看备份概要, 确认后把全部数据恢复回来.
+   */
+  readonly restorer: RestoreBridge;
   /**
    * 链接接口: 请主进程用系统默认程序打开外部链接.
    */

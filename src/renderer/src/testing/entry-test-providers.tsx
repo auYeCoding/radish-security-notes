@@ -5,6 +5,7 @@ import type { EmailBackupBridge } from "@shared/email-backup/email-backup-bridge
 import type { ExportBridge } from "@shared/export/export-bridge";
 import type { ImportBridge } from "@shared/import/import-bridge";
 import type { LinkBridge } from "@shared/links/link-bridge";
+import type { RestoreBridge } from "@shared/restore/restore-bridge";
 import type { ReactNode } from "react";
 
 import { AttachmentBridgeProvider } from "@renderer/stores/attachment-bridge-provider";
@@ -21,6 +22,7 @@ import type { FolderStore } from "@renderer/stores/folder-store";
 import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { ImportBridgeProvider } from "@renderer/stores/import-bridge-provider";
 import { LinkBridgeProvider } from "@renderer/stores/link-bridge-provider";
+import { RestoreBridgeProvider } from "@renderer/stores/restore-bridge-provider";
 import type { TagStore } from "@renderer/stores/tag-store";
 import { TagStoreProvider } from "@renderer/stores/tag-store-provider";
 import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
@@ -90,6 +92,10 @@ export interface EntryTestProviderValues {
    */
   readonly emailBackupBridge: EmailBackupBridge;
   /**
+   * 恢复桥.
+   */
+  readonly restoreBridge: RestoreBridge;
+  /**
    * 链接桥.
    */
   readonly linkBridge: LinkBridge;
@@ -97,7 +103,7 @@ export interface EntryTestProviderValues {
 
 /**
  * 创建包裹被测组件的 Provider: 在保险库 Provider 之内依次注入条目, 自定义类型, 文件夹, 标签,
- * 批量选中 store, 批量桥, TOTP 桥, 附件桥与链接桥.
+ * 批量选中 store, 批量桥, TOTP 桥, 附件桥, 导入桥, 导出桥, 邮箱备份桥, 恢复桥与链接桥.
  * @param values 要注入的 store 与桥.
  * @returns Provider 组件.
  */
@@ -125,9 +131,13 @@ export function createEntryTestProviders(
                             <EmailBackupBridgeProvider
                               bridge={values.emailBackupBridge}
                             >
-                              <LinkBridgeProvider bridge={values.linkBridge}>
-                                {props.children}
-                              </LinkBridgeProvider>
+                              <RestoreBridgeProvider
+                                bridge={values.restoreBridge}
+                              >
+                                <LinkBridgeProvider bridge={values.linkBridge}>
+                                  {props.children}
+                                </LinkBridgeProvider>
+                              </RestoreBridgeProvider>
                             </EmailBackupBridgeProvider>
                           </ExportBridgeProvider>
                         </ImportBridgeProvider>

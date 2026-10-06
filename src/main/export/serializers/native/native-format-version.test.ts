@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  attachmentIdOfPath,
+  isNativeAttachmentId,
   NATIVE_FORMAT_ID,
   NATIVE_FORMAT_VERSION,
   nativeAttachmentPath,
@@ -24,6 +26,31 @@ describe("本应用格式的版本与路径", () => {
       expect(() => nativeAttachmentPath(unsafe)).toThrow(
         "附件编号含有不能用作文件名的字符",
       );
+    }
+  });
+
+  it("附件编号只允许字母, 数字, 下划线与连字符", () => {
+    expect(isNativeAttachmentId("att-1_A")).toBe(true);
+    for (const unsafe of ["../x", "a/b", "a\\b", "a.b", "", "a b"]) {
+      expect(isNativeAttachmentId(unsafe)).toBe(false);
+    }
+  });
+
+  it("由附件路径取回编号, 是 nativeAttachmentPath 的逆运算", () => {
+    expect(attachmentIdOfPath(nativeAttachmentPath("att-1"))).toBe("att-1");
+  });
+
+  it("不在附件目录下, 编号不合规或嵌套的路径取不出编号", () => {
+    for (const path of [
+      "manifest.json",
+      "attachments/",
+      "attachments/a/b",
+      "attachments/../x",
+      "attachments/a.b",
+      "Attachments/a",
+      "/attachments/a",
+    ]) {
+      expect(attachmentIdOfPath(path)).toBeUndefined();
     }
   });
 });

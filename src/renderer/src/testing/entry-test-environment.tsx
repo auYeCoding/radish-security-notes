@@ -11,6 +11,7 @@ import type { FolderBridge } from "@shared/folders/folder-bridge";
 import type { FolderSummary } from "@shared/folders/folder-types";
 import type { ImportBridge } from "@shared/import/import-bridge";
 import type { LinkBridge } from "@shared/links/link-bridge";
+import type { RestoreBridge } from "@shared/restore/restore-bridge";
 import type { TagBridge } from "@shared/tags/tag-bridge";
 import type { TagSummary } from "@shared/tags/tag-types";
 
@@ -45,6 +46,7 @@ import { createFakeExportBridge } from "./fake-export-bridge";
 import { createFakeFolderBridge } from "./fake-folder-bridge";
 import { createFakeImportBridge } from "./fake-import-bridge";
 import { createFakeLinkBridge } from "./fake-link-bridge";
+import { createFakeRestoreBridge } from "./fake-restore-bridge";
 import { createFakeTagBridge } from "./fake-tag-bridge";
 import { createFakeTotpBridge } from "./fake-totp-bridge";
 import {
@@ -93,6 +95,10 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    * 覆盖假邮箱备份桥上的方法, 例如让发送失败.
    */
   readonly emailBackupBridgeOverrides?: Partial<EmailBackupBridge>;
+  /**
+   * 覆盖假恢复桥上的方法, 例如让选择文件失败.
+   */
+  readonly restoreBridgeOverrides?: Partial<RestoreBridge>;
   /**
    * 覆盖假链接桥上的方法, 例如让打开失败.
    */
@@ -171,6 +177,10 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
    */
   readonly emailBackupBridge: EmailBackupBridge;
   /**
+   * 带间谍方法的假恢复桥.
+   */
+  readonly restoreBridge: RestoreBridge;
+  /**
    * 带间谍方法的假链接桥.
    */
   readonly linkBridge: LinkBridge;
@@ -209,6 +219,7 @@ type EntryTestBridges = Pick<
   | "importBridge"
   | "exportBridge"
   | "emailBackupBridge"
+  | "restoreBridge"
   | "linkBridge"
   | "folderBridge"
   | "tagBridge"
@@ -250,6 +261,7 @@ function createEntryTestBridges(
     emailBackupBridge: createFakeEmailBackupBridge(
       options.emailBackupBridgeOverrides,
     ),
+    restoreBridge: createFakeRestoreBridge(options.restoreBridgeOverrides),
     linkBridge: createFakeLinkBridge(options.linkBridgeOverrides),
     folderBridge: createFakeFolderBridge(
       options.folders,
@@ -313,6 +325,7 @@ export async function createEntryTestEnvironment(
     importBridge: bridges.importBridge,
     exportBridge: bridges.exportBridge,
     emailBackupBridge: bridges.emailBackupBridge,
+    restoreBridge: bridges.restoreBridge,
     linkBridge: bridges.linkBridge,
   });
   return { ...vault, ...bridges, ...stores, Providers };

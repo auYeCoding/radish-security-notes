@@ -994,6 +994,142 @@
       }
     }
   },
+  "restore": {
+    "trigger": {
+      "label": "Restore from backup"
+    },
+    "dialog": {
+      "title": "Restore from backup",
+      "description": "Choose a backup file you downloaded from your email, preview it, and confirm to restore. The file is read and decrypted on this computer and its content never leaves the app.",
+      "openTitle": "Choose a backup file",
+      "filter": "Backup files"
+    },
+    "pick": {
+      "intro": "Backup files made by this app are supported: .zip, or .age encrypted with a passphrase. You see a preview first, and nothing changes until you confirm.",
+      "choose": "Choose a backup file...",
+      "included": {
+        "title": "What is restored",
+        "body": "All entries, attachments, folders, tags and custom types."
+      }
+    },
+    "notIncluded": {
+      "title": "What is not in a backup",
+      "body": "Email settings, authorization codes, backup passphrases, the automatic backup schedule, the master password, the recovery key, and the theme and language are not in a backup and are not restored. Set them up again after a fresh install."
+    },
+    "passphrase": {
+      "heading": "Enter the backup passphrase",
+      "description": "This backup file is encrypted with a passphrase (about {size}). Enter the passphrase you set when the backup was made.",
+      "label": "Backup passphrase",
+      "wrong": "Wrong passphrase, try again.",
+      "submit": "Decrypt and preview",
+      "back": "Choose another file"
+    },
+    "preview": {
+      "heading": "Confirm what to restore",
+      "description": "This backup was made on {createdAt}. Nothing changes until you press the button below.",
+      "emptyVault": "The vault is empty now, so the backup is written exactly as it is.",
+      "noSecrets": {
+        "title": "This backup has no secret fields",
+        "description": "Passwords, keys, TOTP secrets and other secret fields are empty in the backup, so they will be empty after the restore."
+      },
+      "noAttachments": {
+        "title": "This backup has no attachment content",
+        "description": "Entries will have no attachments after the restore."
+      },
+      "back": "Choose another file",
+      "submit": "Start restore",
+      "submitReplace": "Clear and restore"
+    },
+    "rows": {
+      "createdAt": "Backup made on",
+      "entries": "Entries",
+      "folders": "Folders",
+      "tags": "Tags",
+      "customTypes": "Custom types",
+      "attachments": "Attachments",
+      "secrets": "Secret fields and TOTP secrets",
+      "attachmentContent": "Attachment content",
+      "encryption": "File encryption"
+    },
+    "values": {
+      "included": "Included",
+      "notIncluded": "Not included",
+      "encrypted": "Passphrase encrypted",
+      "plain": "Not encrypted",
+      "attachments": "{count}, {size} in total"
+    },
+    "replace": {
+      "title": "The vault will be cleared",
+      "description": "The vault now holds {entries} entries, {attachments} attachments, {folders} folders, {tags} tags and {customTypes} custom types. The restore permanently deletes them first, then writes the backup, and it cannot be undone. Export your current data first if you may need it. If the restore fails, your current data stays as it is.",
+      "acknowledge": "I understand this data will be permanently deleted"
+    },
+    "confirm": {
+      "masterPassword": {
+        "label": "Master password",
+        "hint": "A restore writes a lot of data. Enter your master password again to confirm it is you."
+      }
+    },
+    "progress": {
+      "idle": "Working...",
+      "reading": "Reading the backup file...",
+      "decrypting": "Decrypting, this can take a few seconds...",
+      "unpacking": "Unpacking...",
+      "validating": "Checking the content...",
+      "writing": "Writing to the vault...",
+      "counts": "{processed} / {total}"
+    },
+    "result": {
+      "heading": "Restore complete",
+      "replaced": "The previous data was cleared and replaced with the backup.",
+      "close": "Done"
+    },
+    "problem": {
+      "withPosition": "{section}, item {position}, {code}",
+      "withoutPosition": "{section}, {code}",
+      "section": {
+        "manifest": "manifest",
+        "archive": "archive",
+        "folders": "folders",
+        "tags": "tags",
+        "customTypes": "custom types",
+        "entries": "entries",
+        "attachments": "attachments"
+      },
+      "code": {
+        "wrong-shape": "wrong structure",
+        "duplicate-id": "duplicate id",
+        "duplicate-name": "duplicate name",
+        "invalid-value": "invalid value",
+        "unknown-reference": "refers to something that does not exist",
+        "count-mismatch": "count does not match the manifest",
+        "unexpected-file": "unknown file",
+        "duplicate-file": "duplicate file name",
+        "missing-file": "missing file",
+        "size-mismatch": "attachment size does not match",
+        "too-many-files": "too many files",
+        "too-large": "too large",
+        "too-many-entries": "too many entries"
+      }
+    },
+    "failure": {
+      "vault-locked": "The vault is locked. Unlock it and try again.",
+      "unexpected-error": "The restore failed and nothing was changed. Try again; if it still fails, close the app and retry.",
+      "invalid-input": "Invalid parameters. Choose the file again.",
+      "busy": "Another restore is in progress. Wait a moment.",
+      "no-pending-restore": "There is no backup waiting for confirmation. Choose the file again.",
+      "file-unreadable": "This file cannot be read.",
+      "file-too-large": "This file is over the restore limit and cannot be restored.",
+      "not-a-backup": "This is not a backup file from this app.",
+      "wrong-passphrase": "Wrong passphrase, try again.",
+      "damaged-file": "The backup file is damaged or incomplete. Nothing was changed.",
+      "newer-version": "This backup comes from a newer version of the app. Update the app before restoring.",
+      "invalid-content": "The backup content is not valid and was rejected as a whole. Nothing was changed. First problem: {problem}.",
+      "limit-exceeded": "The backup is over the restore limit and was rejected as a whole. Nothing was changed. First problem: {problem}.",
+      "wrong-master-password": "The master password is wrong, try again.",
+      "replace-not-acknowledged": "Confirm first that the vault will be cleared.",
+      "back": "Choose another file"
+    }
+  },
   "settings": {
     "open": "Settings"
   },

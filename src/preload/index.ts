@@ -13,6 +13,7 @@ import { createImportBridge } from "./create-import-bridge";
 import { createLinkBridge } from "./create-link-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
 import { createRecoveryBridge } from "./create-recovery-bridge";
+import { createRestoreBridge } from "./create-restore-bridge";
 import { createTagBridge } from "./create-tag-bridge";
 import { createTotpBridge } from "./create-totp-bridge";
 import { createVaultBridge } from "./create-vault-bridge";
@@ -37,6 +38,7 @@ const api: RendererApi = {
   importer: createImportBridge(ipcRenderer),
   exporter: createExportBridge(ipcRenderer),
   emailBackup: createEmailBackupBridge(ipcRenderer),
+  restorer: createRestoreBridge(ipcRenderer),
   links: createLinkBridge(ipcRenderer),
 };
 
