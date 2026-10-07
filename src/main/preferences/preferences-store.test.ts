@@ -50,3 +50,29 @@ describe("PreferencesStore", () => {
     expect(store.getLanguage("zh-CN")).toBe("zh");
   });
 });
+
+describe("PreferencesStore: 侧栏折叠状态", () => {
+  it("没有保存过时侧栏默认展开", () => {
+    const store = new PreferencesStore(createInMemoryKeyValueBackend());
+
+    expect(store.isSidebarCollapsed()).toBe(false);
+  });
+
+  it("保存侧栏折叠状态后能读回, 再展开也能读回", () => {
+    const store = new PreferencesStore(createInMemoryKeyValueBackend());
+
+    store.setSidebarCollapsed(true);
+    expect(store.isSidebarCollapsed()).toBe(true);
+
+    store.setSidebarCollapsed(false);
+    expect(store.isSidebarCollapsed()).toBe(false);
+  });
+
+  it("存储里的侧栏折叠状态不是布尔值时按展开处理", () => {
+    const store = new PreferencesStore(
+      createInMemoryKeyValueBackend({ isSidebarCollapsed: "yes" }),
+    );
+
+    expect(store.isSidebarCollapsed()).toBe(false);
+  });
+});

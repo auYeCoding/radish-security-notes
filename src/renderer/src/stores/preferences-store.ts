@@ -6,7 +6,7 @@ import type { i18n } from "i18next";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 /**
- * 偏好状态: 用户当前选择的主题来源与界面语言.
+ * 偏好状态: 用户当前选择的主题来源, 界面语言与侧栏折叠状态.
  */
 export interface PreferencesState {
   /**
@@ -17,6 +17,10 @@ export interface PreferencesState {
    * 当前界面语言.
    */
   readonly language: SupportedLanguage;
+  /**
+   * 侧栏当前是否折叠.
+   */
+  readonly isSidebarCollapsed: boolean;
 }
 
 /**
@@ -35,6 +39,12 @@ export interface PreferencesActions {
    * @returns 主进程保存并切换后兑现.
    */
   setLanguage: (language: SupportedLanguage) => Promise<void>;
+  /**
+   * 折叠或展开侧栏.
+   * @param isCollapsed 侧栏是否折叠.
+   * @returns 主进程保存后兑现.
+   */
+  setSidebarCollapsed: (isCollapsed: boolean) => Promise<void>;
 }
 
 /**
@@ -72,6 +82,7 @@ export function createPreferencesStore(
   return createStore<PreferencesState & PreferencesActions>()((set) => ({
     themeSource: initial.themeSource,
     language: initial.language,
+    isSidebarCollapsed: initial.isSidebarCollapsed,
     setThemeSource: async (themeSource) => {
       await bridge.setThemeSource(themeSource);
       set({ themeSource });
@@ -80,6 +91,10 @@ export function createPreferencesStore(
       await bridge.setLanguage(language);
       await i18n.changeLanguage(language);
       set({ language });
+    },
+    setSidebarCollapsed: async (isCollapsed) => {
+      await bridge.setSidebarCollapsed(isCollapsed);
+      set({ isSidebarCollapsed: isCollapsed });
     },
   }));
 }

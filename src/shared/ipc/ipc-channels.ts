@@ -5,6 +5,7 @@ export const IPC_CHANNELS = {
   preferencesGetSnapshot: "preferences:get-snapshot",
   preferencesSetThemeSource: "preferences:set-theme-source",
   preferencesSetLanguage: "preferences:set-language",
+  preferencesSetSidebarCollapsed: "preferences:set-sidebar-collapsed",
   vaultGetStatus: "vault:get-status",
   vaultSetupWithMasterPassword: "vault:setup-with-master-password",
   vaultSetupWithoutMasterPassword: "vault:setup-without-master-password",

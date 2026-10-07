@@ -17,10 +17,11 @@ import type { KeyValueBackend } from "./key-value-backend";
 const PREFERENCE_KEYS = {
   themeSource: "themeSource",
   language: "language",
+  isSidebarCollapsed: "isSidebarCollapsed",
 } as const;
 
 /**
- * 用户偏好存储: 保存并读取主题来源与界面语言, 读到不合法的值时回退到默认.
+ * 用户偏好存储: 保存并读取主题来源, 界面语言与侧栏折叠状态, 读到不合法的值时回退到默认.
  */
 export class PreferencesStore {
   /**
@@ -64,5 +65,21 @@ export class PreferencesStore {
    */
   setLanguage(language: SupportedLanguage): void {
     this.backend.set(PREFERENCE_KEYS.language, language);
+  }
+
+  /**
+   * 读取侧栏是否折叠.
+   * @returns 已保存的折叠状态, 没有保存过或存储里的值不是布尔值时为 false.
+   */
+  isSidebarCollapsed(): boolean {
+    return this.backend.get(PREFERENCE_KEYS.isSidebarCollapsed) === true;
+  }
+
+  /**
+   * 保存侧栏是否折叠.
+   * @param isCollapsed 要保存的折叠状态.
+   */
+  setSidebarCollapsed(isCollapsed: boolean): void {
+    this.backend.set(PREFERENCE_KEYS.isSidebarCollapsed, isCollapsed);
   }
 }

@@ -27,6 +27,11 @@
     "tagsLoadFailed": "Unable to load tags. Close the app and try again.",
     "actions": "More actions for {name}"
   },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "rowTooltip": "{name} ({count})"
+  },
   "folderName": {
     "label": "Name",
     "cancel": "Cancel",

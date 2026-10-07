@@ -18,6 +18,7 @@ import { PreferencesStoreProvider } from "@renderer/stores/preferences-store-pro
 export const TEST_INITIAL_SNAPSHOT: PreferencesSnapshot = {
   themeSource: "system",
   language: "zh",
+  isSidebarCollapsed: false,
   isPseudoLocalizationEnabled: false,
 };
 
@@ -68,6 +69,7 @@ export async function createPreferencesTestEnvironment(
     getSnapshot: vi.fn(() => Promise.resolve(TEST_INITIAL_SNAPSHOT)),
     setThemeSource: vi.fn(() => Promise.resolve()),
     setLanguage: vi.fn(() => Promise.resolve()),
+    setSidebarCollapsed: vi.fn(() => Promise.resolve()),
     ...bridgeOverrides,
   };
   const i18nInstance = await createI18nInstance({

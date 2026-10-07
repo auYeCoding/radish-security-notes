@@ -59,8 +59,18 @@ describe("PreferencesService", () => {
     expect(service.getSnapshot()).toEqual({
       themeSource: "system",
       language: "zh",
+      isSidebarCollapsed: false,
       isPseudoLocalizationEnabled: false,
     });
+  });
+
+  it("保存侧栏折叠状态后快照带回它", async () => {
+    const { service, store } = await createService("en-US");
+
+    service.setSidebarCollapsed(true);
+
+    expect(store.isSidebarCollapsed()).toBe(true);
+    expect(service.getSnapshot().isSidebarCollapsed).toBe(true);
   });
 
   it("切换主题来源时保存并应用到系统主题", async () => {

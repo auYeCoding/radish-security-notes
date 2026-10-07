@@ -59,6 +59,7 @@ export class PreferencesService {
     return {
       themeSource: store.getThemeSource(),
       language: store.getLanguage(systemLocale),
+      isSidebarCollapsed: store.isSidebarCollapsed(),
       isPseudoLocalizationEnabled,
     };
   }
@@ -81,6 +82,14 @@ export class PreferencesService {
     this.dependencies.store.setLanguage(language);
     await this.dependencies.i18n.changeLanguage(language);
     this.languageListeners.forEach((listener) => listener(language));
+  }
+
+  /**
+   * 保存侧栏是否折叠.
+   * @param isCollapsed 侧栏是否折叠.
+   */
+  setSidebarCollapsed(isCollapsed: boolean): void {
+    this.dependencies.store.setSidebarCollapsed(isCollapsed);
   }
 
   /**

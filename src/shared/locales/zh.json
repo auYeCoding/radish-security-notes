@@ -27,6 +27,11 @@
     "tagsLoadFailed": "无法读取标签. 请关闭应用后重试.",
     "actions": "{name} 的更多操作"
   },
+  "sidebar": {
+    "collapse": "收起侧栏",
+    "expand": "展开侧栏",
+    "rowTooltip": "{name} ({count})"
+  },
   "folderName": {
     "label": "名称",
     "cancel": "取消",

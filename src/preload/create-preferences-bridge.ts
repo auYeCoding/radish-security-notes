@@ -39,5 +39,11 @@ export function createPreferencesBridge(
     setLanguage: async (language) => {
       await ipcRenderer.invoke(IPC_CHANNELS.preferencesSetLanguage, language);
     },
+    setSidebarCollapsed: async (isCollapsed) => {
+      await ipcRenderer.invoke(
+        IPC_CHANNELS.preferencesSetSidebarCollapsed,
+        isCollapsed,
+      );
+    },
   };
 }

@@ -23,4 +23,10 @@ export interface PreferencesBridge {
    * @returns 保存完成后兑现.
    */
   setLanguage: (language: SupportedLanguage) => Promise<void>;
+  /**
+   * 设置侧栏是否折叠, 主进程保存.
+   * @param isCollapsed 侧栏是否折叠.
+   * @returns 保存完成后兑现.
+   */
+  setSidebarCollapsed: (isCollapsed: boolean) => Promise<void>;
 }

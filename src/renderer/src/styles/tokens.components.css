@@ -5,6 +5,7 @@
 :root {
   --control-height: calc(var(--space-base) * 8);
   --sidebar-width: calc(var(--space-base) * 56);
+  --sidebar-collapsed-width: calc(var(--space-base) * 14);
   --list-pane-width: calc(var(--space-base) * 80);
   --topbar-height: calc(var(--space-base) * 14);
   --titlebar-height: calc(var(--space-base) * 8);

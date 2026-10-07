@@ -14,6 +14,10 @@ export interface PreferencesSnapshot {
    */
   readonly language: SupportedLanguage;
   /**
+   * 侧栏是否处于折叠状态, 用户没有折叠过时为 false.
+   */
+  readonly isSidebarCollapsed: boolean;
+  /**
    * 是否启用开发用的伪本地化.
    */
   readonly isPseudoLocalizationEnabled: boolean;

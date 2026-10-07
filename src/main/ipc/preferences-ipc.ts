@@ -46,4 +46,13 @@ export function registerPreferencesIpc(
     }
     return service.setLanguage(language);
   });
+  ipcMain.handle(
+    IPC_CHANNELS.preferencesSetSidebarCollapsed,
+    (_event, isCollapsed) => {
+      if (typeof isCollapsed !== "boolean") {
+        throw new Error("无效的侧栏折叠状态");
+      }
+      service.setSidebarCollapsed(isCollapsed);
+    },
+  );
 }

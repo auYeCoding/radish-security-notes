@@ -44,10 +44,12 @@ function createFakeService(): PreferencesService {
     getSnapshot: vi.fn(() => ({
       themeSource: "system",
       language: "en",
+      isSidebarCollapsed: false,
       isPseudoLocalizationEnabled: false,
     })),
     setThemeSource: vi.fn(),
     setLanguage: vi.fn(() => Promise.resolve()),
+    setSidebarCollapsed: vi.fn(),
     onLanguageChanged: vi.fn(),
   } as unknown as PreferencesService;
 }
@@ -95,5 +97,21 @@ describe("registerPreferencesIpc", () => {
     expect(() =>
       ipcMain.invoke(IPC_CHANNELS.preferencesSetLanguage, "pseudo"),
     ).toThrow("无效的界面语言");
+  });
+
+  it("布尔的侧栏折叠状态交给服务, 非布尔值被拒绝且不触达服务", () => {
+    const ipcMain = createFakeIpcMain();
+    const service = createFakeService();
+    registerPreferencesIpc(ipcMain, service);
+
+    ipcMain.invoke(IPC_CHANNELS.preferencesSetSidebarCollapsed, true);
+    ipcMain.invoke(IPC_CHANNELS.preferencesSetSidebarCollapsed, false);
+
+    expect(service.setSidebarCollapsed).toHaveBeenNthCalledWith(1, true);
+    expect(service.setSidebarCollapsed).toHaveBeenNthCalledWith(2, false);
+    expect(() =>
+      ipcMain.invoke(IPC_CHANNELS.preferencesSetSidebarCollapsed, "true"),
+    ).toThrow("无效的侧栏折叠状态");
+    expect(service.setSidebarCollapsed).toHaveBeenCalledTimes(2);
   });
 });

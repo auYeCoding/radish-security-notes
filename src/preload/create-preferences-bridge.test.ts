@@ -9,6 +9,7 @@ describe("createPreferencesBridge", () => {
     const snapshot = {
       themeSource: "dark",
       language: "zh",
+      isSidebarCollapsed: false,
       isPseudoLocalizationEnabled: false,
     };
     const invoke = vi.fn(() => Promise.resolve(snapshot));
@@ -35,6 +36,18 @@ describe("createPreferencesBridge", () => {
       2,
       IPC_CHANNELS.preferencesSetLanguage,
       "en",
+    );
+  });
+
+  it("setSidebarCollapsed 调用对应通道并带上折叠状态", async () => {
+    const invoke = vi.fn(() => Promise.resolve(undefined));
+    const bridge = createPreferencesBridge({ invoke });
+
+    await bridge.setSidebarCollapsed(true);
+
+    expect(invoke).toHaveBeenCalledWith(
+      IPC_CHANNELS.preferencesSetSidebarCollapsed,
+      true,
     );
   });
 });
