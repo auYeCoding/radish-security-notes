@@ -7,6 +7,7 @@
 @import "./tokens.semantic.css";
 @import "./tokens.components.css";
 @import "./theme.css";
+@import "./print-recovery-kit.css";
 
 @layer base {
   * {

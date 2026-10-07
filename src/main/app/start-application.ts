@@ -16,6 +16,7 @@ import { registerMasterPasswordIpc } from "../ipc/master-password-ipc";
 import type { ExternalLinkOpener } from "../links/external-link-opener";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
 import { registerRecoveryIpc } from "../ipc/recovery-ipc";
+import { registerRecoveryKeyIpc } from "../ipc/recovery-key-ipc";
 import { registerRestoreIpc } from "../ipc/restore-ipc";
 import { registerTagIpc } from "../ipc/tag-ipc";
 import { registerTotpIpc } from "../ipc/totp-ipc";
@@ -115,6 +116,7 @@ export async function startApplication(): Promise<void> {
   registerVaultIpc(ipcMain, vault.service);
   const recovery = createRecoveryRuntime(runtime.i18n);
   registerRecoveryIpc(ipcMain, vault.service, recovery.textFileSaver);
+  registerRecoveryKeyIpc(ipcMain, vault.service);
   registerMasterPasswordIpc(
     ipcMain,
     vault.service,

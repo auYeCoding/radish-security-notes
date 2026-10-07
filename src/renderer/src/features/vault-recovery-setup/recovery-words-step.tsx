@@ -1,12 +1,8 @@
 import { useTranslation } from "react-i18next";
 
-import { NumberedWordGrid } from "@renderer/components/numbered-word-grid";
-import { Alert, AlertDescription } from "@renderer/components/ui/alert";
+import { RecoveryWordsDisplay } from "@renderer/components/recovery-words-display";
 import { Button } from "@renderer/components/ui/button";
-import { FieldDescription } from "@renderer/components/ui/field";
-import { RECOVERY_WORD_COUNT } from "@shared/vault/recovery-words";
-
-import { RecoverySaveActions } from "./recovery-save-actions";
+import { useVaultStore } from "@renderer/stores/use-vault-store";
 
 /**
  * 展示步骤的属性.
@@ -23,7 +19,7 @@ interface RecoveryWordsStepProps {
 }
 
 /**
- * 恢复词展示步骤: 泄露警示, 带序号的 24 个词, 保存手段与继续按钮. 没有复制入口.
+ * 恢复词展示步骤: 恢复词展示加继续按钮. 没有复制入口, 文本文件经保险库 store 保存.
  * @param props 组件属性.
  * @returns 展示步骤元素.
  */
@@ -31,22 +27,15 @@ export function RecoveryWordsStep(
   props: RecoveryWordsStepProps,
 ): React.JSX.Element {
   const { t } = useTranslation();
+  const saveRecoveryTextFile = useVaultStore(
+    (state) => state.saveRecoveryTextFile,
+  );
   return (
     <div className="flex flex-col gap-6">
-      <Alert role="note">
-        <AlertDescription>{t("vault.recovery.warning")}</AlertDescription>
-      </Alert>
-      <NumberedWordGrid
-        label={t("vault.recovery.wordsLabel")}
-        count={RECOVERY_WORD_COUNT}
-        renderCell={(position) => (
-          <span className="font-mono text-sm text-foreground">
-            {props.words[position - 1]}
-          </span>
-        )}
+      <RecoveryWordsDisplay
+        words={props.words}
+        onSaveTextFile={saveRecoveryTextFile}
       />
-      <FieldDescription>{t("vault.recovery.show.noCopy")}</FieldDescription>
-      <RecoverySaveActions words={props.words} />
       <Button type="button" onClick={props.onContinue}>
         {t("vault.recovery.show.continue")}
       </Button>

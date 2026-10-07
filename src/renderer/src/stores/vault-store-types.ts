@@ -1,5 +1,6 @@
 import type {
   RecoveryBridge,
+  RecoveryKeyViewResult,
   RecoveryTextFileStatus,
 } from "@shared/vault/recovery-bridge";
 import type { VaultBridge } from "@shared/vault/vault-bridge";
@@ -95,6 +96,12 @@ export interface VaultActions {
   saveRecoveryTextFile: (
     words: readonly string[],
   ) => Promise<RecoveryTextFileStatus>;
+  /**
+   * 查看恢复密钥, 不改变保险库状态, 失败也不进失败页.
+   * @param masterPassword 用户输入的当前主密码, 由系统保护数据密钥时不给.
+   * @returns 查看结果, 成功时带 24 个恢复词.
+   */
+  viewRecoveryKey: (masterPassword?: string) => Promise<RecoveryKeyViewResult>;
 }
 
 /**

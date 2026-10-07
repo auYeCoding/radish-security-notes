@@ -30,7 +30,7 @@ interface SettingsDialogProps {
    */
   readonly data: SettingsDataEntries;
   /**
-   * "安全" 分区一行右侧的操作元素.
+   * "安全" 分区两行右侧的操作元素.
    */
   readonly security: SettingsSecurityEntries;
 }

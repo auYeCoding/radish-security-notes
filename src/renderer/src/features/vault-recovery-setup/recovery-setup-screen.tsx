@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { GateCard } from "@renderer/components/gate-card";
+import { RecoveryPrintSheet } from "@renderer/components/recovery-print-sheet";
 import { useVaultStore } from "@renderer/stores/use-vault-store";
 
 import { pickConfirmationPositions } from "./recovery-challenge";
 import { RecoveryConfirmStep } from "./recovery-confirm-step";
-import { RecoveryPrintSheet } from "./recovery-print-sheet";
 import { RecoveryWordsStep } from "./recovery-words-step";
 
 /**

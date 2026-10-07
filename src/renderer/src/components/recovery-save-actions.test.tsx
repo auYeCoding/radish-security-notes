@@ -21,9 +21,13 @@ async function renderActions(
   options: VaultTestEnvironmentOptions = {},
 ): Promise<VaultTestEnvironment> {
   const environment = await createVaultTestEnvironment(options);
-  render(<RecoverySaveActions words={TEST_RECOVERY_WORDS} />, {
-    wrapper: environment.Providers,
-  });
+  render(
+    <RecoverySaveActions
+      words={TEST_RECOVERY_WORDS}
+      onSaveTextFile={environment.recoveryBridge.saveTextFile}
+    />,
+    { wrapper: environment.Providers },
+  );
   return environment;
 }
 

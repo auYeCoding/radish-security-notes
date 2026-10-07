@@ -1,12 +1,34 @@
 import { describe, expect, it } from "vitest";
 
-import { requireMasterPassword, requireRecoveryWords } from "./ipc-arguments";
+import {
+  requireMasterPassword,
+  requireOptionalMasterPassword,
+  requireRecoveryWords,
+} from "./ipc-arguments";
 
 describe("requireMasterPassword", () => {
   it("字符串原样通过, 其它类型被拒绝", () => {
     expect(requireMasterPassword("abc")).toBe("abc");
     expect(() => requireMasterPassword(12345678)).toThrow("无效的主密码");
     expect(() => requireMasterPassword(undefined)).toThrow("无效的主密码");
+  });
+});
+
+describe("requireOptionalMasterPassword", () => {
+  it("字符串与 undefined 原样通过", () => {
+    expect(requireOptionalMasterPassword("abc")).toBe("abc");
+    expect(requireOptionalMasterPassword("")).toBe("");
+    expect(requireOptionalMasterPassword(undefined)).toBeUndefined();
+  });
+
+  it("其它类型被拒绝, 包括 null 与对象", () => {
+    expect(() => requireOptionalMasterPassword(null)).toThrow("无效的主密码");
+    expect(() => requireOptionalMasterPassword(12345678)).toThrow(
+      "无效的主密码",
+    );
+    expect(() => requireOptionalMasterPassword({ password: "x" })).toThrow(
+      "无效的主密码",
+    );
   });
 });
 

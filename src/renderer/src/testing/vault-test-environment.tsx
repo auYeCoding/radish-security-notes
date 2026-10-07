@@ -129,6 +129,7 @@ export async function createVaultTestEnvironment(
       Promise.resolve(VAULT_OPERATION_SUCCEEDED),
     ),
     saveTextFile: vi.fn(() => Promise.resolve("saved" as const)),
+    viewKey: vi.fn(() => Promise.resolve(TEST_SETUP_SUCCEEDED)),
     ...options.recoveryBridgeOverrides,
   };
   const vaultStore = createVaultStore({

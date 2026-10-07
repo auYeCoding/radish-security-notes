@@ -4,7 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@renderer/components/ui/button";
 import { FieldDescription } from "@renderer/components/ui/field";
 
-import { useRecoveryTextSave } from "./use-recovery-text-save";
+import {
+  useRecoveryTextSave,
+  type SaveRecoveryTextFile,
+} from "./use-recovery-text-save";
 
 /**
  * 保存手段按钮区的属性.
@@ -14,6 +17,10 @@ interface RecoverySaveActionsProps {
    * 要保存的 24 个恢复词.
    */
   readonly words: readonly string[];
+  /**
+   * 把恢复词保存为文本文件的函数, 由调用方提供.
+   */
+  readonly onSaveTextFile: SaveRecoveryTextFile;
 }
 
 /**
@@ -26,7 +33,10 @@ export function RecoverySaveActions(
   props: RecoverySaveActionsProps,
 ): React.JSX.Element {
   const { t } = useTranslation();
-  const { state, save } = useRecoveryTextSave(props.words);
+  const { state, save } = useRecoveryTextSave(
+    props.words,
+    props.onSaveTextFile,
+  );
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-2">

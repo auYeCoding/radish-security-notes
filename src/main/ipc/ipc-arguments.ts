@@ -22,6 +22,20 @@ export function requireMasterPassword(masterPassword: unknown): string {
 }
 
 /**
+ * 校验渲染进程传来的主密码参数是字符串或没有给出. 没有给出表示由系统保护数据密钥, 不需要主密码.
+ * @param masterPassword 渲染进程传来的值.
+ * @returns 校验通过的主密码, 没有给出时为 undefined.
+ * @throws Error 当参数既不是字符串也不是 undefined 时.
+ */
+export function requireOptionalMasterPassword(
+  masterPassword: unknown,
+): string | undefined {
+  return masterPassword === undefined
+    ? undefined
+    : requireMasterPassword(masterPassword);
+}
+
+/**
  * 校验渲染进程传来的恢复词参数是由字符串组成的有限长数组. 词数, 词表与校验和由保险库服务
  * 判定并带着原因返回, 这里只保证类型与大小.
  * @param words 渲染进程传来的值.

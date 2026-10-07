@@ -24,13 +24,14 @@ export interface VaultOperation {
    */
   readonly failureWordPosition: number | undefined;
   /**
-   * 执行一个保险库操作, 记录执行状态与失败原因. 操作抛出错误时按意外错误处理.
+   * 执行一个保险库操作, 记录执行状态与失败原因. 操作抛出错误时按意外错误处理. 操作的成功结果
+   * 可以带额外内容 (例如恢复词), 原样返回给调用方.
    * @param operation 要执行的操作.
    * @returns 操作结果.
    */
-  readonly run: (
-    operation: () => Promise<VaultOperationResult>,
-  ) => Promise<VaultOperationResult>;
+  readonly run: <Result extends VaultOperationResult>(
+    operation: () => Promise<Result>,
+  ) => Promise<Result | VaultOperationFailure>;
 }
 
 /**
@@ -43,9 +44,9 @@ export function useVaultOperation(): VaultOperation {
     undefined,
   );
   const run = useCallback(
-    async (
-      operation: () => Promise<VaultOperationResult>,
-    ): Promise<VaultOperationResult> => {
+    async <Result extends VaultOperationResult>(
+      operation: () => Promise<Result>,
+    ): Promise<Result | VaultOperationFailure> => {
       setIsPending(true);
       setFailure(undefined);
       try {

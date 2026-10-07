@@ -6,13 +6,14 @@ import { useAutoBackupFailure } from "@renderer/features/email-backup/use-auto-b
 import { ExportTrigger } from "@renderer/features/export-data/export-trigger";
 import { ImportTrigger } from "@renderer/features/import-data/import-trigger";
 import { MasterPasswordSwitch } from "@renderer/features/master-password-switch/master-password-switch";
+import { RecoveryKeyViewer } from "@renderer/features/recovery-key-viewer/recovery-key-viewer";
 import { RestoreTrigger } from "@renderer/features/restore-backup/restore-trigger";
 import { SettingsDialog } from "@renderer/features/settings-dialog/settings-dialog";
 import { SettingsTrigger } from "@renderer/features/settings-trigger/settings-trigger";
 
 /**
  * 设置入口的装配: 侧栏底部的设置按钮与它打开的设置对话框. 持有对话框的开合状态, 把导入, 导出, 邮箱
- * 备份, 从备份恢复四个入口放进对话框的 "数据" 分区, 把主密码开关放进 "安全" 分区; 最近一次自动备份
+ * 备份, 从备份恢复四个入口放进对话框的 "数据" 分区, 把主密码开关与查看恢复密钥放进 "安全" 分区; 最近一次自动备份
  * 失败时设置按钮上有失败标记.
  * 对话框打开期间不读取失败状态, 标记由对话框里的邮箱备份入口显示, 关闭后立即重新读取.
  * @returns 设置按钮与设置对话框元素.
@@ -35,7 +36,10 @@ export function SettingsEntry(): React.JSX.Element {
             emailBackupAction: <EmailBackupTrigger />,
             restoreAction: <RestoreTrigger />,
           }}
-          security={{ masterPasswordAction: <MasterPasswordSwitch /> }}
+          security={{
+            masterPasswordAction: <MasterPasswordSwitch />,
+            recoveryKeyAction: <RecoveryKeyViewer />,
+          }}
         />
       )}
     </>

@@ -1,0 +1,10 @@
+/*
+ * 设置里查看恢复密钥时的打印隔离. 打印套件由 portal 挂在 body 的直接子元素上, 带
+ * data-recovery-print-kit 标记; 页面上存在这个标记时, 打印只留套件, body 的其它直接子元素,
+ * 即三栏主界面所在的根容器与设置对话框, 遮罩所在的 portal 容器, 都不进入打印.
+ */
+@media print {
+  body:has(> [data-recovery-print-kit]) > :not([data-recovery-print-kit]) {
+    display: none;
+  }
+}

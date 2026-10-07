@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { SwitchField } from "@renderer/components/switch-field";
-
-import { DisableMasterPasswordDialog } from "./disable-master-password-dialog";
-import { EnableMasterPasswordDialog } from "./enable-master-password-dialog";
 import {
   useMasterPasswordState,
   type MasterPasswordState,
-} from "./use-master-password-state";
+} from "@renderer/stores/use-master-password-state";
+
+import { DisableMasterPasswordDialog } from "./disable-master-password-dialog";
+import { EnableMasterPasswordDialog } from "./enable-master-password-dialog";
 
 /**
  * 当前打开的对话框: 开启, 关闭, 或没有.

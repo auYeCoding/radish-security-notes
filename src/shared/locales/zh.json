@@ -1134,7 +1134,7 @@
     "open": "设置",
     "dialog": {
       "title": "设置",
-      "description": "管理数据的导入, 导出, 备份与恢复."
+      "description": "管理数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥."
     },
     "data": {
       "title": "数据",
@@ -1190,6 +1190,37 @@
             "notAcknowledged": "请先确认已了解关闭后的保护强度.",
             "systemUnavailable": "系统暂时无法保护数据密钥, 主密码保持开启. 请稍后重试."
           }
+        }
+      },
+      "recoveryKey": {
+        "name": "恢复密钥",
+        "description": "恢复密钥由数据密钥确定, 可随时重新查看, 内容不变.",
+        "action": "查看恢复密钥",
+        "verify": {
+          "title": "查看恢复密钥",
+          "description": "验证后显示 24 个恢复词. 内容与首次展示的相同, 泄露后无法更换.",
+          "passwordLabel": "当前主密码",
+          "acknowledgeLabel": "我已确认周围没有他人查看",
+          "loading": "正在读取...",
+          "unavailable": "无法读取主密码设置. 请点击重试.",
+          "retry": "重试",
+          "autoHidden": "为保护安全, 恢复词已自动隐藏. 需要重新验证才能再次查看.",
+          "cancel": "取消",
+          "submit": "查看",
+          "submitting": "正在验证...",
+          "error": {
+            "wrongPassword": "主密码不正确, 请重新输入.",
+            "passwordRequired": "请输入当前主密码.",
+            "notAcknowledged": "请先确认周围没有他人查看.",
+            "unexpectedState": "当前状态不允许这次操作. 请关闭对话框, 确认主密码设置后重试.",
+            "unexpected": "读取失败, 保险库保持不变. 请稍后重试."
+          }
+        },
+        "shown": {
+          "title": "恢复密钥",
+          "description": "这 24 个词与首次展示的相同, 泄露后无法更换. 显示 {seconds} 秒后会自动隐藏, 关闭对话框也会清除.",
+          "hide": "隐藏",
+          "done": "完成"
         }
       }
     }

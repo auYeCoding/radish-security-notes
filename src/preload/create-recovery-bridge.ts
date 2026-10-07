@@ -1,6 +1,7 @@
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 import type {
   RecoveryBridge,
+  RecoveryKeyViewResult,
   RecoveryTextFileStatus,
 } from "@shared/vault/recovery-bridge";
 import type { VaultOperationResult } from "@shared/vault/vault-operation-result";
@@ -44,6 +45,13 @@ export function createRecoveryBridge(
         words,
       );
       return status as RecoveryTextFileStatus;
+    },
+    viewKey: async (masterPassword) => {
+      const result = await ipcRenderer.invoke(
+        IPC_CHANNELS.recoveryViewKey,
+        masterPassword,
+      );
+      return result as RecoveryKeyViewResult;
     },
   };
 }

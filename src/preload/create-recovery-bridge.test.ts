@@ -68,3 +68,33 @@ describe("createRecoveryBridge", () => {
     expect(status).toBe("cancelled");
   });
 });
+
+describe("createRecoveryBridge 查看恢复密钥", () => {
+  it("viewKey 带上主密码调用查看通道并返回带词的结果", async () => {
+    const success = { ok: true, recoveryWords: WORDS };
+    const invoke = vi.fn(() => Promise.resolve(success));
+
+    const result = await createRecoveryBridge({ invoke }).viewKey(
+      "current password",
+    );
+
+    expect(invoke).toHaveBeenCalledWith(
+      IPC_CHANNELS.recoveryViewKey,
+      "current password",
+    );
+    expect(result).toEqual(success);
+  });
+
+  it("viewKey 没有主密码时只带通道名, 并原样返回失败", async () => {
+    const failure = { ok: false, reason: "unexpected-state" };
+    const invoke = vi.fn(() => Promise.resolve(failure));
+
+    const result = await createRecoveryBridge({ invoke }).viewKey();
+
+    expect(invoke).toHaveBeenCalledWith(
+      IPC_CHANNELS.recoveryViewKey,
+      undefined,
+    );
+    expect(result).toEqual(failure);
+  });
+});

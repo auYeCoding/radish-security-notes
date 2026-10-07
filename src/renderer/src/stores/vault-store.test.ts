@@ -52,6 +52,7 @@ function createRecoveryBridge(
       Promise.resolve(VAULT_OPERATION_SUCCEEDED),
     ),
     saveTextFile: vi.fn(() => Promise.resolve("saved" as const)),
+    viewKey: vi.fn(() => Promise.resolve(SETUP_SUCCEEDED)),
     ...overrides,
   };
 }
@@ -195,6 +196,34 @@ describe("createVaultStore 恢复词确认", () => {
     expect(await store.getState().saveRecoveryTextFile(WORDS)).toBe(
       "cancelled",
     );
+  });
+});
+
+describe("createVaultStore 查看恢复密钥", () => {
+  it("把主密码交给恢复桥并原样返回带词的结果, 状态不变", async () => {
+    const recoveryBridge = createRecoveryBridge();
+    const store = createStoreWith(createBridge(), "unlocked", recoveryBridge);
+
+    const result = await store.getState().viewRecoveryKey("current password");
+
+    expect(recoveryBridge.viewKey).toHaveBeenCalledWith("current password");
+    expect(result).toEqual(SETUP_SUCCEEDED);
+    expect(store.getState().status).toBe("unlocked");
+    expect(store.getState().pendingRecoveryWords).toBeUndefined();
+  });
+
+  it("失败不改变保险库状态, 也不重新向主进程取状态", async () => {
+    const bridge = createBridge();
+    const recoveryBridge = createRecoveryBridge({
+      viewKey: () => Promise.resolve(vaultOperationFailed("unexpected-error")),
+    });
+    const store = createStoreWith(bridge, "unlocked", recoveryBridge);
+
+    const result = await store.getState().viewRecoveryKey();
+
+    expect(result).toEqual({ ok: false, reason: "unexpected-error" });
+    expect(store.getState().status).toBe("unlocked");
+    expect(bridge.getStatus).not.toHaveBeenCalled();
   });
 });
 

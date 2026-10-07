@@ -11,6 +11,10 @@ export interface SettingsSecurityEntries {
    * 主密码行的操作元素.
    */
   readonly masterPasswordAction: React.ReactNode;
+  /**
+   * 恢复密钥行的操作元素.
+   */
+  readonly recoveryKeyAction: React.ReactNode;
 }
 
 /**
@@ -24,8 +28,8 @@ interface SettingsSecuritySectionProps {
 }
 
 /**
- * 设置对话框的 "安全" 分区: 目前只有 "主密码" 一行, 名称与说明是本分区自己的文案, 右侧是装配层
- * 提供的开关.
+ * 设置对话框的 "安全" 分区: 依次是 "主密码" 与 "恢复密钥" 两行, 名称与说明是本分区自己的文案,
+ * 右侧是装配层提供的开关与按钮.
  * @param props 组件属性.
  * @returns 安全分区元素.
  */
@@ -39,6 +43,11 @@ export function SettingsSecuritySection(
         name={t("settings.security.masterPassword.name")}
         description={t("settings.security.masterPassword.description")}
         action={props.entries.masterPasswordAction}
+      />
+      <SettingsRow
+        name={t("settings.security.recoveryKey.name")}
+        description={t("settings.security.recoveryKey.description")}
+        action={props.entries.recoveryKeyAction}
       />
     </SettingsSection>
   );

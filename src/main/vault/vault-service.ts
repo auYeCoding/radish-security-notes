@@ -1,3 +1,4 @@
+import type { RecoveryKeyViewResult } from "@shared/vault/recovery-bridge";
 import {
   VAULT_OPERATION_SUCCEEDED,
   vaultOperationFailed,
@@ -23,6 +24,7 @@ import { KeyProtectionWriter } from "./key-protection-writer";
 import { unprotectWithMasterPassword } from "./master-password-key-protector";
 import { MasterPasswordSwitch } from "./master-password-switch";
 import type { DataKeyRecovery } from "./recover-data-key";
+import { RecoveryKeyViewer } from "./recovery-key-viewer";
 import { dataKeyToRecoveryWords } from "./recovery-phrase";
 import type { SafeStoragePort } from "./safe-storage-port";
 import type { SystemKeyPersistence } from "./system-key-persistence";
@@ -100,6 +102,11 @@ export class VaultService {
   private readonly masterPasswordSwitch: MasterPasswordSwitch;
 
   /**
+   * 已解锁后重新解出数据密钥并编码成恢复词.
+   */
+  private readonly recoveryKeyViewer: RecoveryKeyViewer;
+
+  /**
    * 创建保险库服务.
    * @param dependencies 服务依赖.
    */
@@ -112,6 +119,12 @@ export class VaultService {
     this.masterPasswordSwitch = new MasterPasswordSwitch({
       keyFileStore: dependencies.keyFileStore,
       keyProtection: this.keyProtection,
+      safeStorage: dependencies.safeStorage,
+      isUnlocked: () => this.status === "unlocked",
+      onFailure: dependencies.onFailure,
+    });
+    this.recoveryKeyViewer = new RecoveryKeyViewer({
+      keyFileStore: dependencies.keyFileStore,
       safeStorage: dependencies.safeStorage,
       isUnlocked: () => this.status === "unlocked",
       onFailure: dependencies.onFailure,
@@ -272,6 +285,18 @@ export class VaultService {
     currentPassword: string,
   ): Promise<VaultOperationResult> {
     return this.masterPasswordSwitch.disable(currentPassword);
+  }
+
+  /**
+   * 查看恢复密钥: 已解锁时重新解出数据密钥并编码, 内容与首次展示的相同. 设了主密码时要用输入的
+   * 主密码验证. 失败不改变保险库状态, 密钥文件保持原样.
+   * @param masterPassword 用户输入的当前主密码, 由系统保护数据密钥时不需要.
+   * @returns 成功时带 24 个恢复词, 失败时带原因.
+   */
+  viewRecoveryKey(
+    masterPassword: string | undefined,
+  ): Promise<RecoveryKeyViewResult> {
+    return this.recoveryKeyViewer.view(masterPassword);
   }
 
   /**

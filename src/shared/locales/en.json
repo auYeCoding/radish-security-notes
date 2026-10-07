@@ -1134,7 +1134,7 @@
     "open": "Settings",
     "dialog": {
       "title": "Settings",
-      "description": "Manage importing, exporting, backing up and restoring your data."
+      "description": "Manage importing, exporting, backing up and restoring your data, plus your master password and recovery key."
     },
     "data": {
       "title": "Data",
@@ -1190,6 +1190,37 @@
             "notAcknowledged": "Confirm that you understand the protection after turning it off.",
             "systemUnavailable": "The system cannot protect the data key right now and the master password stays on. Please try again later."
           }
+        }
+      },
+      "recoveryKey": {
+        "name": "Recovery key",
+        "description": "The recovery key is determined by your data key, so you can view it again at any time and it never changes.",
+        "action": "View recovery key",
+        "verify": {
+          "title": "View recovery key",
+          "description": "After verification, the 24 recovery words are shown. They are the same as when first shown, and they cannot be replaced if leaked.",
+          "passwordLabel": "Current master password",
+          "acknowledgeLabel": "I confirmed that no one else can see my screen",
+          "loading": "Loading...",
+          "unavailable": "Cannot read the master password setting. Select Retry.",
+          "retry": "Retry",
+          "autoHidden": "For your safety, the recovery words were hidden automatically. Verify again to view them.",
+          "cancel": "Cancel",
+          "submit": "View",
+          "submitting": "Verifying...",
+          "error": {
+            "wrongPassword": "The master password is incorrect. Please try again.",
+            "passwordRequired": "Enter your current master password.",
+            "notAcknowledged": "Confirm that no one else can see your screen.",
+            "unexpectedState": "This operation is not allowed in the current state. Close this dialog, check the master password setting and try again.",
+            "unexpected": "Reading failed and your vault is unchanged. Please try again later."
+          }
+        },
+        "shown": {
+          "title": "Recovery key",
+          "description": "These 24 words are the same as when first shown, and they cannot be replaced if leaked. They are hidden automatically after {seconds} seconds, and closing this dialog clears them too.",
+          "hide": "Hide",
+          "done": "Done"
         }
       }
     }

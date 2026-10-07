@@ -21,10 +21,11 @@ const TEST_ENTRIES = {
 };
 
 /**
- * 安全分区一行右侧的操作按钮.
+ * 安全分区两行右侧的操作按钮.
  */
 const TEST_SECURITY = {
   masterPasswordAction: <Button>主密码操作</Button>,
+  recoveryKeyAction: <Button>恢复密钥操作</Button>,
 };
 
 /**
@@ -65,7 +66,9 @@ describe("设置对话框: 内容", () => {
 
     const dialog = screen.getByRole("dialog", { name: "设置" });
     expect(
-      within(dialog).getByText("管理数据的导入, 导出, 备份与恢复."),
+      within(dialog).getByText(
+        "管理数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥.",
+      ),
     ).toBeDefined();
     expect(within(dialog).getByRole("region", { name: "数据" })).toBeDefined();
   });
@@ -96,7 +99,7 @@ describe("设置对话框: 内容", () => {
 });
 
 describe("设置对话框: 安全分区", () => {
-  it("数据分区之后是安全分区, 有主密码一行, 带名称, 说明与操作", async () => {
+  it("数据分区之后是安全分区, 依次是主密码与恢复密钥两行, 带名称, 说明与操作", async () => {
     await renderDialog();
 
     const dialog = screen.getByRole("dialog", { name: "设置" });
@@ -113,6 +116,9 @@ describe("设置对话框: 安全分区", () => {
       "主密码",
       "开启后每次启动应用都要输入主密码. 关闭后启动时直接进入, 数据文件仍然加密.",
       "主密码操作",
+      "恢复密钥",
+      "恢复密钥由数据密钥确定, 可随时重新查看, 内容不变.",
+      "恢复密钥操作",
     ];
     const positions = expectedInOrder.map((part) => text.indexOf(part));
     expect(positions.every((position) => position >= 0)).toBe(true);
@@ -147,7 +153,7 @@ describe("设置对话框: 英文界面", () => {
     const dialog = screen.getByRole("dialog", { name: "Settings" });
     expect(
       within(dialog).getByText(
-        "Manage importing, exporting, backing up and restoring your data.",
+        "Manage importing, exporting, backing up and restoring your data, plus your master password and recovery key.",
       ),
     ).toBeDefined();
     expect(within(dialog).getByRole("region", { name: "Data" })).toBeDefined();
@@ -173,6 +179,12 @@ describe("设置对话框: 英文界面", () => {
     expect(
       section.getByText(
         "When on, the master password is required every time the app starts. When off, the app opens directly and your data files stay encrypted.",
+      ),
+    ).toBeDefined();
+    expect(section.getByText("Recovery key")).toBeDefined();
+    expect(
+      section.getByText(
+        "The recovery key is determined by your data key, so you can view it again at any time and it never changes.",
       ),
     ).toBeDefined();
   });

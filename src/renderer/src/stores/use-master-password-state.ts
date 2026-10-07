@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useMasterPasswordBridge } from "@renderer/stores/use-master-password-bridge";
+import { useMasterPasswordBridge } from "./use-master-password-bridge";
 
 /**
  * 主密码当前的状态: 还在读取, 已开启, 未开启, 或读取失败无法判断.

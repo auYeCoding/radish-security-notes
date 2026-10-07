@@ -1,7 +1,9 @@
 import {
   vaultOperationFailed,
+  type VaultOperationFailure,
   type VaultOperationResult,
 } from "@shared/vault/vault-operation-result";
+import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 
 /**
  * 不改变保险库状态的操作守卫.
@@ -10,12 +12,12 @@ export interface NonFatalOperationGuard {
   /**
    * 执行一个操作. 同一时间只允许一个操作, 已有操作在执行时直接按状态不符拒绝; 操作抛出意外
    * 错误时只通知回调并返回失败结果, 不改变保险库状态.
-   * @param operation 要执行的操作.
-   * @returns 操作结果.
+   * @param operation 要执行的操作, 结果可以是带恢复词的成功结果.
+   * @returns 操作结果, 被拒绝或意外失败时是失败结果.
    */
-  readonly run: (
-    operation: () => Promise<VaultOperationResult>,
-  ) => Promise<VaultOperationResult>;
+  readonly run: <Result extends VaultOperationResult | VaultSetupResult>(
+    operation: () => Promise<Result>,
+  ) => Promise<Result | VaultOperationFailure>;
 }
 
 /**
