@@ -1134,7 +1134,18 @@
     "open": "Settings",
     "dialog": {
       "title": "Settings",
-      "description": "Manage importing, exporting, backing up and restoring your data, plus your master password and recovery key."
+      "description": "Manage appearance and language, importing, exporting, backing up and restoring your data, plus your master password and recovery key."
+    },
+    "appearance": {
+      "title": "Appearance and language",
+      "theme": {
+        "name": "Theme",
+        "description": "Choose light, dark or follow the system."
+      },
+      "language": {
+        "name": "Language",
+        "description": "Choose the interface language."
+      }
     },
     "data": {
       "title": "Data",

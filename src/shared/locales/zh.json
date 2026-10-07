@@ -1134,7 +1134,18 @@
     "open": "设置",
     "dialog": {
       "title": "设置",
-      "description": "管理数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥."
+      "description": "管理外观与语言, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥."
+    },
+    "appearance": {
+      "title": "外观与语言",
+      "theme": {
+        "name": "主题",
+        "description": "选择浅色, 深色或跟随系统."
+      },
+      "language": {
+        "name": "语言",
+        "description": "选择界面语言."
+      }
     },
     "data": {
       "title": "数据",

@@ -9,6 +9,7 @@ import {
 } from "@renderer/testing/preferences-test-environment";
 
 import { SettingsDialog } from "./settings-dialog";
+import { SETTINGS_DIALOG_BODY_SLOT } from "./settings-dialog-body-slot";
 
 /**
  * 四行右侧的操作按钮, 名称各不相同, 方便按位置核对.
@@ -26,6 +27,14 @@ const TEST_ENTRIES = {
 const TEST_SECURITY = {
   masterPasswordAction: <Button>主密码操作</Button>,
   recoveryKeyAction: <Button>恢复密钥操作</Button>,
+};
+
+/**
+ * 外观与语言分区两行右侧的操作按钮.
+ */
+const TEST_APPEARANCE = {
+  themeAction: <Button>主题操作</Button>,
+  languageAction: <Button>语言操作</Button>,
 };
 
 /**
@@ -52,6 +61,7 @@ async function renderDialog(): Promise<RenderedDialog> {
   render(
     <SettingsDialog
       onClose={onClose}
+      appearance={TEST_APPEARANCE}
       data={TEST_ENTRIES}
       security={TEST_SECURITY}
     />,
@@ -67,7 +77,7 @@ describe("设置对话框: 内容", () => {
     const dialog = screen.getByRole("dialog", { name: "设置" });
     expect(
       within(dialog).getByText(
-        "管理数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥.",
+        "管理外观与语言, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥.",
       ),
     ).toBeDefined();
     expect(within(dialog).getByRole("region", { name: "数据" })).toBeDefined();
@@ -104,14 +114,14 @@ describe("设置对话框: 安全分区", () => {
 
     const dialog = screen.getByRole("dialog", { name: "设置" });
     const regions = within(dialog).getAllByRole("region");
-    expect(regions).toHaveLength(2);
-    expect(regions[0]).toBe(
+    expect(regions).toHaveLength(3);
+    expect(regions[1]).toBe(
       within(dialog).getByRole("region", { name: "数据" }),
     );
-    expect(regions[1]).toBe(
+    expect(regions[2]).toBe(
       within(dialog).getByRole("region", { name: "安全" }),
     );
-    const text = regions[1].textContent ?? "";
+    const text = regions[2].textContent ?? "";
     const expectedInOrder = [
       "主密码",
       "开启后每次启动应用都要输入主密码. 关闭后启动时直接进入, 数据文件仍然加密.",
@@ -123,6 +133,57 @@ describe("设置对话框: 安全分区", () => {
     const positions = expectedInOrder.map((part) => text.indexOf(part));
     expect(positions.every((position) => position >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  });
+});
+
+describe("设置对话框: 外观与语言分区", () => {
+  it("外观与语言分区排在最前, 依次是主题与语言两行, 带名称, 说明与操作", async () => {
+    await renderDialog();
+
+    const dialog = screen.getByRole("dialog", { name: "设置" });
+    const regions = within(dialog).getAllByRole("region");
+    expect(regions[0]).toBe(
+      within(dialog).getByRole("region", { name: "外观与语言" }),
+    );
+    const text = regions[0].textContent ?? "";
+    const expectedInOrder = [
+      "外观与语言",
+      "主题",
+      "选择浅色, 深色或跟随系统.",
+      "主题操作",
+      "语言",
+      "选择界面语言.",
+      "语言操作",
+    ];
+    const positions = expectedInOrder.reduce<number[]>((found, part) => {
+      const [previous = -1] = found.slice(-1);
+      return [...found, text.indexOf(part, previous + 1)];
+    }, []);
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  });
+
+  it("三个分区放在对话框内部可纵向滚动的内容区里, 标题与说明在内容区之外", async () => {
+    await renderDialog();
+
+    const dialog = screen.getByRole("dialog", { name: "设置" });
+    const body = dialog.querySelector(
+      `[data-slot='${SETTINGS_DIALOG_BODY_SLOT}']`,
+    );
+    expect(body?.classList.contains("overflow-y-auto")).toBe(true);
+    expect(dialog.classList.contains("max-h-11/12")).toBe(true);
+    expect(within(dialog).getAllByRole("region")).toHaveLength(3);
+    within(dialog)
+      .getAllByRole("region")
+      .forEach((region) => expect(body?.contains(region)).toBe(true));
+    expect(body?.contains(within(dialog).getByText("设置"))).toBe(false);
+    expect(
+      body?.contains(
+        within(dialog).getByText(
+          "管理外观与语言, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥.",
+        ),
+      ),
+    ).toBe(false);
   });
 });
 
@@ -153,7 +214,7 @@ describe("设置对话框: 英文界面", () => {
     const dialog = screen.getByRole("dialog", { name: "Settings" });
     expect(
       within(dialog).getByText(
-        "Manage importing, exporting, backing up and restoring your data, plus your master password and recovery key.",
+        "Manage appearance and language, importing, exporting, backing up and restoring your data, plus your master password and recovery key.",
       ),
     ).toBeDefined();
     expect(within(dialog).getByRole("region", { name: "Data" })).toBeDefined();
@@ -164,6 +225,27 @@ describe("设置对话框: 英文界面", () => {
     ).toBeDefined();
   });
 
+  it("外观与语言分区的标题, 行名称与说明是英文", async () => {
+    const { environment } = await renderDialog();
+
+    await act(() => environment.i18n.changeLanguage("en"));
+
+    const section = within(
+      within(screen.getByRole("dialog", { name: "Settings" })).getByRole(
+        "region",
+        { name: "Appearance and language" },
+      ),
+    );
+    expect(section.getByText("Theme")).toBeDefined();
+    expect(
+      section.getByText("Choose light, dark or follow the system."),
+    ).toBeDefined();
+    expect(section.getByText("Language")).toBeDefined();
+    expect(section.getByText("Choose the interface language.")).toBeDefined();
+  });
+});
+
+describe("设置对话框: 英文界面的安全分区", () => {
   it("安全分区的标题, 行名称与说明是英文", async () => {
     const { environment } = await renderDialog();
 
