@@ -8,6 +8,7 @@ import { EmailBackupBridgeProvider } from "./email-backup-bridge-provider";
 import { ExportBridgeProvider } from "./export-bridge-provider";
 import { ImportBridgeProvider } from "./import-bridge-provider";
 import { LinkBridgeProvider } from "./link-bridge-provider";
+import { MasterPasswordBridgeProvider } from "./master-password-bridge-provider";
 import { RestoreBridgeProvider } from "./restore-bridge-provider";
 import { TotpBridgeProvider } from "./totp-bridge-provider";
 
@@ -16,7 +17,7 @@ import { TotpBridgeProvider } from "./totp-bridge-provider";
  */
 interface BridgeProvidersProps {
   /**
-   * preload 暴露的接口, 取其中按需读取数据的批量, TOTP, 附件, 导入, 导出, 邮箱备份, 恢复与链接八个桥.
+   * preload 暴露的接口, 取其中按需读取数据的批量, TOTP, 附件, 导入, 导出, 邮箱备份, 恢复, 主密码开关与链接九个桥.
    */
   readonly api: Pick<
     RendererApi,
@@ -27,6 +28,7 @@ interface BridgeProvidersProps {
     | "exporter"
     | "emailBackup"
     | "restorer"
+    | "masterPassword"
     | "links"
   >;
   /**
@@ -36,8 +38,8 @@ interface BridgeProvidersProps {
 }
 
 /**
- * 把批量桥, TOTP 桥, 附件桥, 导入桥, 导出桥, 邮箱备份桥, 恢复桥与链接桥注入其下的组件树. 这八个桥
- * 不放进全局状态, 组件按需经桥读取.
+ * 把批量桥, TOTP 桥, 附件桥, 导入桥, 导出桥, 邮箱备份桥, 恢复桥, 主密码开关桥与链接桥注入其下的
+ * 组件树. 这九个桥不放进全局状态, 组件按需经桥读取.
  * @param props 组件属性.
  * @returns 包裹子节点的 Provider 组合.
  */
@@ -53,9 +55,11 @@ export function BridgeProviders(
             <ExportBridgeProvider bridge={api.exporter}>
               <EmailBackupBridgeProvider bridge={api.emailBackup}>
                 <RestoreBridgeProvider bridge={api.restorer}>
-                  <LinkBridgeProvider bridge={api.links}>
-                    {props.children}
-                  </LinkBridgeProvider>
+                  <MasterPasswordBridgeProvider bridge={api.masterPassword}>
+                    <LinkBridgeProvider bridge={api.links}>
+                      {props.children}
+                    </LinkBridgeProvider>
+                  </MasterPasswordBridgeProvider>
                 </RestoreBridgeProvider>
               </EmailBackupBridgeProvider>
             </ExportBridgeProvider>

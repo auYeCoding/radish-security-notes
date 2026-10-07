@@ -1150,6 +1150,48 @@
       "restore": {
         "description": "Choose a backup file, preview it and restore your data."
       }
+    },
+    "security": {
+      "title": "Security",
+      "masterPassword": {
+        "name": "Master password",
+        "description": "When on, the master password is required every time the app starts. When off, the app opens directly and your data files stay encrypted.",
+        "state": {
+          "enabled": "On",
+          "disabled": "Off",
+          "loading": "Loading...",
+          "unavailable": "Unavailable"
+        },
+        "error": {
+          "unexpected": "The operation failed and your master password setting is unchanged. Please try again later.",
+          "unexpectedState": "This operation is not allowed in the current state. Close this dialog, check the switch and try again."
+        },
+        "enable": {
+          "title": "Turn on master password",
+          "description": "Once on, the master password is required to open your data the next time the app starts. You do not need to unlock again now.",
+          "cancel": "Cancel",
+          "submit": "Turn on master password",
+          "submitting": "Turning on..."
+        },
+        "disable": {
+          "title": "Turn off master password",
+          "description": "Once off, the app no longer asks for the master password when it starts.",
+          "riskTitle": "Protection gets weaker",
+          "risk": "Anyone who can sign in to this Windows account can open the app directly. Your data files stay encrypted, but if the system key stops working (after reinstalling Windows or resetting the Windows password), only the recovery key can get your data back, so make sure it is stored safely.",
+          "passwordLabel": "Current master password",
+          "acknowledgeLabel": "I understand the protection after turning it off",
+          "pendingNotice": "Asking the system to protect the data key, which can take ten seconds or more.",
+          "cancel": "Cancel",
+          "submit": "Turn off master password",
+          "submitting": "Turning off...",
+          "error": {
+            "wrongPassword": "The master password is incorrect. Please try again.",
+            "passwordRequired": "Enter your current master password.",
+            "notAcknowledged": "Confirm that you understand the protection after turning it off.",
+            "systemUnavailable": "The system cannot protect the data key right now and the master password stays on. Please try again later."
+          }
+        }
+      }
     }
   },
   "preferences": {

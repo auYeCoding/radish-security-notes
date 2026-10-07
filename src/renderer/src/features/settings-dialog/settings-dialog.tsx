@@ -12,6 +12,10 @@ import {
   SettingsDataSection,
   type SettingsDataEntries,
 } from "./settings-data-section";
+import {
+  SettingsSecuritySection,
+  type SettingsSecurityEntries,
+} from "./settings-security-section";
 
 /**
  * 设置对话框的属性.
@@ -25,11 +29,15 @@ interface SettingsDialogProps {
    * "数据" 分区四行右侧的操作元素.
    */
   readonly data: SettingsDataEntries;
+  /**
+   * "安全" 分区一行右侧的操作元素.
+   */
+  readonly security: SettingsSecurityEntries;
 }
 
 /**
- * 设置对话框, 挂载即打开, 关闭即卸载: 各分区纵向排列, 目前只有 "数据" 分区. 分区里的操作元素在这个
- * 对话框的子树里再打开功能对话框, 功能对话框叠在设置对话框之上, 按 Escape 一次只关最上层.
+ * 设置对话框, 挂载即打开, 关闭即卸载: 各分区纵向排列, 依次是 "数据" 与 "安全" 分区. 分区里的操作元素
+ * 在这个对话框的子树里再打开功能对话框, 功能对话框叠在设置对话框之上, 按 Escape 一次只关最上层.
  * @param props 组件属性.
  * @returns 对话框元素.
  */
@@ -50,6 +58,7 @@ export function SettingsDialog(props: SettingsDialogProps): React.JSX.Element {
           </DialogDescription>
         </DialogHeader>
         <SettingsDataSection entries={props.data} />
+        <SettingsSecuritySection entries={props.security} />
       </DialogContent>
     </Dialog>
   );

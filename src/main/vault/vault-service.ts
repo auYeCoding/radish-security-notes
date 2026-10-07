@@ -21,6 +21,7 @@ import type { KeyFileStore } from "./key-file-store";
 import { MASTER_PASSWORD_PROTECTION } from "./key-record";
 import { KeyProtectionWriter } from "./key-protection-writer";
 import { unprotectWithMasterPassword } from "./master-password-key-protector";
+import { MasterPasswordSwitch } from "./master-password-switch";
 import type { DataKeyRecovery } from "./recover-data-key";
 import { dataKeyToRecoveryWords } from "./recovery-phrase";
 import type { SafeStoragePort } from "./safe-storage-port";
@@ -94,6 +95,11 @@ export class VaultService {
   private readonly recovery: VaultRecovery;
 
   /**
+   * 已解锁后在系统保护与主密码保护之间切换.
+   */
+  private readonly masterPasswordSwitch: MasterPasswordSwitch;
+
+  /**
    * 创建保险库服务.
    * @param dependencies 服务依赖.
    */
@@ -102,6 +108,13 @@ export class VaultService {
     this.recovery = new VaultRecovery({
       databaseFile: dependencies.paths.databaseFile,
       keyProtection: this.keyProtection,
+    });
+    this.masterPasswordSwitch = new MasterPasswordSwitch({
+      keyFileStore: dependencies.keyFileStore,
+      keyProtection: this.keyProtection,
+      safeStorage: dependencies.safeStorage,
+      isUnlocked: () => this.status === "unlocked",
+      onFailure: dependencies.onFailure,
     });
   }
 
@@ -237,6 +250,28 @@ export class VaultService {
     words: readonly string[],
   ): Promise<VaultOperationResult> {
     return this.restore(() => this.recovery.recoverWithSystemProtection(words));
+  }
+
+  /**
+   * 开启主密码: 已解锁且当前由系统保护数据密钥时, 改用新主密码保护, 当前会话保持解锁. 失败不
+   * 改变保险库状态, 密钥文件保持原样.
+   * @param masterPassword 新主密码.
+   * @returns 开启结果.
+   */
+  enableMasterPassword(masterPassword: string): Promise<VaultOperationResult> {
+    return this.masterPasswordSwitch.enable(masterPassword);
+  }
+
+  /**
+   * 关闭主密码: 已解锁且当前由主密码保护数据密钥时, 校验当前主密码后改交系统保护, 下次启动
+   * 不再要求输入. 失败不改变保险库状态, 密钥文件保持原样.
+   * @param currentPassword 当前主密码.
+   * @returns 关闭结果.
+   */
+  disableMasterPassword(
+    currentPassword: string,
+  ): Promise<VaultOperationResult> {
+    return this.masterPasswordSwitch.disable(currentPassword);
   }
 
   /**

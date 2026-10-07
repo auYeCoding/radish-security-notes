@@ -12,6 +12,7 @@ import { registerExportIpc } from "../ipc/export-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
 import { registerImportIpc } from "../ipc/import-ipc";
 import { registerLinkIpc } from "../ipc/link-ipc";
+import { registerMasterPasswordIpc } from "../ipc/master-password-ipc";
 import type { ExternalLinkOpener } from "../links/external-link-opener";
 import { registerPreferencesIpc } from "../ipc/preferences-ipc";
 import { registerRecoveryIpc } from "../ipc/recovery-ipc";
@@ -114,6 +115,11 @@ export async function startApplication(): Promise<void> {
   registerVaultIpc(ipcMain, vault.service);
   const recovery = createRecoveryRuntime(runtime.i18n);
   registerRecoveryIpc(ipcMain, vault.service, recovery.textFileSaver);
+  registerMasterPasswordIpc(
+    ipcMain,
+    vault.service,
+    vault.masterPasswordVerifier,
+  );
   const entries = createEntryRuntime(vault.service);
   registerEntryIpc(ipcMain, entries.service);
   registerCustomEntryTypeIpc(

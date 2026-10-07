@@ -11,6 +11,7 @@ import { createExportBridge } from "./create-export-bridge";
 import { createFolderBridge } from "./create-folder-bridge";
 import { createImportBridge } from "./create-import-bridge";
 import { createLinkBridge } from "./create-link-bridge";
+import { createMasterPasswordBridge } from "./create-master-password-bridge";
 import { createPreferencesBridge } from "./create-preferences-bridge";
 import { createRecoveryBridge } from "./create-recovery-bridge";
 import { createRestoreBridge } from "./create-restore-bridge";
@@ -25,6 +26,7 @@ const api: RendererApi = {
   preferences: createPreferencesBridge(ipcRenderer),
   vault: createVaultBridge(ipcRenderer),
   recovery: createRecoveryBridge(ipcRenderer),
+  masterPassword: createMasterPasswordBridge(ipcRenderer),
   entries: createEntryBridge(ipcRenderer),
   entryTypes: createEntryTypeBridge(ipcRenderer),
   folders: createFolderBridge(ipcRenderer),

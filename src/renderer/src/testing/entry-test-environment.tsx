@@ -14,6 +14,7 @@ import type { LinkBridge } from "@shared/links/link-bridge";
 import type { RestoreBridge } from "@shared/restore/restore-bridge";
 import type { TagBridge } from "@shared/tags/tag-bridge";
 import type { TagSummary } from "@shared/tags/tag-types";
+import type { MasterPasswordBridge } from "@shared/vault/master-password-bridge";
 
 import {
   createBatchSelectionStore,
@@ -46,6 +47,7 @@ import { createFakeExportBridge } from "./fake-export-bridge";
 import { createFakeFolderBridge } from "./fake-folder-bridge";
 import { createFakeImportBridge } from "./fake-import-bridge";
 import { createFakeLinkBridge } from "./fake-link-bridge";
+import { createFakeMasterPasswordBridge } from "./fake-master-password-bridge";
 import { createFakeRestoreBridge } from "./fake-restore-bridge";
 import { createFakeTagBridge } from "./fake-tag-bridge";
 import { createFakeTotpBridge } from "./fake-totp-bridge";
@@ -100,6 +102,14 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    */
   readonly restoreBridgeOverrides?: Partial<RestoreBridge>;
   /**
+   * 假主密码开关桥初始是否设了主密码, 默认没有.
+   */
+  readonly hasMasterPassword?: boolean;
+  /**
+   * 覆盖假主密码开关桥上的方法, 例如让开启失败.
+   */
+  readonly masterPasswordBridgeOverrides?: Partial<MasterPasswordBridge>;
+  /**
    * 覆盖假链接桥上的方法, 例如让打开失败.
    */
   readonly linkBridgeOverrides?: Partial<LinkBridge>;
@@ -133,7 +143,7 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
 /**
  * 组件测试用的条目环境: 在保险库环境之上增加假的条目桥, 真实的条目 store, 假的自定义类型桥,
  * 真实的自定义类型 store, 假的文件夹桥, 真实的文件夹 store, 假的标签桥, 真实的标签 store, 假的
- * 批量桥, 真实的批量选中 store, 假的 TOTP 桥, 假的附件桥与假的链接桥.
+ * 批量桥, 真实的批量选中 store, 假的 TOTP 桥, 假的附件桥, 假的主密码开关桥与假的链接桥.
  */
 export interface EntryTestEnvironment extends VaultTestEnvironment {
   /**
@@ -181,6 +191,10 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
    */
   readonly restoreBridge: RestoreBridge;
   /**
+   * 带间谍方法的假主密码开关桥, 开启与关闭成功后读取到新模式.
+   */
+  readonly masterPasswordBridge: MasterPasswordBridge;
+  /**
    * 带间谍方法的假链接桥.
    */
   readonly linkBridge: LinkBridge;
@@ -220,6 +234,7 @@ type EntryTestBridges = Pick<
   | "exportBridge"
   | "emailBackupBridge"
   | "restoreBridge"
+  | "masterPasswordBridge"
   | "linkBridge"
   | "folderBridge"
   | "tagBridge"
@@ -262,6 +277,10 @@ function createEntryTestBridges(
       options.emailBackupBridgeOverrides,
     ),
     restoreBridge: createFakeRestoreBridge(options.restoreBridgeOverrides),
+    masterPasswordBridge: createFakeMasterPasswordBridge(
+      options.hasMasterPassword,
+      options.masterPasswordBridgeOverrides,
+    ),
     linkBridge: createFakeLinkBridge(options.linkBridgeOverrides),
     folderBridge: createFakeFolderBridge(
       options.folders,
@@ -326,6 +345,7 @@ export async function createEntryTestEnvironment(
     exportBridge: bridges.exportBridge,
     emailBackupBridge: bridges.emailBackupBridge,
     restoreBridge: bridges.restoreBridge,
+    masterPasswordBridge: bridges.masterPasswordBridge,
     linkBridge: bridges.linkBridge,
   });
   return { ...vault, ...bridges, ...stores, Providers };

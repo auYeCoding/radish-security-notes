@@ -21,6 +21,13 @@ const TEST_ENTRIES = {
 };
 
 /**
+ * 安全分区一行右侧的操作按钮.
+ */
+const TEST_SECURITY = {
+  masterPasswordAction: <Button>主密码操作</Button>,
+};
+
+/**
  * 渲染设置对话框后拿到的结果.
  */
 interface RenderedDialog {
@@ -41,9 +48,14 @@ interface RenderedDialog {
 async function renderDialog(): Promise<RenderedDialog> {
   const environment = await createPreferencesTestEnvironment();
   const onClose = vi.fn();
-  render(<SettingsDialog onClose={onClose} data={TEST_ENTRIES} />, {
-    wrapper: environment.Providers,
-  });
+  render(
+    <SettingsDialog
+      onClose={onClose}
+      data={TEST_ENTRIES}
+      security={TEST_SECURITY}
+    />,
+    { wrapper: environment.Providers },
+  );
   return { onClose, environment };
 }
 
@@ -76,6 +88,31 @@ describe("设置对话框: 内容", () => {
       "从备份恢复",
       "选择备份文件, 预览并确认后恢复数据.",
       "恢复操作",
+    ];
+    const positions = expectedInOrder.map((part) => text.indexOf(part));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  });
+});
+
+describe("设置对话框: 安全分区", () => {
+  it("数据分区之后是安全分区, 有主密码一行, 带名称, 说明与操作", async () => {
+    await renderDialog();
+
+    const dialog = screen.getByRole("dialog", { name: "设置" });
+    const regions = within(dialog).getAllByRole("region");
+    expect(regions).toHaveLength(2);
+    expect(regions[0]).toBe(
+      within(dialog).getByRole("region", { name: "数据" }),
+    );
+    expect(regions[1]).toBe(
+      within(dialog).getByRole("region", { name: "安全" }),
+    );
+    const text = regions[1].textContent ?? "";
+    const expectedInOrder = [
+      "主密码",
+      "开启后每次启动应用都要输入主密码. 关闭后启动时直接进入, 数据文件仍然加密.",
+      "主密码操作",
     ];
     const positions = expectedInOrder.map((part) => text.indexOf(part));
     expect(positions.every((position) => position >= 0)).toBe(true);
@@ -117,6 +154,25 @@ describe("设置对话框: 英文界面", () => {
     expect(
       within(dialog).getByText(
         "Send all of your data to your own mailbox, or set up automatic backups.",
+      ),
+    ).toBeDefined();
+  });
+
+  it("安全分区的标题, 行名称与说明是英文", async () => {
+    const { environment } = await renderDialog();
+
+    await act(() => environment.i18n.changeLanguage("en"));
+
+    const section = within(
+      within(screen.getByRole("dialog", { name: "Settings" })).getByRole(
+        "region",
+        { name: "Security" },
+      ),
+    );
+    expect(section.getByText("Master password")).toBeDefined();
+    expect(
+      section.getByText(
+        "When on, the master password is required every time the app starts. When off, the app opens directly and your data files stay encrypted.",
       ),
     ).toBeDefined();
   });

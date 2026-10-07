@@ -11,6 +11,7 @@ import type { LinkBridge } from "../links/link-bridge";
 import type { PreferencesBridge } from "../preferences/preferences-bridge";
 import type { RestoreBridge } from "../restore/restore-bridge";
 import type { TagBridge } from "../tags/tag-bridge";
+import type { MasterPasswordBridge } from "../vault/master-password-bridge";
 import type { RecoveryBridge } from "../vault/recovery-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
 
@@ -30,6 +31,10 @@ export interface RendererApi {
    * 恢复接口: 校验恢复词, 凭词恢复保险库, 保存恢复词文本文件.
    */
   readonly recovery: RecoveryBridge;
+  /**
+   * 主密码开关接口: 读取当前是否设了主密码, 开启与关闭主密码.
+   */
+  readonly masterPassword: MasterPasswordBridge;
   /**
    * 条目接口: 读取列表与详情, 新建, 更新与删除条目, 复制字段.
    */

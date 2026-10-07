@@ -14,6 +14,9 @@ export const IPC_CHANNELS = {
   recoveryRestoreWithoutMasterPassword:
     "recovery:restore-without-master-password",
   recoverySaveTextFile: "recovery:save-text-file",
+  masterPasswordHas: "master-password:has",
+  masterPasswordEnable: "master-password:enable",
+  masterPasswordDisable: "master-password:disable",
   entriesList: "entries:list",
   entriesGet: "entries:get",
   entriesCreate: "entries:create",

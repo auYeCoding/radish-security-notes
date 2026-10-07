@@ -1150,6 +1150,48 @@
       "restore": {
         "description": "选择备份文件, 预览并确认后恢复数据."
       }
+    },
+    "security": {
+      "title": "安全",
+      "masterPassword": {
+        "name": "主密码",
+        "description": "开启后每次启动应用都要输入主密码. 关闭后启动时直接进入, 数据文件仍然加密.",
+        "state": {
+          "enabled": "已开启",
+          "disabled": "未开启",
+          "loading": "读取中...",
+          "unavailable": "无法读取"
+        },
+        "error": {
+          "unexpected": "操作失败, 主密码设置保持不变. 请稍后重试.",
+          "unexpectedState": "当前状态不允许这次操作. 请关闭对话框, 确认开关状态后重试."
+        },
+        "enable": {
+          "title": "开启主密码",
+          "description": "开启后, 下次启动应用要输入主密码才能打开数据. 当前不需要重新解锁.",
+          "cancel": "取消",
+          "submit": "开启主密码",
+          "submitting": "正在开启..."
+        },
+        "disable": {
+          "title": "关闭主密码",
+          "description": "关闭后, 下次启动应用不再要求输入主密码.",
+          "riskTitle": "关闭后保护会变弱",
+          "risk": "能登录本机这个 Windows 账户的人都能直接打开软件. 数据文件仍然加密, 但系统密钥失效 (重装系统, 重置 Windows 密码) 时, 只能靠恢复密钥找回数据, 请确认恢复密钥已妥善保管.",
+          "passwordLabel": "当前主密码",
+          "acknowledgeLabel": "我了解关闭后的保护强度",
+          "pendingNotice": "正在请系统保护数据密钥, 可能要等十几秒.",
+          "cancel": "取消",
+          "submit": "关闭主密码",
+          "submitting": "正在关闭...",
+          "error": {
+            "wrongPassword": "主密码不正确, 请重新输入.",
+            "passwordRequired": "请输入当前主密码.",
+            "notAcknowledged": "请先确认已了解关闭后的保护强度.",
+            "systemUnavailable": "系统暂时无法保护数据密钥, 主密码保持开启. 请稍后重试."
+          }
+        }
+      }
     }
   },
   "preferences": {
