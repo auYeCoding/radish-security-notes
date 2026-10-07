@@ -15,6 +15,7 @@ import type { RestoreBridge } from "@shared/restore/restore-bridge";
 import type { TagBridge } from "@shared/tags/tag-bridge";
 import type { TagSummary } from "@shared/tags/tag-types";
 import type { MasterPasswordBridge } from "@shared/vault/master-password-bridge";
+import type { WindowControlsBridge } from "@shared/window/window-controls-bridge";
 
 import {
   createBatchSelectionStore,
@@ -51,6 +52,10 @@ import { createFakeMasterPasswordBridge } from "./fake-master-password-bridge";
 import { createFakeRestoreBridge } from "./fake-restore-bridge";
 import { createFakeTagBridge } from "./fake-tag-bridge";
 import { createFakeTotpBridge } from "./fake-totp-bridge";
+import {
+  createFakeWindowControlsBridge,
+  type FakeWindowControlsBridge,
+} from "./fake-window-controls-bridge";
 import {
   createVaultTestEnvironment,
   type VaultTestEnvironment,
@@ -114,6 +119,10 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
    */
   readonly linkBridgeOverrides?: Partial<LinkBridge>;
   /**
+   * 覆盖假窗口控制桥上的方法, 例如让读取初始状态得到已最大化.
+   */
+  readonly windowControlsBridgeOverrides?: Partial<WindowControlsBridge>;
+  /**
    * 假文件夹桥里的初始文件夹, 按创建先后排列, 默认没有文件夹.
    */
   readonly folders?: readonly FolderSummary[];
@@ -143,7 +152,8 @@ export interface EntryTestEnvironmentOptions extends VaultTestEnvironmentOptions
 /**
  * 组件测试用的条目环境: 在保险库环境之上增加假的条目桥, 真实的条目 store, 假的自定义类型桥,
  * 真实的自定义类型 store, 假的文件夹桥, 真实的文件夹 store, 假的标签桥, 真实的标签 store, 假的
- * 批量桥, 真实的批量选中 store, 假的 TOTP 桥, 假的附件桥, 假的主密码开关桥与假的链接桥.
+ * 批量桥, 真实的批量选中 store, 假的 TOTP 桥, 假的附件桥, 假的主密码开关桥, 假的链接桥与假的窗口
+ * 控制桥.
  */
 export interface EntryTestEnvironment extends VaultTestEnvironment {
   /**
@@ -199,6 +209,10 @@ export interface EntryTestEnvironment extends VaultTestEnvironment {
    */
   readonly linkBridge: LinkBridge;
   /**
+   * 带间谍方法的假窗口控制桥, 可模拟主进程推送最大化状态.
+   */
+  readonly windowControlsBridge: FakeWindowControlsBridge;
+  /**
    * 被测的条目 store.
    */
   readonly entryStore: EntryStore;
@@ -236,6 +250,7 @@ type EntryTestBridges = Pick<
   | "restoreBridge"
   | "masterPasswordBridge"
   | "linkBridge"
+  | "windowControlsBridge"
   | "folderBridge"
   | "tagBridge"
 >;
@@ -282,6 +297,9 @@ function createEntryTestBridges(
       options.masterPasswordBridgeOverrides,
     ),
     linkBridge: createFakeLinkBridge(options.linkBridgeOverrides),
+    windowControlsBridge: createFakeWindowControlsBridge(
+      options.windowControlsBridgeOverrides,
+    ),
     folderBridge: createFakeFolderBridge(
       options.folders,
       options.folderBridgeOverrides,
@@ -321,7 +339,7 @@ function createEntryTestStores(bridges: EntryTestBridges): EntryTestStores {
  * 创建组件测试用的条目环境, 保险库默认已解锁.
  * @param options 保险库初始状态, 初始条目, 文件夹与标签, 桥方法的覆盖.
  * @returns 条目环境, 其 `Providers` 同时注入偏好, 保险库, 条目, 自定义类型, 文件夹, 标签, 批量选中
- * 七个 store, 批量桥, TOTP 桥, 附件桥与链接桥.
+ * 七个 store, 批量桥, TOTP 桥, 附件桥, 链接桥与窗口控制桥.
  */
 export async function createEntryTestEnvironment(
   options: EntryTestEnvironmentOptions = {},
@@ -347,6 +365,7 @@ export async function createEntryTestEnvironment(
     restoreBridge: bridges.restoreBridge,
     masterPasswordBridge: bridges.masterPasswordBridge,
     linkBridge: bridges.linkBridge,
+    windowControlsBridge: bridges.windowControlsBridge,
   });
   return { ...vault, ...bridges, ...stores, Providers };
 }

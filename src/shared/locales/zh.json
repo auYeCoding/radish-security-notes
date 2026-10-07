@@ -9,6 +9,13 @@
   "common": {
     "close": "关闭"
   },
+  "window": {
+    "controls": "窗口控制",
+    "minimize": "最小化",
+    "maximize": "最大化",
+    "restore": "还原",
+    "close": "关闭"
+  },
   "folderPane": {
     "foldersHeading": "文件夹",
     "tagsHeading": "标签",

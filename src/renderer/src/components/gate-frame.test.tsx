@@ -54,6 +54,15 @@ describe("GateFrame 上下内边距", () => {
   });
 });
 
+describe("GateFrame 最小高度", () => {
+  it("跟随窗口框架里标题栏下方的内容区, 不再用整个屏幕的高度", () => {
+    const { main } = renderFrame();
+
+    expect(main.classList.contains("min-h-full")).toBe(true);
+    expect(main.classList.contains("min-h-screen")).toBe(false);
+  });
+});
+
 describe("GateFrame 默认版式", () => {
   it("不传版式属性与传默认版式渲染出相同的类名", () => {
     const withoutLayout = renderFrame();

@@ -14,6 +14,7 @@ import type { TagBridge } from "../tags/tag-bridge";
 import type { MasterPasswordBridge } from "../vault/master-password-bridge";
 import type { RecoveryBridge } from "../vault/recovery-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
+import type { WindowControlsBridge } from "../window/window-controls-bridge";
 
 /**
  * preload 经 `contextBridge` 暴露在 `window.api` 上的全部接口.
@@ -83,4 +84,8 @@ export interface RendererApi {
    * 链接接口: 请主进程用系统默认程序打开外部链接.
    */
   readonly links: LinkBridge;
+  /**
+   * 窗口控制接口: 最小化, 最大化或还原, 关闭主窗口, 订阅最大化状态.
+   */
+  readonly windowControls: WindowControlsBridge;
 }

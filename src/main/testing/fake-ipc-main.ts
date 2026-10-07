@@ -11,6 +11,18 @@ export interface FakeIpcMain extends IpcMainPort {
    * @returns 处理函数的返回值.
    */
   invoke: (channel: string, ...args: unknown[]) => unknown;
+  /**
+   * 以指定的事件调用某个通道上注册的处理函数, 用来模拟不同的调用来源.
+   * @param event 传给处理函数的事件.
+   * @param channel 通道名.
+   * @param args 传给处理函数的参数.
+   * @returns 处理函数的返回值.
+   */
+  invokeWithEvent: (
+    event: unknown,
+    channel: string,
+    ...args: unknown[]
+  ) => unknown;
 }
 
 /**
@@ -27,5 +39,7 @@ export function createFakeIpcMain(): FakeIpcMain {
       handlers.set(channel, handler);
     },
     invoke: (channel, ...args) => handlers.get(channel)?.({}, ...args),
+    invokeWithEvent: (event, channel, ...args) =>
+      handlers.get(channel)?.(event, ...args),
   };
 }

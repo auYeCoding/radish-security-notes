@@ -35,9 +35,10 @@ const GATE_FRAME_SPACING_CLASSES = {
 const GATE_FRAME_PRINT_KIT_CLASSES = "print:block print:min-h-0 print:p-0";
 
 /**
- * 整屏页面的外框: 填满窗口, 内容居中, 右上角放一组控件. 引导页, 解锁页, 失败页与恢复相关
- * 页面共用, 这些页面显示时三栏主界面还没有挂载. 宽松档的上下内边距让页面比窗口高时卡片不会
- * 盖住右上角的控件; 带打印套件的页面在打印时只留套件.
+ * 整屏页面的外框: 填满窗口框架里标题栏下方的内容区, 内容居中, 右上角放一组控件, 所以控件落在
+ * 标题栏之下, 不与窗口按钮重叠. 引导页, 解锁页, 失败页与恢复相关页面共用, 这些页面显示时三栏
+ * 主界面还没有挂载. 宽松档的上下内边距让页面比内容区高时卡片不会盖住右上角的控件; 带打印套件的
+ * 页面在打印时只留套件.
  * @param props 组件属性.
  * @returns 外框元素.
  */
@@ -47,7 +48,7 @@ export function GateFrame(props: GateFrameProps): React.JSX.Element {
   return (
     <main
       className={cn(
-        "relative flex min-h-screen items-center justify-center bg-background text-foreground",
+        "relative flex min-h-full items-center justify-center bg-background text-foreground",
         GATE_FRAME_SPACING_CLASSES[spacing],
         isPrintKit && GATE_FRAME_PRINT_KIT_CLASSES,
       )}

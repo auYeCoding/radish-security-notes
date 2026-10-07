@@ -66,6 +66,16 @@ describe("createMainWindow 导航防护", () => {
   });
 });
 
+describe("createMainWindow 无框窗口", () => {
+  it("不使用系统边框与标题栏, 拖动与窗口按钮由页面提供", () => {
+    createMainWindow(WINDOW_OPTIONS);
+
+    expect(electronMocks.createWindow).toHaveBeenCalledWith(
+      expect.objectContaining({ frame: false }),
+    );
+  });
+});
+
 describe("createMainWindow 窗口尺寸", () => {
   it("内容区最小宽度是 768 像素, 与恢复词网格固定 4 列配套", () => {
     createMainWindow(WINDOW_OPTIONS);

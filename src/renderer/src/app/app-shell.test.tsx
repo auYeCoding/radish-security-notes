@@ -27,10 +27,10 @@ function isFollowing(first: Node, second: Node): boolean {
 }
 
 describe("AppShell 布局", () => {
-  it("显示三栏空壳: 标签与文件夹, 条目列表, 条目详情, 搜索入口与设置按钮", async () => {
+  it("显示三栏空壳: 标签与文件夹, 条目列表, 条目详情, 搜索入口与设置按钮, 应用名称在标题栏里而不在三栏界面里", async () => {
     await renderShell();
 
-    expect(screen.getByText("安全笔记")).toBeDefined();
+    expect(screen.queryByText("安全笔记")).toBeNull();
     expect(screen.getByRole("heading", { name: "标签" })).toBeDefined();
     expect(screen.getByRole("heading", { name: "文件夹" })).toBeDefined();
     expect(screen.getByRole("heading", { name: "条目" })).toBeDefined();

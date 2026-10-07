@@ -1,0 +1,12 @@
+/*
+ * 拖动区域工具类: app-region-drag 标出可拖动窗口的区域, app-region-no-drag 标出其中不触发拖动的
+ * 可点击元素. Electron 把拖动区域交给系统当作标题栏处理, 拖动, 双击空白处最大化或还原, 系统菜单
+ * 都保持系统行为.
+ */
+@utility app-region-drag {
+  -webkit-app-region: drag;
+}
+
+@utility app-region-no-drag {
+  -webkit-app-region: no-drag;
+}

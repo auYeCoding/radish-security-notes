@@ -21,8 +21,14 @@ import { registerRestoreIpc } from "../ipc/restore-ipc";
 import { registerTagIpc } from "../ipc/tag-ipc";
 import { registerTotpIpc } from "../ipc/totp-ipc";
 import { registerVaultIpc } from "../ipc/vault-ipc";
+import { registerWindowControlsIpc } from "../ipc/window-controls-ipc";
 import { resolveWindowBackground } from "../theme/window-background";
 import { createMainWindow } from "../window/create-main-window";
+import {
+  createMainWindowHolder,
+  type MainWindowHolder,
+} from "../window/main-window-holder";
+import { watchMaximizedState } from "../window/maximized-state-notifier";
 import { applyWindowBackground, applyWindowTitle } from "../window/window-sync";
 import {
   createPreferencesRuntime,
@@ -67,21 +73,46 @@ function keepWindowsInSync(runtime: PreferencesRuntime): void {
 }
 
 /**
- * 按当前主题与语言创建主窗口.
+ * 按当前主题与语言创建主窗口, 登记到主窗口持有者, 并让它的最大化状态推送给页面.
  * @param runtime 偏好运行时对象.
  * @param openExternalLink 外部链接打开器.
+ * @param mainWindowHolder 主窗口持有者.
  */
 function openMainWindow(
   runtime: PreferencesRuntime,
   openExternalLink: ExternalLinkOpener,
+  mainWindowHolder: MainWindowHolder<BrowserWindow>,
 ): void {
-  createMainWindow({
+  const mainWindow = createMainWindow({
     icon,
     title: runtime.i18n.t("app.title"),
     backgroundColor: resolveWindowBackground(
       runtime.themeController.getResolvedTheme(),
     ),
     openExternalLink,
+  });
+  mainWindowHolder.set(mainWindow);
+  watchMaximizedState(mainWindow);
+}
+
+/**
+ * 启动主窗口: 注册窗口控制的 IPC, 让全部窗口的标题与背景色跟随语言和主题, 创建主窗口, 并在没有
+ * 窗口时被重新激活的情形下再创建一个.
+ * @param runtime 偏好运行时对象.
+ * @param openExternalLink 外部链接打开器.
+ */
+function launchMainWindow(
+  runtime: PreferencesRuntime,
+  openExternalLink: ExternalLinkOpener,
+): void {
+  const mainWindowHolder = createMainWindowHolder<BrowserWindow>();
+  registerWindowControlsIpc(ipcMain, mainWindowHolder);
+  keepWindowsInSync(runtime);
+  openMainWindow(runtime, openExternalLink, mainWindowHolder);
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      openMainWindow(runtime, openExternalLink, mainWindowHolder);
+    }
   });
 }
 
@@ -147,11 +178,5 @@ export async function startApplication(): Promise<void> {
     emailBackup.discardTemporaryFiles();
     vault.service.close();
   });
-  keepWindowsInSync(runtime);
-  openMainWindow(runtime, openExternalLink);
-  app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      openMainWindow(runtime, openExternalLink);
-    }
-  });
+  launchMainWindow(runtime, openExternalLink);
 }

@@ -80,4 +80,9 @@ export const IPC_CHANNELS = {
   restoreProgress: "restore:progress",
   restoreCancel: "restore:cancel",
   linksOpenExternal: "links:open-external",
+  windowMinimize: "window:minimize",
+  windowToggleMaximize: "window:toggle-maximize",
+  windowClose: "window:close",
+  windowIsMaximized: "window:is-maximized",
+  windowMaximizedChanged: "window:maximized-changed",
 } as const;

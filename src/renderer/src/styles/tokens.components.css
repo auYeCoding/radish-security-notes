@@ -7,5 +7,6 @@
   --sidebar-width: calc(var(--space-base) * 56);
   --list-pane-width: calc(var(--space-base) * 80);
   --topbar-height: calc(var(--space-base) * 14);
+  --titlebar-height: calc(var(--space-base) * 8);
   --list-row-height: calc(var(--space-base) * 15);
 }

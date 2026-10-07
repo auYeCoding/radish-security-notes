@@ -9,6 +9,13 @@
   "common": {
     "close": "Close"
   },
+  "window": {
+    "controls": "Window controls",
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close"
+  },
   "folderPane": {
     "foldersHeading": "Folders",
     "tagsHeading": "Tags",

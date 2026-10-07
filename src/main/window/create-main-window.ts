@@ -4,6 +4,7 @@ import { is } from "@electron-toolkit/utils";
 import { BrowserWindow } from "electron";
 
 import type { ExternalLinkOpener } from "../links/external-link-opener";
+import { FRAMELESS_WINDOW_OPTIONS } from "./frameless-window-options";
 import { guardWindowNavigation } from "./navigation-guard";
 
 /**
@@ -44,13 +45,14 @@ export const MAIN_WINDOW_WIDTH = 1100;
 export const MAIN_WINDOW_HEIGHT = 720;
 
 /**
- * 创建主窗口, 渲染完成后再显示, 并加上导航防护: 页面不能导航离开应用, 新窗口一律拒绝. 开发环境
- * 加载 electron-vite 提供的渲染进程地址, 生产环境加载打包后的本地 index.html.
+ * 创建无框的主窗口, 渲染完成后再显示, 并加上导航防护: 页面不能导航离开应用, 新窗口一律拒绝.
+ * 开发环境加载 electron-vite 提供的渲染进程地址, 生产环境加载打包后的本地 index.html.
  * @param options 窗口选项.
  * @returns 新建的主窗口.
  */
 export function createMainWindow(options: MainWindowOptions): BrowserWindow {
   const mainWindow = new BrowserWindow({
+    ...FRAMELESS_WINDOW_OPTIONS,
     useContentSize: true,
     width: MAIN_WINDOW_WIDTH,
     height: MAIN_WINDOW_HEIGHT,

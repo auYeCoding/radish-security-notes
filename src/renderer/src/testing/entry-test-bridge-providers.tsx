@@ -7,6 +7,7 @@ import type { ImportBridge } from "@shared/import/import-bridge";
 import type { LinkBridge } from "@shared/links/link-bridge";
 import type { RestoreBridge } from "@shared/restore/restore-bridge";
 import type { MasterPasswordBridge } from "@shared/vault/master-password-bridge";
+import type { WindowControlsBridge } from "@shared/window/window-controls-bridge";
 import type { ReactNode } from "react";
 
 import { AttachmentBridgeProvider } from "@renderer/stores/attachment-bridge-provider";
@@ -18,6 +19,7 @@ import { LinkBridgeProvider } from "@renderer/stores/link-bridge-provider";
 import { MasterPasswordBridgeProvider } from "@renderer/stores/master-password-bridge-provider";
 import { RestoreBridgeProvider } from "@renderer/stores/restore-bridge-provider";
 import { TotpBridgeProvider } from "@renderer/stores/totp-bridge-provider";
+import { WindowControlsBridgeProvider } from "@renderer/stores/window-controls-bridge-provider";
 
 /**
  * 条目测试 Provider 需要注入的按需读取数据的桥.
@@ -59,6 +61,10 @@ export interface EntryTestBridgeValues {
    * 链接桥.
    */
   readonly linkBridge: LinkBridge;
+  /**
+   * 窗口控制桥.
+   */
+  readonly windowControlsBridge: WindowControlsBridge;
 }
 
 /**
@@ -76,8 +82,8 @@ interface EntryTestBridgeProvidersProps {
 }
 
 /**
- * 依次注入批量桥, TOTP 桥, 附件桥, 导入桥, 导出桥, 邮箱备份桥, 恢复桥, 主密码开关桥与链接桥, 与
- * 全局的 `BridgeProviders` 一一对应.
+ * 依次注入批量桥, TOTP 桥, 附件桥, 导入桥, 导出桥, 邮箱备份桥, 恢复桥, 主密码开关桥, 链接桥与窗口
+ * 控制桥, 与全局的 `BridgeProviders` 一一对应.
  * @param props 组件属性.
  * @returns 包裹子节点的桥 Provider 组合.
  */
@@ -97,7 +103,11 @@ export function EntryTestBridgeProviders(
                     bridge={values.masterPasswordBridge}
                   >
                     <LinkBridgeProvider bridge={values.linkBridge}>
-                      {props.children}
+                      <WindowControlsBridgeProvider
+                        bridge={values.windowControlsBridge}
+                      >
+                        {props.children}
+                      </WindowControlsBridgeProvider>
                     </LinkBridgeProvider>
                   </MasterPasswordBridgeProvider>
                 </RestoreBridgeProvider>
