@@ -2,9 +2,9 @@ import { MailIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Badge } from "@renderer/components/ui/badge";
 import { Button } from "@renderer/components/ui/button";
 
+import { AutoBackupFailureBadge } from "./auto-backup-failure-badge";
 import { EmailBackupDialog } from "./email-backup-dialog";
 import { useAutoBackupFailure } from "./use-auto-backup-failure";
 
@@ -26,11 +26,7 @@ export function EmailBackupTrigger(): React.JSX.Element {
       >
         <MailIcon aria-hidden="true" data-icon="inline-start" />
         {t("emailBackup.trigger.label")}
-        {failureReason !== undefined && (
-          <Badge variant="destructive" className="ml-auto">
-            {t("emailBackup.trigger.failureBadge")}
-          </Badge>
-        )}
+        {failureReason !== undefined && <AutoBackupFailureBadge />}
       </Button>
       {isOpen && <EmailBackupDialog onClose={() => setIsOpen(false)} />}
     </>

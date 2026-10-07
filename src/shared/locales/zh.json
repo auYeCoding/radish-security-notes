@@ -1131,7 +1131,26 @@
     }
   },
   "settings": {
-    "open": "设置"
+    "open": "设置",
+    "dialog": {
+      "title": "设置",
+      "description": "管理数据的导入, 导出, 备份与恢复."
+    },
+    "data": {
+      "title": "数据",
+      "import": {
+        "description": "导入其他密码管理器导出的文件."
+      },
+      "export": {
+        "description": "把保险库里的条目导出成一个文件."
+      },
+      "emailBackup": {
+        "description": "把全部数据发到你自己的邮箱, 也可以设置自动备份."
+      },
+      "restore": {
+        "description": "选择备份文件, 预览并确认后恢复数据."
+      }
+    }
   },
   "preferences": {
     "theme": {

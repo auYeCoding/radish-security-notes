@@ -1131,7 +1131,26 @@
     }
   },
   "settings": {
-    "open": "Settings"
+    "open": "Settings",
+    "dialog": {
+      "title": "Settings",
+      "description": "Manage importing, exporting, backing up and restoring your data."
+    },
+    "data": {
+      "title": "Data",
+      "import": {
+        "description": "Import a file exported from another password manager."
+      },
+      "export": {
+        "description": "Export the entries in the vault to a file."
+      },
+      "emailBackup": {
+        "description": "Send all of your data to your own mailbox, or set up automatic backups."
+      },
+      "restore": {
+        "description": "Choose a backup file, preview it and restore your data."
+      }
+    }
   },
   "preferences": {
     "theme": {

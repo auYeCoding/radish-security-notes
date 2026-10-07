@@ -40,28 +40,6 @@ describe("AppShell 布局", () => {
     expect(screen.getByRole("button", { name: "设置" })).toBeDefined();
   });
 
-  it("侧栏底部导出入口在导入入口之后, 邮箱备份入口之前", async () => {
-    await renderShell();
-
-    const sidebar = within(screen.getByRole("complementary"));
-    const importTrigger = sidebar.getByRole("button", { name: "导入数据" });
-    const exportTrigger = sidebar.getByRole("button", { name: "导出数据" });
-    const emailBackup = sidebar.getByRole("button", { name: "邮箱备份" });
-    expect(isFollowing(importTrigger, exportTrigger)).toBe(true);
-    expect(isFollowing(exportTrigger, emailBackup)).toBe(true);
-  });
-
-  it("侧栏底部从备份恢复入口在邮箱备份入口之后, 设置按钮之前", async () => {
-    await renderShell();
-
-    const sidebar = within(screen.getByRole("complementary"));
-    const emailBackup = sidebar.getByRole("button", { name: "邮箱备份" });
-    const restore = sidebar.getByRole("button", { name: "从备份恢复" });
-    const settings = sidebar.getByRole("button", { name: "设置" });
-    expect(isFollowing(emailBackup, restore)).toBe(true);
-    expect(isFollowing(restore, settings)).toBe(true);
-  });
-
   it("侧栏里标签在文件夹之上, 且没有主题与语言切换控件", async () => {
     await renderShell();
 
@@ -82,6 +60,40 @@ describe("AppShell 布局", () => {
     const languageGroup = topbar.getByRole("group", { name: "语言" });
     expect(isFollowing(searchbox, themeGroup)).toBe(true);
     expect(isFollowing(themeGroup, languageGroup)).toBe(true);
+  });
+});
+
+describe("AppShell 设置入口", () => {
+  it("侧栏底部只有设置按钮, 导入, 导出, 邮箱备份, 从备份恢复入口不在侧栏", async () => {
+    await renderShell();
+
+    const sidebar = within(screen.getByRole("complementary"));
+    expect(sidebar.getByRole("button", { name: "设置" })).toBeDefined();
+    ["导入数据", "导出数据", "邮箱备份", "从备份恢复"].forEach((name) =>
+      expect(sidebar.queryByRole("button", { name })).toBeNull(),
+    );
+  });
+
+  it("设置对话框里导出入口在导入入口之后, 邮箱备份入口之前", async () => {
+    await renderShell();
+    await userEvent.setup().click(screen.getByRole("button", { name: "设置" }));
+
+    const dialog = within(await screen.findByRole("dialog", { name: "设置" }));
+    const importTrigger = dialog.getByRole("button", { name: "导入数据" });
+    const exportTrigger = dialog.getByRole("button", { name: "导出数据" });
+    const emailBackup = dialog.getByRole("button", { name: "邮箱备份" });
+    expect(isFollowing(importTrigger, exportTrigger)).toBe(true);
+    expect(isFollowing(exportTrigger, emailBackup)).toBe(true);
+  });
+
+  it("设置对话框里从备份恢复入口在邮箱备份入口之后", async () => {
+    await renderShell();
+    await userEvent.setup().click(screen.getByRole("button", { name: "设置" }));
+
+    const dialog = within(await screen.findByRole("dialog", { name: "设置" }));
+    const emailBackup = dialog.getByRole("button", { name: "邮箱备份" });
+    const restore = dialog.getByRole("button", { name: "从备份恢复" });
+    expect(isFollowing(emailBackup, restore)).toBe(true);
   });
 });
 
