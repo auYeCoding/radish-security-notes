@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import type { AttachmentMeta } from "@shared/attachments/attachment-types";
 
 import { formatByteSize } from "@renderer/components/format-byte-size";
+import { FAST_STATE_TRANSITION } from "@renderer/components/ui/state-motion";
+import { cn } from "@renderer/lib/class-names";
 
 import { AttachmentKindIcon } from "./attachment-kind-icon";
 import {
@@ -24,7 +26,12 @@ export function AttachmentRow(props: AttachmentRowProps): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const attachment: AttachmentMeta = props.attachment;
   return (
-    <li className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50">
+    <li
+      className={cn(
+        FAST_STATE_TRANSITION,
+        "flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50",
+      )}
+    >
       <AttachmentKindIcon name={attachment.name} />
       <span className="min-w-0 flex-1 text-sm break-words">
         {attachment.name}

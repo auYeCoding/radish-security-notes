@@ -1,6 +1,8 @@
 import { ArrowLeftRightIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { FADE_IN_MOTION } from "@renderer/components/ui/state-motion";
+import { cn } from "@renderer/lib/class-names";
 import { useBatchOperations } from "@renderer/stores/use-batch-operations";
 
 import { BatchActionButton } from "./batch-action-button";
@@ -33,7 +35,7 @@ interface BatchBarActionsProps {
 
 /**
  * 选择栏右侧的批量操作按钮组: 移入文件夹, 加标签, 摘标签, 反选与删除. 移入文件夹与标签的菜单点一项
- * 就对选中的条目执行, 删除先经确认框.
+ * 就对选中的条目执行, 删除先经确认框. 勾选第一项时整组快档淡入出现.
  * @param props 组件属性.
  * @returns 按钮组元素.
  */
@@ -44,7 +46,7 @@ export function BatchBarActions(
   const operations = useBatchOperations();
   const { entryIds, isRunning, run } = props;
   return (
-    <div className="ms-auto flex items-center gap-0.5">
+    <div className={cn(FADE_IN_MOTION, "ms-auto flex items-center gap-0.5")}>
       <BatchMoveMenu
         isDisabled={isRunning}
         onMove={(folderId) =>

@@ -1,11 +1,14 @@
 import { CheckIcon } from "lucide-react";
 
 import { Button } from "@renderer/components/ui/button";
+import { FADE_IN_MOTION } from "@renderer/components/ui/state-motion";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@renderer/components/ui/tooltip";
+
+import { cn } from "@renderer/lib/class-names";
 
 import { COPY_FEEDBACK_MILLISECONDS } from "./copy-button";
 import { groupTotpCode } from "./totp-code-format";
@@ -65,7 +68,12 @@ export function TotpCodeButton(props: TotpCodeButtonProps): React.JSX.Element {
         <TooltipContent>{props.label}</TooltipContent>
       </Tooltip>
       {feedback.isActive ? (
-        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        <span
+          className={cn(
+            FADE_IN_MOTION,
+            "flex items-center gap-1 text-xs text-muted-foreground",
+          )}
+        >
           <CheckIcon aria-hidden="true" className="size-3.5" />
           {props.copiedLabel}
         </span>

@@ -6,6 +6,7 @@ import type { EntrySummary } from "@shared/entries/entry-types";
 
 import { Button } from "@renderer/components/ui/button";
 import { Checkbox } from "@renderer/components/ui/checkbox";
+import { FAST_STATE_TRANSITION } from "@renderer/components/ui/state-motion";
 import { useDragSource } from "@renderer/lib/drag-drop/use-drag-source";
 
 import { EntryRowContent } from "./entry-row-content";
@@ -14,10 +15,12 @@ import { rowCheckboxLabelledBy } from "./entry-row-ids";
 
 /**
  * 列表项外层的类名. 类名在模块加载时合并好, 渲染时直接取用: 条目很多时全选会让每个列表项重新
- * 渲染, 每次都合并类名开销不小.
+ * 渲染, 每次都合并类名开销不小. 选中竖条与底色的出现和消失取快档状态过渡.
  */
-const ROW_CLASS_NAME =
-  "flex h-(--list-row-height) items-center border-s-2 border-s-transparent";
+const ROW_CLASS_NAME = cn(
+  FAST_STATE_TRANSITION,
+  "flex h-(--list-row-height) items-center border-s-2 border-s-transparent",
+);
 
 /**
  * 选中查看详情的列表项外层的类名.

@@ -10,6 +10,7 @@ import {
 import {
   BASE_STATE_TRANSITION,
   BASE_TRANSFORM_TRANSITION,
+  FADE_IN_MOTION,
   FAST_STATE_TRANSITION,
   MARK_TRANSITION,
 } from "./state-motion";
@@ -22,6 +23,7 @@ const STATE_CONSTANTS: readonly (readonly [string, string])[] = [
   ["BASE_STATE_TRANSITION", BASE_STATE_TRANSITION],
   ["BASE_TRANSFORM_TRANSITION", BASE_TRANSFORM_TRANSITION],
   ["MARK_TRANSITION", MARK_TRANSITION],
+  ["FADE_IN_MOTION", FADE_IN_MOTION],
 ];
 
 describe("状态过渡常量", () => {
@@ -38,6 +40,7 @@ describe("状态过渡常量", () => {
       "motion-fast",
     ]);
     expect(extractDurationTokens(MARK_TRANSITION, "")).toEqual(["motion-fast"]);
+    expect(extractDurationTokens(FADE_IN_MOTION, "")).toEqual(["motion-fast"]);
     expect(extractDurationTokens(BASE_STATE_TRANSITION, "")).toEqual([
       "motion-base",
     ]);
@@ -74,5 +77,23 @@ describe("状态过渡常量", () => {
     expect(readTokenMilliseconds("motion-base")).toBeGreaterThan(
       readTokenMilliseconds("motion-fast"),
     );
+  });
+});
+
+describe("淡入常量", () => {
+  it("只改透明度, 不位移不缩放, 用进入动画而不是过渡", () => {
+    const classNames = FADE_IN_MOTION.split(" ");
+
+    expect(classNames).toEqual(
+      expect.arrayContaining(["animate-in", "fade-in-0"]),
+    );
+    expect(
+      classNames.filter((name) => /zoom|slide|translate/.test(name)),
+    ).toEqual([]);
+  });
+
+  it("时长取快档, 不是过渡类", () => {
+    expect(FADE_IN_MOTION.split(" ")).not.toContain("transition");
+    expect(extractDurationTokens(FADE_IN_MOTION, "")).toEqual(["motion-fast"]);
   });
 });

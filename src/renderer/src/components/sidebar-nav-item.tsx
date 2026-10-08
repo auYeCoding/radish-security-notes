@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@renderer/components/ui/button";
+import { FAST_STATE_TRANSITION } from "@renderer/components/ui/state-motion";
 import {
   Tooltip,
   TooltipContent,
@@ -104,6 +105,7 @@ export function SidebarNavItem(props: SidebarNavItemProps): React.JSX.Element {
     <li
       ref={setNodeRef}
       className={cn(
+        FAST_STATE_TRANSITION,
         "flex items-center border-s-2 border-s-transparent",
         ROW_END_PADDING[layout],
         props.isSelected && "border-s-brand bg-muted",

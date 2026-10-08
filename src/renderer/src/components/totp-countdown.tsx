@@ -1,4 +1,9 @@
 import { Progress } from "@renderer/components/ui/progress";
+import {
+  FADE_IN_MOTION,
+  FAST_STATE_TRANSITION,
+} from "@renderer/components/ui/state-motion";
+import { cn } from "@renderer/lib/class-names";
 
 /**
  * 进度条取值的上限, 剩余时间占满整个周期时是 100.
@@ -37,7 +42,7 @@ interface TotpCountdownProps {
 
 /**
  * 验证码的倒计时: 一行剩余时间, 临近换码时加粗并出现提示文字, 下方是随剩余时间缩短的细进度条.
- * 进度每秒变化一次, 没有过渡动画.
+ * 进度每秒变化一次, 没有过渡动画; 剩余时间的强调色取快档状态过渡, 提示文字快档淡入.
  * @param props 组件属性.
  * @returns 倒计时元素.
  */
@@ -47,11 +52,16 @@ export function TotpCountdown(props: TotpCountdownProps): React.JSX.Element {
   return (
     <div className="flex w-full max-w-60 flex-col gap-1.5">
       <p className="flex items-center gap-2 text-xs text-muted-foreground tabular-nums">
-        <span className={props.isEnding ? "font-semibold text-foreground" : ""}>
+        <span
+          className={cn(
+            FAST_STATE_TRANSITION,
+            props.isEnding && "font-semibold text-foreground",
+          )}
+        >
           {props.remainingText}
         </span>
         {props.isEnding ? (
-          <span className="font-semibold text-foreground">
+          <span className={cn(FADE_IN_MOTION, "font-semibold text-foreground")}>
             {props.endingText}
           </span>
         ) : null}

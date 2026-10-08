@@ -1,6 +1,7 @@
 import { CheckIcon, CopyIcon } from "lucide-react";
 
 import { Button } from "@renderer/components/ui/button";
+import { FADE_IN_MOTION } from "@renderer/components/ui/state-motion";
 import {
   Tooltip,
   TooltipContent,
@@ -65,7 +66,7 @@ export function CopyButton(props: CopyButtonProps): React.JSX.Element {
         >
           {feedback.isActive ? (
             <>
-              <CheckIcon aria-hidden="true" />
+              <CheckIcon aria-hidden="true" className={FADE_IN_MOTION} />
               {props.copiedLabel}
             </>
           ) : (

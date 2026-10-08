@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
 
+import {
+  FADE_IN_MOTION,
+  FAST_STATE_TRANSITION,
+} from "@renderer/components/ui/state-motion";
 import { cn } from "@renderer/lib/class-names";
 
 import { useFileDrag } from "./use-file-drag";
@@ -47,6 +51,7 @@ export function AttachmentDropZone(
     <section
       aria-label={props.label}
       className={cn(
+        FAST_STATE_TRANSITION,
         "flex max-w-xl flex-col gap-3 rounded-lg border border-dashed p-3",
         isDragging ? "border-primary bg-muted" : "border-border",
       )}
@@ -57,7 +62,7 @@ export function AttachmentDropZone(
         role="status"
         className={cn(
           "text-sm text-muted-foreground",
-          isDragging ? "" : "sr-only",
+          isDragging ? FADE_IN_MOTION : "sr-only",
         )}
       >
         {isDragging ? props.dropHint : ""}

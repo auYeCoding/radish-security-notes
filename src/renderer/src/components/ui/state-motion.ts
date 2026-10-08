@@ -23,3 +23,10 @@ export const BASE_TRANSFORM_TRANSITION =
  */
 export const MARK_TRANSITION =
   "transition duration-(--motion-fast) ease-(--motion-ease) data-starting-style:scale-90 data-starting-style:opacity-0 data-ending-style:scale-90 data-ending-style:opacity-0";
+
+/**
+ * 快档淡入: 元素挂载时只做透明度由 0 到 1 的淡入, 不位移不缩放, 用于反馈提示, 批量按钮组与
+ * 详情内容这类条件渲染出现的元素. 消失时直接卸载, 不做动画.
+ */
+export const FADE_IN_MOTION =
+  "animate-in fade-in-0 duration-(--motion-fast) ease-(--motion-ease)";
