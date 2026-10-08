@@ -48,6 +48,7 @@ function createFakeService(): VaultService {
     unlock: vi.fn(() =>
       Promise.resolve({ ok: false, reason: "wrong-password" }),
     ),
+    lock: vi.fn(() => Promise.resolve({ ok: false, reason: "tasks-running" })),
   } as unknown as VaultService;
 }
 
@@ -109,5 +110,18 @@ describe("registerVaultIpc", () => {
     );
     expect(service.setupWithMasterPassword).not.toHaveBeenCalled();
     expect(service.unlock).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerVaultIpc 锁定", () => {
+  it("锁定通道不带参数调用服务的锁定方法并返回结果", async () => {
+    const ipcMain = createFakeIpcMain();
+    const service = createFakeService();
+    registerVaultIpc(ipcMain, service);
+
+    const result = await ipcMain.invoke(IPC_CHANNELS.vaultLock);
+
+    expect(service.lock).toHaveBeenCalledWith();
+    expect(result).toEqual({ ok: false, reason: "tasks-running" });
   });
 });

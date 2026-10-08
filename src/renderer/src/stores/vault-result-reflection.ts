@@ -25,6 +25,14 @@ export interface VaultResultReflection {
     result: VaultOperationResult,
   ) => Promise<VaultOperationResult>;
   /**
+   * 让状态跟随锁定的结果: 成功变为已锁定并清除待确认的恢复词与恢复请求, 失败按原因处理.
+   * @param result 锁定结果.
+   * @returns 原样返回锁定结果.
+   */
+  readonly reflectLock: (
+    result: VaultOperationResult,
+  ) => Promise<VaultOperationResult>;
+  /**
    * 让状态跟随设置的结果: 成功变为已解锁并记下待确认的恢复词, 失败按原因处理.
    * @param result 设置结果.
    * @returns 原样返回设置结果.
@@ -69,6 +77,20 @@ export function createVaultResultReflection(
     }
     return result;
   };
+  const reflectLock = async (
+    result: VaultOperationResult,
+  ): Promise<VaultOperationResult> => {
+    if (result.ok) {
+      set({
+        status: "locked",
+        pendingRecoveryWords: undefined,
+        isRestoreRequested: false,
+      });
+    } else {
+      await reflectFailure(result);
+    }
+    return result;
+  };
   const reflectSetup = async (
     result: VaultSetupResult,
   ): Promise<VaultSetupResult> => {
@@ -79,5 +101,5 @@ export function createVaultResultReflection(
     }
     return result;
   };
-  return { reflect, reflectSetup, reflectFailure };
+  return { reflect, reflectLock, reflectSetup, reflectFailure };
 }

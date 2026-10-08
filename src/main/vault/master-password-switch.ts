@@ -19,6 +19,7 @@ import {
   createNonFatalOperationGuard,
   type NonFatalOperationGuard,
 } from "./non-fatal-operation-guard";
+import type { OperationExclusion } from "./operation-exclusion";
 import type { SafeStoragePort } from "./safe-storage-port";
 import { unprotectWithSystem } from "./system-key-protector";
 
@@ -47,6 +48,10 @@ export interface MasterPasswordSwitchDependencies {
    */
   readonly safeStorage: SafeStoragePort;
   /**
+   * 与保险库其它操作共用的互斥标志, 切换期间锁定等其它操作被拒绝.
+   */
+  readonly exclusion: OperationExclusion;
+  /**
    * 保险库当前是否已解锁, 只有已解锁时才允许切换.
    */
   readonly isUnlocked: () => boolean;
@@ -72,7 +77,10 @@ export class MasterPasswordSwitch {
    * @param dependencies 开关依赖.
    */
   constructor(private readonly dependencies: MasterPasswordSwitchDependencies) {
-    this.guard = createNonFatalOperationGuard(dependencies.onFailure);
+    this.guard = createNonFatalOperationGuard(
+      dependencies.onFailure,
+      dependencies.exclusion,
+    );
   }
 
   /**

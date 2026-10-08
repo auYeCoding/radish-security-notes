@@ -9,6 +9,8 @@ export type VaultFailureReason =
   | "recovery-unknown-word"
   | "recovery-checksum"
   | "recovery-key-rejected"
+  | "tasks-running"
+  | "master-password-required"
   | "unexpected-state"
   | "unexpected-error";
 

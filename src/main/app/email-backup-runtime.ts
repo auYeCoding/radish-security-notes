@@ -64,6 +64,10 @@ export interface EmailBackupRuntime {
    * 停止自动备份调度, 应用退出时调用.
    */
   readonly stopAutoBackup: () => void;
+  /**
+   * 暂停自动备份直到保险库再次解锁: 锁定时调用, 解锁后沿用启动补发检查一次.
+   */
+  readonly pauseAutoBackupUntilUnlocked: () => void;
 }
 
 /**
@@ -193,5 +197,6 @@ export function createEmailBackupRuntime(
     discardTemporaryFiles: () => pipeline.temporaryStore.discardAll(),
     startAutoBackup: () => scheduler.start(),
     stopAutoBackup: () => scheduler.stop(),
+    pauseAutoBackupUntilUnlocked: () => scheduler.pauseUntilUnlocked(),
   };
 }

@@ -34,6 +34,19 @@ describe("导入服务: 解析结果的释放", () => {
     });
   });
 
+  it("锁定时释放等待确认的解析结果, 不能再确认", async () => {
+    const fixture = createImportServiceFixture(() => getDatabase().orm);
+    await chooseLogin(fixture);
+
+    fixture.service.discardPending();
+
+    expect(fixture.service.run({ duplicatePolicy: "skip" })).toEqual({
+      ok: false,
+      reason: "no-pending-import",
+    });
+    expect(fixture.service.getProgress().stage).toBe("idle");
+  });
+
   it("超时后释放, 不能再确认", async () => {
     const fixture = createImportServiceFixture(() => getDatabase().orm);
     await chooseLogin(fixture);
@@ -66,6 +79,21 @@ describe("导入服务: 并发与取消", () => {
     const second = await fixture.service.chooseFile("bitwardenJson");
     expect(second).toEqual({ ok: false, reason: "busy" });
     expect((await first).ok).toBe(true);
+  });
+
+  it("选择文件期间报告有任务进行中, 结束后恢复空闲", async () => {
+    const fixture = createImportServiceFixture(() => getDatabase().orm);
+    fixture.state.files.set(
+      SAMPLE_SOURCE_PATH,
+      Buffer.from(bitwardenExport([bitwardenLogin()]), "utf8"),
+    );
+    expect(fixture.service.hasRunningTask()).toBe(false);
+
+    const choosing = fixture.service.chooseFile("bitwardenJson");
+    expect(fixture.service.hasRunningTask()).toBe(true);
+    await choosing;
+
+    expect(fixture.service.hasRunningTask()).toBe(false);
   });
 
   it("解析中途取消, 返回取消结果, 没有留下等待确认的结果", async () => {

@@ -91,10 +91,20 @@ export class AutoBackupScheduler {
       this.beginChecking();
       return;
     }
-    this.cancelProbe = this.dependencies.clock.every(
-      () => this.probeUnlock(),
-      AUTO_BACKUP_UNLOCK_PROBE_INTERVAL_MILLISECONDS,
-    );
+    this.beginProbing();
+  }
+
+  /**
+   * 暂停检查并回到探测: 保险库被锁定后调用, 取消周期检查, 重新每隔几秒看一次解锁了没有, 解锁后
+   * 沿用启动补发. 还没启动, 已经停止或已经在探测时什么也不做.
+   */
+  pauseUntilUnlocked(): void {
+    if (!this.isStarted || this.cancelProbe !== undefined) {
+      return;
+    }
+    this.cancelCheck?.();
+    this.cancelCheck = undefined;
+    this.beginProbing();
   }
 
   /**
@@ -106,6 +116,16 @@ export class AutoBackupScheduler {
     this.cancelProbe = undefined;
     this.cancelCheck = undefined;
     this.isStarted = false;
+  }
+
+  /**
+   * 开始每隔几秒探测一次保险库是否已解锁.
+   */
+  private beginProbing(): void {
+    this.cancelProbe = this.dependencies.clock.every(
+      () => this.probeUnlock(),
+      AUTO_BACKUP_UNLOCK_PROBE_INTERVAL_MILLISECONDS,
+    );
   }
 
   /**

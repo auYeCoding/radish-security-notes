@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import type { VaultService } from "../vault/vault-service";
 import {
   startService,
+  type CreateServiceOptions,
   type VaultServiceHarness,
 } from "./vault-service-harness";
 import { TEST_MASTER_PASSWORD } from "./vault-test-fixtures";
@@ -79,4 +80,25 @@ export async function prepareVaultWithProbe(
   writeRecoveryProbe(service);
   service.close();
   return result.recoveryWords;
+}
+
+/**
+ * 创建带标记数据的保险库并重新启动服务, 主密码保护的再用测试主密码解锁, 相当于用户启动应用后
+ * 进入已解锁的主界面.
+ * @param harness 测试环境.
+ * @param mode 保护方式.
+ * @param options 创建服务时可覆盖的依赖.
+ * @returns 已解锁的服务.
+ */
+export async function startUnlockedProbeService(
+  harness: VaultServiceHarness,
+  mode: ProtectionMode,
+  options?: CreateServiceOptions,
+): Promise<VaultService> {
+  await prepareVaultWithProbe(harness, mode);
+  const service = await startService(harness, options);
+  if (mode === "master-password") {
+    await service.unlock(TEST_MASTER_PASSWORD);
+  }
+  return service;
 }

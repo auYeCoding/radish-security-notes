@@ -30,4 +30,9 @@ export interface VaultBridge {
    * @returns 解锁结果.
    */
   unlock: (masterPassword: string) => Promise<VaultOperationResult>;
+  /**
+   * 锁定已解锁的保险库: 主进程关闭数据库并丢弃解密状态, 之后要再次输入主密码才能进入.
+   * @returns 锁定结果, 有任务进行中或未设主密码时为带原因的失败.
+   */
+  lock: () => Promise<VaultOperationResult>;
 }

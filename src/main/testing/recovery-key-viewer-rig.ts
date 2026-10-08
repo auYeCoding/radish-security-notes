@@ -1,3 +1,4 @@
+import { createOperationExclusion } from "../vault/operation-exclusion";
 import { RecoveryKeyViewer } from "../vault/recovery-key-viewer";
 import type { SafeStoragePort } from "../vault/safe-storage-port";
 import type { SwitchRig } from "./master-password-switch-rig";
@@ -45,6 +46,7 @@ export function createViewer(
   const viewer = new RecoveryKeyViewer({
     keyFileStore: rig.keyFileStore,
     safeStorage: options.safeStorage ?? createFakeSafeStorage(),
+    exclusion: createOperationExclusion(),
     isUnlocked: () => options.isUnlocked ?? true,
     onFailure: (error) => failures.push(error),
   });

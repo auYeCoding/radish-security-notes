@@ -5,6 +5,7 @@ import {
   MasterPasswordSwitch,
   type MasterPasswordSwitchKeyProtection,
 } from "../vault/master-password-switch";
+import { createOperationExclusion } from "../vault/operation-exclusion";
 import { dataKeyToRecoveryWords } from "../vault/recovery-phrase";
 import type { SafeStoragePort } from "../vault/safe-storage-port";
 import type { SystemKeyPersistence } from "../vault/system-key-persistence";
@@ -147,6 +148,7 @@ export async function createSwitchRig(
       keyFileStore: harness.keyFileStore,
       keyProtection,
       safeStorage,
+      exclusion: createOperationExclusion(),
       isUnlocked: () => options.isUnlocked ?? true,
       onFailure: (error) => failures.push(error),
     }),

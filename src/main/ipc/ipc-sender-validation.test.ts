@@ -122,9 +122,11 @@ const MODULE_CASES: readonly ModuleCase[] = [
       IPC_CHANNELS.vaultSetupWithMasterPassword,
       IPC_CHANNELS.vaultSetupWithoutMasterPassword,
       IPC_CHANNELS.vaultUnlock,
+      IPC_CHANNELS.vaultLock,
     ],
     passingCalls: [
       { channel: IPC_CHANNELS.vaultGetStatus, args: [], method: "getStatus" },
+      { channel: IPC_CHANNELS.vaultLock, args: [], method: "lock" },
       {
         channel: IPC_CHANNELS.vaultUnlock,
         args: ["a long enough password"],

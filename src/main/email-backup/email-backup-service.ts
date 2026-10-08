@@ -163,6 +163,14 @@ export class EmailBackupService {
   }
 
   /**
+   * 判断是否有一次发送 (测试邮件, 立即备份或自动备份) 正在进行.
+   * @returns 进行中为 true.
+   */
+  hasRunningTask(): boolean {
+    return this.isBusy;
+  }
+
+  /**
    * 读取上次备份的结果.
    * @returns 上次结果, 从没备份过时为 undefined, 未解锁时为失败结果.
    */

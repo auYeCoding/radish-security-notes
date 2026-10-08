@@ -31,6 +31,7 @@ function createBridge(overrides: Partial<VaultBridge> = {}): VaultBridge {
     setupWithMasterPassword: vi.fn(() => Promise.resolve(SETUP_SUCCEEDED)),
     setupWithoutMasterPassword: vi.fn(() => Promise.resolve(SETUP_SUCCEEDED)),
     unlock: vi.fn(() => Promise.resolve(VAULT_OPERATION_SUCCEEDED)),
+    lock: vi.fn(() => Promise.resolve(VAULT_OPERATION_SUCCEEDED)),
     ...overrides,
   };
 }
@@ -169,6 +170,77 @@ describe("createVaultStore 失败路径", () => {
 
     expect(store.getState().status).toBe("needs-setup");
     expect(store.getState().pendingRecoveryWords).toBeUndefined();
+  });
+});
+
+describe("createVaultStore 锁定", () => {
+  it("锁定成功后状态变为 locked, 并清除待确认的恢复词与恢复请求", async () => {
+    const bridge = createBridge();
+    const store = createStoreWith(bridge, "needs-setup");
+    await store.getState().setupWithMasterPassword("password-1");
+    store.getState().requestRestore();
+
+    const result = await store.getState().lock();
+
+    expect(result).toEqual(VAULT_OPERATION_SUCCEEDED);
+    expect(bridge.lock).toHaveBeenCalledTimes(1);
+    expect(store.getState().status).toBe("locked");
+    expect(store.getState().pendingRecoveryWords).toBeUndefined();
+    expect(store.getState().isRestoreRequested).toBe(false);
+  });
+
+  it("锁定后用主密码解锁可以回到 unlocked", async () => {
+    const store = createStoreWith(createBridge(), "unlocked");
+    await store.getState().lock();
+
+    await store.getState().unlock("password-1");
+
+    expect(store.getState().status).toBe("unlocked");
+  });
+});
+
+describe("createVaultStore 锁定被拒绝或出错", () => {
+  it.each(["tasks-running", "master-password-required"] as const)(
+    "被拒绝 (%s) 时状态保持 unlocked, 不重新向主进程取状态",
+    async (reason) => {
+      const bridge = createBridge({
+        lock: () => Promise.resolve(vaultOperationFailed(reason)),
+      });
+      const store = createStoreWith(bridge, "unlocked");
+
+      const result = await store.getState().lock();
+
+      expect(result).toEqual({ ok: false, reason });
+      expect(store.getState().status).toBe("unlocked");
+      expect(bridge.getStatus).not.toHaveBeenCalled();
+    },
+  );
+
+  it("主进程报告状态不符时重新向主进程取状态", async () => {
+    const store = createStoreWith(
+      createBridge({
+        getStatus: () => Promise.resolve("locked"),
+        lock: () => Promise.resolve(vaultOperationFailed("unexpected-state")),
+      }),
+      "unlocked",
+    );
+
+    await store.getState().lock();
+
+    expect(store.getState().status).toBe("locked");
+  });
+
+  it("主进程报告意外错误时状态变为 failed", async () => {
+    const store = createStoreWith(
+      createBridge({
+        lock: () => Promise.resolve(vaultOperationFailed("unexpected-error")),
+      }),
+      "unlocked",
+    );
+
+    await store.getState().lock();
+
+    expect(store.getState().status).toBe("failed");
   });
 });
 

@@ -126,6 +126,65 @@ describe("自动备份调度器: 未解锁", () => {
   });
 });
 
+describe("自动备份调度器: 锁定后暂停", () => {
+  it("暂停后不再周期检查, 改为探测; 解锁后立即补发一次, 再每五分钟检查", () => {
+    const { scheduler, runScheduled, lock } = createHarness(true);
+    scheduler.start();
+    lock.isUnlocked = false;
+    scheduler.pauseUntilUnlocked();
+    runScheduled.mockClear();
+
+    vi.advanceTimersByTime(3 * CHECK);
+    expect(runScheduled).not.toHaveBeenCalled();
+    lock.isUnlocked = true;
+    vi.advanceTimersByTime(PROBE);
+    expect(runScheduled.mock.calls).toEqual([["catch-up"]]);
+    vi.advanceTimersByTime(CHECK);
+    expect(runScheduled.mock.calls).toEqual([["catch-up"], ["scheduled"]]);
+    scheduler.stop();
+  });
+
+  it("可以反复暂停与恢复", () => {
+    const { scheduler, runScheduled, lock } = createHarness(true);
+    scheduler.start();
+    for (let round = 0; round < 2; round += 1) {
+      lock.isUnlocked = false;
+      scheduler.pauseUntilUnlocked();
+      lock.isUnlocked = true;
+      vi.advanceTimersByTime(PROBE);
+    }
+    expect(runScheduled.mock.calls).toEqual([
+      ["catch-up"],
+      ["catch-up"],
+      ["catch-up"],
+    ]);
+    scheduler.stop();
+  });
+});
+
+describe("自动备份调度器: 暂停的边界", () => {
+  it("已经在探测时再暂停不会重复登记探测", () => {
+    const { scheduler, runScheduled, lock } = createHarness(false);
+    scheduler.start();
+    scheduler.pauseUntilUnlocked();
+    lock.isUnlocked = true;
+    vi.advanceTimersByTime(PROBE);
+    expect(runScheduled.mock.calls).toEqual([["catch-up"]]);
+    scheduler.stop();
+  });
+
+  it("还没启动或已停止时暂停无效", () => {
+    const { scheduler, runScheduled, lock } = createHarness(true);
+    scheduler.pauseUntilUnlocked();
+    scheduler.start();
+    scheduler.stop();
+    scheduler.pauseUntilUnlocked();
+    lock.isUnlocked = true;
+    vi.advanceTimersByTime(10 * CHECK);
+    expect(runScheduled).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("自动备份调度器: 检查出错", () => {
   it("出错只通知回调, 不抛出, 下一次检查照常进行", async () => {
     const { scheduler, runScheduled, onFailure } = createHarness(true);

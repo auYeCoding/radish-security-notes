@@ -21,14 +21,17 @@ import { fileExists } from "./file-exists";
 import type { KeyFileStore } from "./key-file-store";
 import { MASTER_PASSWORD_PROTECTION } from "./key-record";
 import { KeyProtectionWriter } from "./key-protection-writer";
+import type { LockRegistry } from "./lock-registry";
 import { unprotectWithMasterPassword } from "./master-password-key-protector";
 import { MasterPasswordSwitch } from "./master-password-switch";
+import { createOperationExclusion } from "./operation-exclusion";
 import type { DataKeyRecovery } from "./recover-data-key";
 import { RecoveryKeyViewer } from "./recovery-key-viewer";
 import { dataKeyToRecoveryWords } from "./recovery-phrase";
 import type { SafeStoragePort } from "./safe-storage-port";
 import type { SystemKeyPersistence } from "./system-key-persistence";
 import { unprotectWithSystem } from "./system-key-protector";
+import { VaultLocker } from "./vault-locker";
 import { VaultRecovery } from "./vault-recovery";
 import type { VaultPaths } from "./vault-paths";
 
@@ -61,14 +64,18 @@ export interface VaultServiceDependencies {
    */
   readonly argon2Parameters: Argon2Parameters;
   /**
+   * 锁定登记处, 业务模块在此登记任务探测与锁定时的释放动作.
+   */
+  readonly lockRegistry: LockRegistry;
+  /**
    * 操作或初始化意外失败时的回调, 参数是底层错误.
    */
   readonly onFailure: (error: unknown) => void;
 }
 
 /**
- * 保险库服务: 判定启动状态, 首次设置主密码或跳过, 解锁, 并持有解锁后的加密数据库.
- * 主密码与数据密钥只在方法执行期间存在于内存, 不写入磁盘或日志.
+ * 保险库服务: 判定启动状态, 首次设置主密码或跳过, 解锁, 锁定, 并持有解锁后的加密数据库.
+ * 主密码与数据密钥只在方法执行期间存在于内存, 不写入磁盘或日志; 锁定后连数据库连接也被丢弃.
  */
 export class VaultService {
   /**
@@ -82,9 +89,9 @@ export class VaultService {
   private database: VaultDatabase | undefined;
 
   /**
-   * 是否有设置或解锁操作正在执行.
+   * 与切换主密码, 查看恢复密钥和锁定共用的互斥标志, 同一时间只允许一个操作.
    */
-  private isOperationRunning = false;
+  private readonly exclusion = createOperationExclusion();
 
   /**
    * 把数据密钥保护起来并写成密钥文件, 设置与恢复共用.
@@ -107,6 +114,11 @@ export class VaultService {
   private readonly recoveryKeyViewer: RecoveryKeyViewer;
 
   /**
+   * 已解锁后关闭数据库, 丢弃解密状态并回到锁定.
+   */
+  private readonly locker: VaultLocker;
+
+  /**
    * 创建保险库服务.
    * @param dependencies 服务依赖.
    */
@@ -120,14 +132,26 @@ export class VaultService {
       keyFileStore: dependencies.keyFileStore,
       keyProtection: this.keyProtection,
       safeStorage: dependencies.safeStorage,
+      exclusion: this.exclusion,
       isUnlocked: () => this.status === "unlocked",
       onFailure: dependencies.onFailure,
     });
     this.recoveryKeyViewer = new RecoveryKeyViewer({
       keyFileStore: dependencies.keyFileStore,
       safeStorage: dependencies.safeStorage,
+      exclusion: this.exclusion,
       isUnlocked: () => this.status === "unlocked",
       onFailure: dependencies.onFailure,
+    });
+    this.locker = new VaultLocker({
+      exclusion: this.exclusion,
+      registry: dependencies.lockRegistry,
+      keyFileStore: dependencies.keyFileStore,
+      isUnlocked: () => this.status === "unlocked",
+      discardDatabase: () => this.releaseDatabase(),
+      markLocked: () => {
+        this.status = "locked";
+      },
     });
   }
 
@@ -300,6 +324,16 @@ export class VaultService {
   }
 
   /**
+   * 锁定保险库: 已解锁且由主密码保护, 没有导入, 导出, 邮箱备份, 恢复进行中时, 关闭数据库并丢弃
+   * 解密状态, 之后要再次输入主密码才能进入. 关闭失败仍进入锁定. 与设置, 解锁, 恢复, 切换主密码,
+   * 查看恢复密钥互斥.
+   * @returns 锁定结果, 被拒绝时带原因, 保险库状态不变.
+   */
+  lock(): Promise<VaultOperationResult> {
+    return this.locker.lock();
+  }
+
+  /**
    * 读取已解锁数据库的查询入口, 条目服务经它读写表.
    * @returns 已解锁时是查询入口, 未解锁时为 undefined.
    */
@@ -311,8 +345,16 @@ export class VaultService {
    * 关闭加密数据库.
    */
   close(): void {
-    this.database?.close();
+    this.releaseDatabase();
+  }
+
+  /**
+   * 先丢弃数据库引用再关闭连接, 关闭抛错时引用也已丢弃, 之后不会再有人拿到旧连接.
+   */
+  private releaseDatabase(): void {
+    const database = this.database;
     this.database = undefined;
+    database?.close();
   }
 
   /**
@@ -416,10 +458,9 @@ export class VaultService {
   private async guard<Result extends VaultOperationResult | VaultSetupResult>(
     operation: () => Promise<Result>,
   ): Promise<Result | VaultOperationFailure> {
-    if (this.isOperationRunning) {
+    if (!this.exclusion.tryAcquire()) {
       return vaultOperationFailed("unexpected-state");
     }
-    this.isOperationRunning = true;
     try {
       return await operation();
     } catch (error) {
@@ -427,7 +468,7 @@ export class VaultService {
       this.dependencies.onFailure(error);
       return vaultOperationFailed("unexpected-error");
     } finally {
-      this.isOperationRunning = false;
+      this.exclusion.release();
     }
   }
 }

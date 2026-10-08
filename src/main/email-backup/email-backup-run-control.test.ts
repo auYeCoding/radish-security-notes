@@ -45,6 +45,31 @@ describe("立即备份: 进度与单飞", () => {
   });
 });
 
+describe("立即备份: 报告有任务进行中", () => {
+  const getDatabase = useVaultDatabase("email-control-running");
+  const getDirectory = useTemporaryDirectory("email-control-running-dir");
+
+  it("发送期间有任务进行中, 结束后恢复空闲, 测试邮件与自动备份检查也算", async () => {
+    const { orm } = getDatabase();
+    seedExportSample(orm);
+    const fixture = createEmailBackupFixture(() => orm, getDirectory());
+    await saveSettings(fixture, PLAINTEXT_SETTINGS);
+    expect(fixture.service.hasRunningTask()).toBe(false);
+
+    const backup = fixture.service.runBackup(RUN_WITH_ATTACHMENTS);
+    expect(fixture.service.hasRunningTask()).toBe(true);
+    await backup;
+    const test = fixture.service.sendTest();
+    expect(fixture.service.hasRunningTask()).toBe(true);
+    await test;
+    const scheduled = fixture.service.runScheduled("scheduled");
+    expect(fixture.service.hasRunningTask()).toBe(true);
+    await scheduled;
+
+    expect(fixture.service.hasRunningTask()).toBe(false);
+  });
+});
+
 describe("立即备份: 没有保存设置或没有条目", () => {
   const getDatabase = useVaultDatabase("email-control-missing");
   const getDirectory = useTemporaryDirectory("email-control-missing-dir");

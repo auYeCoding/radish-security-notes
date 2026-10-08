@@ -51,6 +51,11 @@ export interface VaultActions {
    */
   unlock: (masterPassword: string) => Promise<VaultOperationResult>;
   /**
+   * 锁定已解锁的保险库.
+   * @returns 锁定结果, 成功时状态变为已锁定, 失败时状态不变 (有任务进行中, 未设主密码等).
+   */
+  lock: () => Promise<VaultOperationResult>;
+  /**
    * 用户重输恢复词确认通过, 丢弃待确认的恢复词, 进入三栏主界面.
    */
   confirmRecoveryWords: () => void;

@@ -152,6 +152,17 @@ describe("导出服务: 取消之后与并发", () => {
     expect(service.getProgress().stage).toBe("idle");
   });
 
+  it("导出期间报告有任务进行中, 结束后恢复空闲", async () => {
+    const fixture = seededFixture(getDatabase().orm);
+    expect(fixture.service.hasRunningTask()).toBe(false);
+
+    const running = fixture.service.run(exportRequestOf());
+    expect(fixture.service.hasRunningTask()).toBe(true);
+    await running;
+
+    expect(fixture.service.hasRunningTask()).toBe(false);
+  });
+
   it("导出进行时再发起导出返回忙碌, 不影响进行中的导出", async () => {
     const fixture = seededFixture(getDatabase().orm);
     const first = fixture.service.run(exportRequestOf());

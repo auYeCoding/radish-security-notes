@@ -14,7 +14,10 @@ import { registerImportIpc } from "../ipc/import-ipc";
 import { registerLinkIpc } from "../ipc/link-ipc";
 import { guardIpcMainByMainWindow } from "../ipc/main-window-guarded-ipc";
 import { registerMasterPasswordIpc } from "../ipc/master-password-ipc";
+import type { ExportService } from "../export/export-service";
+import type { ImportService } from "../import/import-service";
 import type { ExternalLinkOpener } from "../links/external-link-opener";
+import type { RestoreService } from "../restore/restore-service";
 import {
   registerPreferencesIpc,
   type IpcMainPort,
@@ -49,6 +52,7 @@ import { createFolderService } from "./folder-runtime";
 import { createImportRuntime } from "./import-runtime";
 import { createLinkRuntime } from "./link-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
+import { registerLockParticipants } from "./register-lock-participants";
 import { createRestoreRuntime } from "./restore-runtime";
 import { createTagService } from "./tag-runtime";
 import { createVaultRuntime, type VaultRuntime } from "./vault-runtime";
@@ -126,28 +130,64 @@ function launchMainWindow(
 }
 
 /**
+ * 数据进出的三个服务.
+ */
+interface DataTransferServices {
+  /**
+   * 导入服务.
+   */
+  readonly importService: ImportService;
+  /**
+   * 导出服务.
+   */
+  readonly exportService: ExportService;
+  /**
+   * 恢复服务.
+   */
+  readonly restoreService: RestoreService;
+}
+
+/**
  * 注册数据进出的 IPC: 从其他管理器导入, 导出, 从备份恢复. 它们都读写已解锁的加密数据库, 文件的
  * 选择, 读取与写出都在主进程里完成.
  * @param guardedIpcMain 带来源校验的主进程 IPC 接口.
  * @param vault 保险库运行时对象.
  * @param translator 主进程的 i18next 实例.
+ * @returns 三个服务, 供锁定登记使用.
  */
 function registerDataTransferIpc(
   guardedIpcMain: IpcMainPort,
   vault: VaultRuntime,
   translator: i18n,
+): DataTransferServices {
+  const importService = createImportRuntime(vault.service, translator).service;
+  const exportService = createExportRuntime(vault, translator).service;
+  const restoreService = createRestoreRuntime(vault, translator).service;
+  registerImportIpc(guardedIpcMain, importService);
+  registerExportIpc(guardedIpcMain, exportService);
+  registerRestoreIpc(guardedIpcMain, restoreService);
+  return { importService, exportService, restoreService };
+}
+
+/**
+ * 注册保险库自身的 IPC: 状态, 设置, 解锁, 锁定, 凭恢复词恢复, 查看恢复密钥与主密码开关.
+ * @param guardedIpcMain 带来源校验的主进程 IPC 接口.
+ * @param vault 保险库运行时对象.
+ * @param translator 主进程的 i18next 实例.
+ */
+function registerVaultSecurityIpc(
+  guardedIpcMain: IpcMainPort,
+  vault: VaultRuntime,
+  translator: i18n,
 ): void {
-  registerImportIpc(
+  registerVaultIpc(guardedIpcMain, vault.service);
+  const recovery = createRecoveryRuntime(translator);
+  registerRecoveryIpc(guardedIpcMain, vault.service, recovery.textFileSaver);
+  registerRecoveryKeyIpc(guardedIpcMain, vault.service);
+  registerMasterPasswordIpc(
     guardedIpcMain,
-    createImportRuntime(vault.service, translator).service,
-  );
-  registerExportIpc(
-    guardedIpcMain,
-    createExportRuntime(vault, translator).service,
-  );
-  registerRestoreIpc(
-    guardedIpcMain,
-    createRestoreRuntime(vault, translator).service,
+    vault.service,
+    vault.masterPasswordVerifier,
   );
 }
 
@@ -166,15 +206,7 @@ export async function startApplication(): Promise<void> {
   const mainWindowHolder = createMainWindowHolder<BrowserWindow>();
   const guardedIpcMain = guardIpcMainByMainWindow(ipcMain, mainWindowHolder);
   registerPreferencesIpc(guardedIpcMain, runtime.service);
-  registerVaultIpc(guardedIpcMain, vault.service);
-  const recovery = createRecoveryRuntime(runtime.i18n);
-  registerRecoveryIpc(guardedIpcMain, vault.service, recovery.textFileSaver);
-  registerRecoveryKeyIpc(guardedIpcMain, vault.service);
-  registerMasterPasswordIpc(
-    guardedIpcMain,
-    vault.service,
-    vault.masterPasswordVerifier,
-  );
+  registerVaultSecurityIpc(guardedIpcMain, vault, runtime.i18n);
   const entries = createEntryRuntime(vault.service);
   registerEntryIpc(guardedIpcMain, entries.service);
   registerCustomEntryTypeIpc(
@@ -187,9 +219,18 @@ export async function startApplication(): Promise<void> {
   registerTotpIpc(guardedIpcMain, entries.totpService, entries.decodeQrImage);
   const attachments = createAttachmentRuntime(vault.service, runtime.i18n);
   registerAttachmentIpc(guardedIpcMain, attachments);
-  registerDataTransferIpc(guardedIpcMain, vault, runtime.i18n);
+  const dataTransfer = registerDataTransferIpc(
+    guardedIpcMain,
+    vault,
+    runtime.i18n,
+  );
   const emailBackup = createEmailBackupRuntime(vault, runtime.i18n);
   registerEmailBackupIpc(guardedIpcMain, emailBackup.service);
+  registerLockParticipants(vault.lockRegistry, {
+    ...dataTransfer,
+    emailBackupService: emailBackup.service,
+    pauseAutoBackupUntilUnlocked: emailBackup.pauseAutoBackupUntilUnlocked,
+  });
   emailBackup.discardTemporaryFiles();
   emailBackup.startAutoBackup();
   const openExternalLink = createLinkRuntime();

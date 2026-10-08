@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createNonFatalOperationGuard } from "./non-fatal-operation-guard";
+import { createOperationExclusion } from "./operation-exclusion";
 
 describe("不改变保险库状态的操作守卫", () => {
   it("操作成功时原样返回结果", async () => {
@@ -46,5 +47,32 @@ describe("不改变保险库状态的操作守卫", () => {
     const result = await guard.run(() => Promise.resolve({ ok: true }));
 
     expect(result).toEqual({ ok: true });
+  });
+});
+
+describe("不改变保险库状态的操作守卫: 共用互斥标志", () => {
+  it("共用同一个互斥标志的两个守卫彼此拒绝", async () => {
+    const exclusion = createOperationExclusion();
+    const first = createNonFatalOperationGuard(vi.fn(), exclusion);
+    const second = createNonFatalOperationGuard(vi.fn(), exclusion);
+    const rejected = vi.fn(() => Promise.resolve({ ok: true as const }));
+
+    const [firstResult, secondResult] = await Promise.all([
+      first.run(() => Promise.resolve({ ok: true })),
+      second.run(rejected),
+    ]);
+
+    expect(firstResult).toEqual({ ok: true });
+    expect(secondResult).toEqual({ ok: false, reason: "unexpected-state" });
+    expect(rejected).not.toHaveBeenCalled();
+  });
+
+  it("操作结束后释放共用的互斥标志", async () => {
+    const exclusion = createOperationExclusion();
+    const guard = createNonFatalOperationGuard(vi.fn(), exclusion);
+
+    await guard.run(() => Promise.reject(new Error("失败")));
+
+    expect(exclusion.tryAcquire()).toBe(true);
   });
 });

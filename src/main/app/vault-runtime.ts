@@ -4,6 +4,7 @@ import { app, safeStorage } from "electron";
 
 import { DEFAULT_ARGON2_PARAMETERS } from "../vault/argon2-parameters";
 import { KeyFileStore } from "../vault/key-file-store";
+import { createLockRegistry, type LockRegistry } from "../vault/lock-registry";
 import {
   createMasterPasswordVerifier,
   type MasterPasswordVerifier,
@@ -40,6 +41,10 @@ export interface VaultRuntime {
    * 主密码校验器, 只校验不改保险库状态, 导出前重新确认主密码时用.
    */
   readonly masterPasswordVerifier: MasterPasswordVerifier;
+  /**
+   * 锁定登记处, 导入, 导出, 恢复, 邮箱备份等模块在此登记任务探测与锁定时的释放动作.
+   */
+  readonly lockRegistry: LockRegistry;
 }
 
 /**
@@ -64,6 +69,7 @@ export async function createVaultRuntime(): Promise<VaultRuntime> {
   const userDataDirectory = app.getPath("userData");
   const paths = resolveVaultPaths(userDataDirectory);
   const keyFileStore = new KeyFileStore(paths);
+  const lockRegistry = createLockRegistry();
   const service = new VaultService({
     paths,
     keyFileStore,
@@ -76,11 +82,13 @@ export async function createVaultRuntime(): Promise<VaultRuntime> {
     }),
     migrationsFolder: join(app.getAppPath(), ...MIGRATIONS_FOLDER_SEGMENTS),
     argon2Parameters: DEFAULT_ARGON2_PARAMETERS,
+    lockRegistry,
     onFailure: reportVaultFailure,
   });
   await service.initialize();
   return {
     service,
     masterPasswordVerifier: createMasterPasswordVerifier(keyFileStore),
+    lockRegistry,
   };
 }

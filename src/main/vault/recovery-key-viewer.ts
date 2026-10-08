@@ -10,6 +10,7 @@ import {
   createNonFatalOperationGuard,
   type NonFatalOperationGuard,
 } from "./non-fatal-operation-guard";
+import type { OperationExclusion } from "./operation-exclusion";
 import { dataKeyToRecoveryWords } from "./recovery-phrase";
 import type { SafeStoragePort } from "./safe-storage-port";
 
@@ -25,6 +26,10 @@ export interface RecoveryKeyViewerDependencies {
    * 系统保护时解开数据密钥用的 safeStorage 接口.
    */
   readonly safeStorage: SafeStoragePort;
+  /**
+   * 与保险库其它操作共用的互斥标志, 查看期间锁定等其它操作被拒绝.
+   */
+  readonly exclusion: OperationExclusion;
   /**
    * 保险库当前是否已解锁, 只有已解锁时才允许查看.
    */
@@ -51,7 +56,10 @@ export class RecoveryKeyViewer {
    * @param dependencies 查看器依赖.
    */
   constructor(private readonly dependencies: RecoveryKeyViewerDependencies) {
-    this.guard = createNonFatalOperationGuard(dependencies.onFailure);
+    this.guard = createNonFatalOperationGuard(
+      dependencies.onFailure,
+      dependencies.exclusion,
+    );
   }
 
   /**

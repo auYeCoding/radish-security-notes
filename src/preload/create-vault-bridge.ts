@@ -37,5 +37,9 @@ export function createVaultBridge(ipcRenderer: IpcRendererPort): VaultBridge {
       );
       return result as VaultOperationResult;
     },
+    lock: async () => {
+      const result = await ipcRenderer.invoke(IPC_CHANNELS.vaultLock);
+      return result as VaultOperationResult;
+    },
   };
 }

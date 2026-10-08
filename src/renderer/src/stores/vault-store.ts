@@ -42,6 +42,7 @@ export function createVaultStore(
         reflection.reflectSetup(await bridge.setupWithoutMasterPassword()),
       unlock: async (masterPassword) =>
         reflection.reflect(await bridge.unlock(masterPassword)),
+      lock: async () => reflection.reflectLock(await bridge.lock()),
       confirmRecoveryWords: () => set({ pendingRecoveryWords: undefined }),
       requestRestore: () => set({ isRestoreRequested: true }),
       cancelRestore: () => set({ isRestoreRequested: false }),

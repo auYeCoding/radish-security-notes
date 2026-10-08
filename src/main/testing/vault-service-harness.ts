@@ -1,6 +1,7 @@
 import { afterEach, beforeEach } from "vitest";
 
 import { KeyFileStore } from "../vault/key-file-store";
+import { createLockRegistry, type LockRegistry } from "../vault/lock-registry";
 import type { SafeStoragePort } from "../vault/safe-storage-port";
 import type { SystemKeyPersistence } from "../vault/system-key-persistence";
 import { resolveVaultPaths, type VaultPaths } from "../vault/vault-paths";
@@ -35,6 +36,10 @@ export interface CreateServiceOptions {
    * 替换默认的系统密钥落盘等待器, 默认立即视为已落盘.
    */
   readonly systemKeyPersistence?: SystemKeyPersistence;
+  /**
+   * 替换默认的空锁定登记处, 锁定测试用它登记任务探测与释放动作.
+   */
+  readonly lockRegistry?: LockRegistry;
 }
 
 /**
@@ -89,6 +94,7 @@ export async function createVaultServiceHarness(): Promise<VaultServiceHarness> 
           options.systemKeyPersistence ?? ALWAYS_PERSISTED_SYSTEM_KEY,
         migrationsFolder: MIGRATIONS_FOLDER,
         argon2Parameters: FAST_ARGON2_PARAMETERS,
+        lockRegistry: options.lockRegistry ?? createLockRegistry(),
         onFailure: (error) => failures.push(error),
       });
       services.push(service);

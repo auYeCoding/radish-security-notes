@@ -215,6 +215,22 @@ export class ImportService {
   }
 
   /**
+   * 判断是否正在选择文件或写库.
+   * @returns 进行中为 true.
+   */
+  hasRunningTask(): boolean {
+    return this.isBusy;
+  }
+
+  /**
+   * 释放等待确认的解析结果 (含明文) 与结束后保留的信息, 保险库锁定时调用.
+   */
+  discardPending(): void {
+    this.dependencies.session.clear();
+    this.tracker.reset();
+  }
+
+  /**
    * 取消: 正在选择与解析时在下一块处理前中止; 否则释放等待确认的解析结果与保留的信息.
    */
   cancel(): void {

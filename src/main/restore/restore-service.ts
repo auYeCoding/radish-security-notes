@@ -236,6 +236,22 @@ export class RestoreService {
   }
 
   /**
+   * 判断是否正在选择, 读取或恢复.
+   * @returns 进行中为 true.
+   */
+  hasRunningTask(): boolean {
+    return this.isBusy;
+  }
+
+  /**
+   * 释放会话里已选定的备份与等待确认的备份 (含明文与附件内容), 保险库锁定时调用.
+   */
+  discardPending(): void {
+    this.dependencies.session.release();
+    this.tracker.reset();
+  }
+
+  /**
    * 取消: 正在选择或读取时让结果作废; 没有进行中的操作时释放会话里的内容.
    */
   cancel(): void {

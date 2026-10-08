@@ -1307,6 +1307,18 @@
         "unexpected": "Unlock failed. Close the app and try again."
       }
     },
+    "lock": {
+      "action": "Lock",
+      "unavailable": "No master password is set, so locking would not protect your data. Turn on a master password in Settings to lock.",
+      "blocked": {
+        "title": "Can't lock",
+        "tasksRunning": "An import, export, email backup or restore is in progress. Wait for it to finish or cancel it, then lock.",
+        "masterPasswordRequired": "No master password is set, so locking would not protect your data. Turn on a master password in Settings to lock.",
+        "unexpectedState": "The vault is busy with another operation. Try again in a moment.",
+        "unexpected": "Can't lock right now. Try again in a moment.",
+        "close": "Got it"
+      }
+    },
     "failure": {
       "title": "Unable to open your data",
       "description": "A data file is missing or damaged, or the system cannot open the protected key. Close the app and try again. Do not delete the vault folder in the data directory. If you saved your recovery words, you can restore with them.",

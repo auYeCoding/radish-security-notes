@@ -236,6 +236,39 @@ describe("恢复服务: 忙碌与读取过程中取消", () => {
   });
 });
 
+describe("恢复服务: 任务进行中的报告与锁定时的释放", () => {
+  const databases = useRestoreDatabases("restore-choose-running");
+
+  it("选择过程中报告有任务进行中, 结束后恢复空闲", async () => {
+    const { file, open } = createGatedFile();
+    const fixture = createRestoreFixture(() => databases.getTarget().orm, {
+      file,
+    });
+    await prepareChosenBackup(fixture, databases);
+    expect(fixture.service.hasRunningTask()).toBe(false);
+
+    const choosing = fixture.service.chooseFile();
+    await Promise.resolve();
+    expect(fixture.service.hasRunningTask()).toBe(true);
+    open();
+    await choosing;
+
+    expect(fixture.service.hasRunningTask()).toBe(false);
+  });
+
+  it("锁定时释放等待确认的备份与进度", async () => {
+    const fixture = createRestoreFixture(() => databases.getTarget().orm);
+    await prepareChosenBackup(fixture, databases);
+    await fixture.service.chooseFile();
+    expect(fixture.session.peek()?.kind).toBe("pending");
+
+    fixture.service.discardPending();
+
+    expect(fixture.session.peek()).toBeUndefined();
+    expect(fixture.service.getProgress().stage).toBe("idle");
+  });
+});
+
 describe("恢复服务: 取消与超时释放等待确认的备份", () => {
   const databases = useRestoreDatabases("restore-choose-release");
 

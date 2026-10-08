@@ -118,6 +118,7 @@ export async function createVaultTestEnvironment(
       Promise.resolve(TEST_SETUP_SUCCEEDED),
     ),
     unlock: vi.fn(() => Promise.resolve(VAULT_OPERATION_SUCCEEDED)),
+    lock: vi.fn(() => Promise.resolve(VAULT_OPERATION_SUCCEEDED)),
     ...options.bridgeOverrides,
   };
   const recoveryBridge: RecoveryBridge = {

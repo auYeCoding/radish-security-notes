@@ -41,7 +41,7 @@ const COLLAPSE_CONSTANT_COVERAGE: readonly (readonly [
   ],
   ["components/sidebar-nav-item-text.tsx", ["COLLAPSIBLE_TEXT_STATE_CLASSES"]],
   [
-    "features/settings-trigger/settings-trigger-icon.tsx",
+    "components/sidebar-button-icon.tsx",
     [
       "COLLAPSE_SPACE_TRANSITION",
       "COLLAPSE_FADE_TRANSITION",
@@ -84,14 +84,19 @@ const COLLAPSE_COMPONENT_COVERAGE: readonly (readonly [
     "@renderer/components/collapsible-text",
   ],
   [
-    "features/settings-trigger/settings-trigger.tsx",
+    "components/sidebar-footer-button.tsx",
     "CollapsibleText",
     "@renderer/components/collapsible-text",
   ],
   [
+    "components/sidebar-footer-button.tsx",
+    "SidebarButtonIcon",
+    "@renderer/components/sidebar-button-icon",
+  ],
+  [
     "features/settings-trigger/settings-trigger.tsx",
-    "SettingsTriggerIcon",
-    "./settings-trigger-icon",
+    "SidebarFooterButton",
+    "@renderer/components/sidebar-footer-button",
   ],
 ];
 

@@ -181,6 +181,14 @@ export class ExportService {
   }
 
   /**
+   * 判断是否正在导出.
+   * @returns 进行中为 true.
+   */
+  hasRunningTask(): boolean {
+    return this.isBusy;
+  }
+
+  /**
    * 取消: 正在导出时中止写出并清理临时文件; 没有进行中的导出时让服务忘掉最近一次导出的路径.
    */
   cancel(): void {

@@ -26,4 +26,5 @@ export function registerVaultIpc(
   ipcMain.handle(IPC_CHANNELS.vaultUnlock, (_event, masterPassword) =>
     service.unlock(requireMasterPassword(masterPassword)),
   );
+  ipcMain.handle(IPC_CHANNELS.vaultLock, () => service.lock());
 }

@@ -13,7 +13,7 @@ import { cn } from "@renderer/lib/class-names";
 import { usePreferencesStore } from "@renderer/stores/use-preferences-store";
 
 import { FolderRowActions } from "./folder-row-actions";
-import { SettingsEntry } from "./settings-entry";
+import { SidebarFooter } from "./sidebar-footer";
 import { TagRowActions } from "./tag-row-actions";
 
 /**
@@ -34,7 +34,7 @@ const TOGGLE_ROW_CLASSES = `flex h-(--control-height) shrink-0 items-center px-3
 
 /**
  * 左侧栏的装配: 顶部一行折叠与展开的切换按钮, 其下是标签与文件夹窗格 (标签分区标题行放新建按钮,
- * 每个标签行与文件夹行尾放更多菜单), 底部是设置按钮. 从偏好 store 读取折叠状态: 展开时用展开宽度,
+ * 每个标签行与文件夹行尾放更多菜单), 底部是设置按钮与锁定按钮. 从偏好 store 读取折叠状态: 展开时用展开宽度,
  * 折叠时用折叠宽度, 两个宽度之间按尺寸过渡变化, 过渡期间裁掉溢出的内容; 并经上下文告诉里面的行,
  * 分区标题与设置按钮改成只剩图标的样式. 只负责装配, 不含业务逻辑.
  * @returns 侧栏元素.
@@ -66,9 +66,7 @@ export function Sidebar(): React.JSX.Element {
           folderHeaderAction={<NewFolderTrigger />}
           renderFolderActions={(folder) => <FolderRowActions folder={folder} />}
         />
-        <div className="flex flex-col gap-1 border-t border-sidebar-border p-3">
-          <SettingsEntry />
-        </div>
+        <SidebarFooter />
       </aside>
     </SidebarCollapseContext.Provider>
   );

@@ -33,6 +33,17 @@ describe("createVaultBridge", () => {
     );
   });
 
+  it("lock 调用锁定通道且不带参数并返回结果", async () => {
+    const invoke = vi.fn(() =>
+      Promise.resolve({ ok: false, reason: "tasks-running" }),
+    );
+
+    const result = await createVaultBridge({ invoke }).lock();
+
+    expect(invoke).toHaveBeenCalledWith(IPC_CHANNELS.vaultLock);
+    expect(result).toEqual({ ok: false, reason: "tasks-running" });
+  });
+
   it("setupWithoutMasterPassword 调用跳过通道并返回结果", async () => {
     const invoke = vi.fn(() => Promise.resolve({ ok: true }));
 
