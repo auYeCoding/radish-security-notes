@@ -12,9 +12,13 @@ import { registerExportIpc } from "../ipc/export-ipc";
 import { registerFolderIpc } from "../ipc/folder-ipc";
 import { registerImportIpc } from "../ipc/import-ipc";
 import { registerLinkIpc } from "../ipc/link-ipc";
+import { guardIpcMainByMainWindow } from "../ipc/main-window-guarded-ipc";
 import { registerMasterPasswordIpc } from "../ipc/master-password-ipc";
 import type { ExternalLinkOpener } from "../links/external-link-opener";
-import { registerPreferencesIpc } from "../ipc/preferences-ipc";
+import {
+  registerPreferencesIpc,
+  type IpcMainPort,
+} from "../ipc/preferences-ipc";
 import { registerRecoveryIpc } from "../ipc/recovery-ipc";
 import { registerRecoveryKeyIpc } from "../ipc/recovery-key-ipc";
 import { registerRestoreIpc } from "../ipc/restore-ipc";
@@ -101,14 +105,17 @@ function openMainWindow(
  * 跟随语言和主题, 创建主窗口, 并在没有窗口时被重新激活的情形下再创建一个.
  * @param runtime 偏好运行时对象.
  * @param openExternalLink 外部链接打开器.
+ * @param mainWindowHolder 主窗口持有者.
+ * @param guardedIpcMain 带来源校验的主进程 IPC 接口.
  */
 function launchMainWindow(
   runtime: PreferencesRuntime,
   openExternalLink: ExternalLinkOpener,
+  mainWindowHolder: MainWindowHolder<BrowserWindow>,
+  guardedIpcMain: IpcMainPort,
 ): void {
-  const mainWindowHolder = createMainWindowHolder<BrowserWindow>();
   watchSecondInstance(app, mainWindowHolder);
-  registerWindowControlsIpc(ipcMain, mainWindowHolder);
+  registerWindowControlsIpc(guardedIpcMain, mainWindowHolder);
   keepWindowsInSync(runtime);
   openMainWindow(runtime, openExternalLink, mainWindowHolder);
   app.on("activate", () => {
@@ -121,16 +128,27 @@ function launchMainWindow(
 /**
  * 注册数据进出的 IPC: 从其他管理器导入, 导出, 从备份恢复. 它们都读写已解锁的加密数据库, 文件的
  * 选择, 读取与写出都在主进程里完成.
+ * @param guardedIpcMain 带来源校验的主进程 IPC 接口.
  * @param vault 保险库运行时对象.
  * @param translator 主进程的 i18next 实例.
  */
-function registerDataTransferIpc(vault: VaultRuntime, translator: i18n): void {
+function registerDataTransferIpc(
+  guardedIpcMain: IpcMainPort,
+  vault: VaultRuntime,
+  translator: i18n,
+): void {
   registerImportIpc(
-    ipcMain,
+    guardedIpcMain,
     createImportRuntime(vault.service, translator).service,
   );
-  registerExportIpc(ipcMain, createExportRuntime(vault, translator).service);
-  registerRestoreIpc(ipcMain, createRestoreRuntime(vault, translator).service);
+  registerExportIpc(
+    guardedIpcMain,
+    createExportRuntime(vault, translator).service,
+  );
+  registerRestoreIpc(
+    guardedIpcMain,
+    createRestoreRuntime(vault, translator).service,
+  );
 }
 
 /**
@@ -145,40 +163,42 @@ export async function startApplication(): Promise<void> {
   });
   const runtime = await createPreferencesRuntime();
   const vault = await createVaultRuntime();
-  registerPreferencesIpc(ipcMain, runtime.service);
-  registerVaultIpc(ipcMain, vault.service);
+  const mainWindowHolder = createMainWindowHolder<BrowserWindow>();
+  const guardedIpcMain = guardIpcMainByMainWindow(ipcMain, mainWindowHolder);
+  registerPreferencesIpc(guardedIpcMain, runtime.service);
+  registerVaultIpc(guardedIpcMain, vault.service);
   const recovery = createRecoveryRuntime(runtime.i18n);
-  registerRecoveryIpc(ipcMain, vault.service, recovery.textFileSaver);
-  registerRecoveryKeyIpc(ipcMain, vault.service);
+  registerRecoveryIpc(guardedIpcMain, vault.service, recovery.textFileSaver);
+  registerRecoveryKeyIpc(guardedIpcMain, vault.service);
   registerMasterPasswordIpc(
-    ipcMain,
+    guardedIpcMain,
     vault.service,
     vault.masterPasswordVerifier,
   );
   const entries = createEntryRuntime(vault.service);
-  registerEntryIpc(ipcMain, entries.service);
+  registerEntryIpc(guardedIpcMain, entries.service);
   registerCustomEntryTypeIpc(
-    ipcMain,
+    guardedIpcMain,
     createCustomEntryTypeService(vault.service),
   );
-  registerFolderIpc(ipcMain, createFolderService(vault.service));
-  registerTagIpc(ipcMain, createTagService(vault.service));
-  registerBatchIpc(ipcMain, createBatchService(vault.service));
-  registerTotpIpc(ipcMain, entries.totpService, entries.decodeQrImage);
+  registerFolderIpc(guardedIpcMain, createFolderService(vault.service));
+  registerTagIpc(guardedIpcMain, createTagService(vault.service));
+  registerBatchIpc(guardedIpcMain, createBatchService(vault.service));
+  registerTotpIpc(guardedIpcMain, entries.totpService, entries.decodeQrImage);
   const attachments = createAttachmentRuntime(vault.service, runtime.i18n);
-  registerAttachmentIpc(ipcMain, attachments);
-  registerDataTransferIpc(vault, runtime.i18n);
+  registerAttachmentIpc(guardedIpcMain, attachments);
+  registerDataTransferIpc(guardedIpcMain, vault, runtime.i18n);
   const emailBackup = createEmailBackupRuntime(vault, runtime.i18n);
-  registerEmailBackupIpc(ipcMain, emailBackup.service);
+  registerEmailBackupIpc(guardedIpcMain, emailBackup.service);
   emailBackup.discardTemporaryFiles();
   emailBackup.startAutoBackup();
   const openExternalLink = createLinkRuntime();
-  registerLinkIpc(ipcMain, openExternalLink);
+  registerLinkIpc(guardedIpcMain, openExternalLink);
   app.on("will-quit", () => {
     attachments.discardTemporaryCopies();
     emailBackup.stopAutoBackup();
     emailBackup.discardTemporaryFiles();
     vault.service.close();
   });
-  launchMainWindow(runtime, openExternalLink);
+  launchMainWindow(runtime, openExternalLink, mainWindowHolder, guardedIpcMain);
 }

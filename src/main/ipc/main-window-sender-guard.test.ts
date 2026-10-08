@@ -1,15 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  SENDER_REJECTION_MESSAGE as REJECTION_MESSAGE,
   createFakeMainWindow,
   createTopFrameEvent,
 } from "../testing/fake-main-window";
 import { requireMainWindowSender } from "./main-window-sender-guard";
-
-/**
- * 校验失败时的错误信息.
- */
-const REJECTION_MESSAGE = "窗口控制只接受来自主窗口的调用";
 
 describe("requireMainWindowSender 放行", () => {
   it("发送者是主窗口的页面且发送帧是顶层帧时返回主窗口", () => {

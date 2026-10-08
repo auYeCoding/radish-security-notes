@@ -4,17 +4,13 @@ import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
 
 import { createFakeIpcMain } from "../testing/fake-ipc-main";
 import {
+  SENDER_REJECTION_MESSAGE as REJECTION_MESSAGE,
   createFakeMainWindow,
   createTopFrameEvent,
   type FakeMainWindow,
 } from "../testing/fake-main-window";
 import { createMainWindowHolder } from "../window/main-window-holder";
 import { registerWindowControlsIpc } from "./window-controls-ipc";
-
-/**
- * 校验失败时的错误信息.
- */
-const REJECTION_MESSAGE = "窗口控制只接受来自主窗口的调用";
 
 /**
  * 全部窗口控制通道.
@@ -46,10 +42,10 @@ interface WindowControlsSetup {
  * @returns 假 IPC 与假主窗口.
  */
 function setUpWindowControls(isMaximized = false): WindowControlsSetup {
-  const ipcMain = createFakeIpcMain();
   const mainWindow = createFakeMainWindow(isMaximized);
   const holder = createMainWindowHolder<FakeMainWindow>();
   holder.set(mainWindow);
+  const ipcMain = createFakeIpcMain(holder);
   registerWindowControlsIpc(ipcMain, holder);
   return { ipcMain, mainWindow };
 }
@@ -126,22 +122,40 @@ describe("registerWindowControlsIpc 来源不合法的调用", () => {
     const { ipcMain, mainWindow } = setUpWindowControls();
 
     for (const channel of WINDOW_CONTROL_CHANNELS) {
-      expect(() => ipcMain.invoke(channel)).toThrow(REJECTION_MESSAGE);
+      expect(() => ipcMain.invokeWithEvent({}, channel)).toThrow(
+        REJECTION_MESSAGE,
+      );
     }
     expect(mainWindow.close).not.toHaveBeenCalled();
   });
 
   it("还没有登记主窗口时全部通道被拒绝", () => {
-    const ipcMain = createFakeIpcMain();
-    registerWindowControlsIpc(
-      ipcMain,
-      createMainWindowHolder<FakeMainWindow>(),
-    );
+    const holder = createMainWindowHolder<FakeMainWindow>();
+    const ipcMain = createFakeIpcMain(holder);
+    registerWindowControlsIpc(ipcMain, holder);
 
     for (const channel of WINDOW_CONTROL_CHANNELS) {
       expect(() =>
         ipcMain.invokeWithEvent(createTopFrameEvent({}), channel),
       ).toThrow(REJECTION_MESSAGE);
+    }
+  });
+});
+
+describe("registerWindowControlsIpc 底层端口不校验来源", () => {
+  it("还没有登记主窗口时通道不操作任何窗口, 也不报错", () => {
+    const handlers = new Map<string, (event: unknown) => unknown>();
+    registerWindowControlsIpc(
+      {
+        handle: (channel, handler) => {
+          handlers.set(channel, handler);
+        },
+      },
+      createMainWindowHolder<FakeMainWindow>(),
+    );
+
+    for (const channel of WINDOW_CONTROL_CHANNELS) {
+      expect(handlers.get(channel)?.({})).toBeUndefined();
     }
   });
 });

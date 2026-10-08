@@ -31,6 +31,12 @@ export interface FakeMainWindow {
 }
 
 /**
+ * 来源校验拒绝调用时的错误信息. 测试里固定写一份字面量, 与生产代码的常量互相钉住.
+ */
+export const SENDER_REJECTION_MESSAGE =
+  "IPC 调用只接受来自主窗口顶层页面的调用";
+
+/**
  * 创建假的主窗口.
  * @param isMaximized 窗口一开始是否最大化.
  * @returns 假的主窗口.
@@ -77,4 +83,37 @@ export interface TopFrameEvent {
  */
 export function createTopFrameEvent(sender: object): TopFrameEvent {
   return { sender, senderFrame: { parent: null } };
+}
+
+/**
+ * 子帧发送帧: 有父帧.
+ */
+export interface SubSenderFrame {
+  /**
+   * 父帧, 子帧不为 null.
+   */
+  readonly parent: object;
+}
+
+/**
+ * 一次来自某个页面子帧的调用事件.
+ */
+export interface SubFrameEvent {
+  /**
+   * 发送调用的页面内容.
+   */
+  readonly sender: object;
+  /**
+   * 发送调用的帧.
+   */
+  readonly senderFrame: SubSenderFrame;
+}
+
+/**
+ * 创建一次来自某个页面子帧的调用事件.
+ * @param sender 发送调用的页面内容.
+ * @returns 带发送者与子发送帧的事件.
+ */
+export function createSubFrameEvent(sender: object): SubFrameEvent {
+  return { sender, senderFrame: { parent: {} } };
 }

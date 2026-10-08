@@ -1,6 +1,11 @@
 import { isRecord } from "./ipc-input-checks";
 
 /**
+ * 来源校验失败时抛出的错误信息: 固定文字, 不含通道名, 参数等任何细节.
+ */
+const SENDER_REJECTION_MESSAGE = "IPC 调用只接受来自主窗口顶层页面的调用";
+
+/**
  * 来源校验依赖的窗口接口, Electron 的 `BrowserWindow` 满足它.
  */
 export interface MainWindowSenderTarget {
@@ -47,7 +52,7 @@ export function requireMainWindowSender<
   WindowType extends MainWindowSenderTarget,
 >(event: unknown, mainWindow: WindowType | undefined): WindowType {
   if (mainWindow === undefined || !isFromMainWindow(event, mainWindow)) {
-    throw new Error("窗口控制只接受来自主窗口的调用");
+    throw new Error(SENDER_REJECTION_MESSAGE);
   }
   return mainWindow;
 }
