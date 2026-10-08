@@ -1,4 +1,5 @@
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
+import { isAutoLockSettings } from "@shared/preferences/auto-lock-settings";
 import { isSupportedLanguage } from "@shared/preferences/language";
 import { isThemeSource } from "@shared/preferences/theme-source";
 
@@ -55,4 +56,10 @@ export function registerPreferencesIpc(
       service.setSidebarCollapsed(isCollapsed);
     },
   );
+  ipcMain.handle(IPC_CHANNELS.preferencesSetAutoLock, (_event, settings) => {
+    if (!isAutoLockSettings(settings)) {
+      throw new Error("无效的自动锁定设置");
+    }
+    service.setAutoLockSettings(settings);
+  });
 }

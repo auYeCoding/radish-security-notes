@@ -14,6 +14,7 @@ import type { TagBridge } from "../tags/tag-bridge";
 import type { MasterPasswordBridge } from "../vault/master-password-bridge";
 import type { RecoveryBridge } from "../vault/recovery-bridge";
 import type { VaultBridge } from "../vault/vault-bridge";
+import type { VaultEventsBridge } from "../vault/vault-events-bridge";
 import type { WindowControlsBridge } from "../window/window-controls-bridge";
 
 /**
@@ -28,6 +29,10 @@ export interface RendererApi {
    * 保险库接口: 查询启动状态, 设置主密码, 跳过, 解锁.
    */
   readonly vault: VaultBridge;
+  /**
+   * 保险库事件接口: 订阅主进程自动锁定保险库的推送.
+   */
+  readonly vaultEvents: VaultEventsBridge;
   /**
    * 恢复接口: 校验恢复词, 凭词恢复保险库, 保存恢复词文本文件.
    */

@@ -24,10 +24,12 @@ import { forceLightThemeWhilePrinting } from "@renderer/theme/print-theme";
 
 import { createWorkspaceStores } from "./create-workspace-stores";
 import { resetWorkspaceOnLock } from "./reset-workspace-on-lock";
+import { watchAutoLock } from "./watch-auto-lock";
 
 /**
  * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store 与工作区的
- * 全部 store (条目, 自定义条目类型, 文件夹, 标签, 批量选中), 让工作区 store 跟随保险库锁定而重置,
+ * 全部 store (条目, 自定义条目类型, 文件夹, 标签, 批量选中), 让保险库 store 跟上主进程的自动锁定,
+ * 让工作区 store 跟随保险库锁定而重置,
  * 让深色类名跟随系统外观 (打印时强制浅色), 安装文件拖放守卫, 最后把根组件挂到容器上.
  * @param container 挂载根组件的容器元素.
  * @returns 挂载完成后兑现.
@@ -43,6 +45,7 @@ export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
   });
   const stores = createWorkspaceStores(window.api);
   resetWorkspaceOnLock(vaultStore, stores);
+  watchAutoLock(vaultStore, window.api.vaultEvents);
   const i18n = await createI18nInstance({
     language: snapshot.language,
     isPseudoLocalizationEnabled: snapshot.isPseudoLocalizationEnabled,

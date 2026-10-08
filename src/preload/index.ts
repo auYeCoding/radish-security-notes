@@ -17,6 +17,7 @@ import { createRestoreBridge } from "./create-restore-bridge";
 import { createTagBridge } from "./create-tag-bridge";
 import { createTotpBridge } from "./create-totp-bridge";
 import { createVaultBridge } from "./create-vault-bridge";
+import { createVaultEventsBridge } from "./create-vault-events-bridge";
 import { createWindowControlsBridge } from "./create-window-controls-bridge";
 
 /**
@@ -25,6 +26,7 @@ import { createWindowControlsBridge } from "./create-window-controls-bridge";
 const api: RendererApi = {
   preferences: createPreferencesBridge(ipcRenderer),
   vault: createVaultBridge(ipcRenderer),
+  vaultEvents: createVaultEventsBridge(ipcRenderer),
   recovery: createRecoveryBridge(ipcRenderer),
   masterPassword: createMasterPasswordBridge(ipcRenderer),
   entries: createEntryBridge(ipcRenderer),

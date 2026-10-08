@@ -6,11 +6,13 @@ export const IPC_CHANNELS = {
   preferencesSetThemeSource: "preferences:set-theme-source",
   preferencesSetLanguage: "preferences:set-language",
   preferencesSetSidebarCollapsed: "preferences:set-sidebar-collapsed",
+  preferencesSetAutoLock: "preferences:set-auto-lock",
   vaultGetStatus: "vault:get-status",
   vaultSetupWithMasterPassword: "vault:setup-with-master-password",
   vaultSetupWithoutMasterPassword: "vault:setup-without-master-password",
   vaultUnlock: "vault:unlock",
   vaultLock: "vault:lock",
+  vaultAutoLocked: "vault:auto-locked",
   recoveryVerifyWords: "recovery:verify-words",
   recoveryRestoreWithMasterPassword: "recovery:restore-with-master-password",
   recoveryRestoreWithoutMasterPassword:

@@ -51,6 +51,7 @@ const CHANNEL_TABLE = "IPC_CHANNELS";
  */
 const PUSH_ONLY_CHANNELS: readonly string[] = [
   IPC_CHANNELS.windowMaximizedChanged,
+  IPC_CHANNELS.vaultAutoLocked,
 ];
 
 /**

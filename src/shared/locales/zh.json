@@ -1245,6 +1245,24 @@
           "hide": "隐藏",
           "done": "完成"
         }
+      },
+      "autoLock": {
+        "toggleLabel": "启用",
+        "unavailable": "未设置主密码, 自动锁定不会生效. 先在上方开启主密码.",
+        "idle": {
+          "name": "空闲自动锁定",
+          "description": "整个 Windows 会话的键盘鼠标空闲达到设定时长后自动锁定, 之后要重新输入主密码.",
+          "minutesLabel": "空闲时长",
+          "minutes": "{minutes} 分钟"
+        },
+        "screenLock": {
+          "name": "锁屏时锁定",
+          "description": "Windows 锁屏时自动锁定保险库."
+        },
+        "sleep": {
+          "name": "休眠时锁定",
+          "description": "Windows 进入睡眠或休眠时自动锁定保险库."
+        }
       }
     }
   },
@@ -1302,6 +1320,11 @@
       "submit": "解锁",
       "submitting": "正在解锁...",
       "forgot": "忘记主密码?",
+      "autoLocked": {
+        "idle": "因长时间没有操作, 保险库已自动锁定.",
+        "screenLock": "因系统锁屏, 保险库已自动锁定.",
+        "sleep": "因系统休眠, 保险库已自动锁定."
+      },
       "error": {
         "wrongPassword": "主密码不正确, 请重新输入.",
         "unexpected": "解锁失败. 请关闭应用后重试."

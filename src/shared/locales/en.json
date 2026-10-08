@@ -1245,6 +1245,24 @@
           "hide": "Hide",
           "done": "Done"
         }
+      },
+      "autoLock": {
+        "toggleLabel": "Enabled",
+        "unavailable": "No master password is set, so auto-lock has no effect. Turn on the master password above first.",
+        "idle": {
+          "name": "Lock when idle",
+          "description": "Locks the vault after the keyboard and mouse have been idle in the whole Windows session for the chosen time. You then enter the master password again.",
+          "minutesLabel": "Idle time",
+          "minutes": "{minutes, plural, one {# minute} other {# minutes}}"
+        },
+        "screenLock": {
+          "name": "Lock when the screen locks",
+          "description": "Locks the vault when Windows locks the screen."
+        },
+        "sleep": {
+          "name": "Lock when the system sleeps",
+          "description": "Locks the vault when Windows goes to sleep or hibernates."
+        }
       }
     }
   },
@@ -1302,6 +1320,11 @@
       "submit": "Unlock",
       "submitting": "Unlocking...",
       "forgot": "Forgot master password?",
+      "autoLocked": {
+        "idle": "The vault was locked automatically after a period of inactivity.",
+        "screenLock": "The vault was locked automatically because the screen was locked.",
+        "sleep": "The vault was locked automatically because the system went to sleep."
+      },
       "error": {
         "wrongPassword": "The master password is incorrect. Try again.",
         "unexpected": "Unlock failed. Close the app and try again."

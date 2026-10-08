@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import {
+  DEFAULT_AUTO_LOCK_SETTINGS,
+  type AutoLockSettings,
+} from "@shared/preferences/auto-lock-settings";
+
 import { createInMemoryKeyValueBackend } from "../testing/in-memory-key-value-backend";
 import { PreferencesStore } from "./preferences-store";
 
@@ -74,5 +79,49 @@ describe("PreferencesStore: 侧栏折叠状态", () => {
     );
 
     expect(store.isSidebarCollapsed()).toBe(false);
+  });
+});
+
+describe("PreferencesStore: 自动锁定设置", () => {
+  const customSettings: AutoLockSettings = {
+    isIdleLockEnabled: false,
+    idleMinutes: 60,
+    isScreenLockEnabled: false,
+    isSleepLockEnabled: true,
+  };
+
+  it("没有保存过时取默认设置", () => {
+    const store = new PreferencesStore(createInMemoryKeyValueBackend());
+
+    expect(store.getAutoLock()).toEqual(DEFAULT_AUTO_LOCK_SETTINGS);
+  });
+
+  it("保存后能读回, 重新创建存储后仍在 (同一后端)", () => {
+    const backend = createInMemoryKeyValueBackend();
+    new PreferencesStore(backend).setAutoLock(customSettings);
+
+    expect(new PreferencesStore(backend).getAutoLock()).toEqual(customSettings);
+  });
+
+  it("存储里的值不是对象时取默认设置", () => {
+    const store = new PreferencesStore(
+      createInMemoryKeyValueBackend({ autoLock: "on" }),
+    );
+
+    expect(store.getAutoLock()).toEqual(DEFAULT_AUTO_LOCK_SETTINGS);
+  });
+
+  it("存储里个别字段不合法时该字段回落默认, 其余保留", () => {
+    const store = new PreferencesStore(
+      createInMemoryKeyValueBackend({
+        autoLock: { ...customSettings, idleMinutes: 7, isSleepLockEnabled: 1 },
+      }),
+    );
+
+    expect(store.getAutoLock()).toEqual({
+      ...customSettings,
+      idleMinutes: DEFAULT_AUTO_LOCK_SETTINGS.idleMinutes,
+      isSleepLockEnabled: DEFAULT_AUTO_LOCK_SETTINGS.isSleepLockEnabled,
+    });
   });
 });

@@ -107,6 +107,7 @@ async function startWiredVault(
       databases.getDirectory(),
     ).service,
     pauseAutoBackupUntilUnlocked,
+    discardAttachmentTemporaryCopies: vi.fn(),
   });
   return { vault, importFixture, restoreFixture, pauseAutoBackupUntilUnlocked };
 }

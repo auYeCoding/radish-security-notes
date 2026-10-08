@@ -10,6 +10,7 @@ import {
 
 import { SettingsDialog } from "./settings-dialog";
 import { SETTINGS_DIALOG_BODY_SLOT } from "./settings-dialog-body-slot";
+import type { SettingsSecurityEntries } from "./settings-security-section";
 
 /**
  * 四行右侧的操作按钮, 名称各不相同, 方便按位置核对.
@@ -22,11 +23,15 @@ const TEST_ENTRIES = {
 };
 
 /**
- * 安全分区两行右侧的操作按钮.
+ * 安全分区五行右侧的操作按钮, 自动锁定可用.
  */
-const TEST_SECURITY = {
+const TEST_SECURITY: SettingsSecurityEntries = {
   masterPasswordAction: <Button>主密码操作</Button>,
   recoveryKeyAction: <Button>恢复密钥操作</Button>,
+  idleLockAction: <Button>空闲锁定操作</Button>,
+  screenLockAction: <Button>锁屏锁定操作</Button>,
+  sleepLockAction: <Button>休眠锁定操作</Button>,
+  isAutoLockUnavailable: false,
 };
 
 /**
@@ -53,9 +58,12 @@ interface RenderedDialog {
 
 /**
  * 在偏好环境里渲染设置对话框.
+ * @param security 安全分区的操作元素, 默认是自动锁定可用的那一组.
  * @returns 关闭回调的间谍与偏好环境.
  */
-async function renderDialog(): Promise<RenderedDialog> {
+async function renderDialog(
+  security: SettingsSecurityEntries = TEST_SECURITY,
+): Promise<RenderedDialog> {
   const environment = await createPreferencesTestEnvironment();
   const onClose = vi.fn();
   render(
@@ -63,7 +71,7 @@ async function renderDialog(): Promise<RenderedDialog> {
       onClose={onClose}
       appearance={TEST_APPEARANCE}
       data={TEST_ENTRIES}
-      security={TEST_SECURITY}
+      security={security}
     />,
     { wrapper: environment.Providers },
   );
@@ -133,6 +141,79 @@ describe("设置对话框: 安全分区", () => {
     const positions = expectedInOrder.map((part) => text.indexOf(part));
     expect(positions.every((position) => position >= 0)).toBe(true);
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  });
+});
+
+describe("设置对话框: 安全分区的自动锁定", () => {
+  it("主密码与恢复密钥之后依次是空闲, 锁屏, 休眠三行, 带名称, 说明与操作", async () => {
+    await renderDialog();
+
+    const text = screen.getByRole("region", { name: "安全" }).textContent ?? "";
+    const expectedInOrder = [
+      "恢复密钥操作",
+      "空闲自动锁定",
+      "整个 Windows 会话的键盘鼠标空闲达到设定时长后自动锁定, 之后要重新输入主密码.",
+      "空闲锁定操作",
+      "锁屏时锁定",
+      "Windows 锁屏时自动锁定保险库.",
+      "锁屏锁定操作",
+      "休眠时锁定",
+      "Windows 进入睡眠或休眠时自动锁定保险库.",
+      "休眠锁定操作",
+    ];
+    const positions = expectedInOrder.reduce<number[]>((found, part) => {
+      const [previous = -1] = found.slice(-1);
+      return [...found, text.indexOf(part, previous + 1)];
+    }, []);
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  });
+});
+
+describe("设置对话框: 安全分区的自动锁定不可用", () => {
+  it("自动锁定可用时没有不可用的原因说明", async () => {
+    await renderDialog();
+
+    expect(
+      screen.queryByText("未设置主密码, 自动锁定不会生效. 先在上方开启主密码."),
+    ).toBeNull();
+  });
+
+  it("自动锁定不可用时三行之后有一行原因说明", async () => {
+    await renderDialog({ ...TEST_SECURITY, isAutoLockUnavailable: true });
+
+    const note = screen.getByRole("note");
+    const section = screen.getByRole("region", { name: "安全" });
+
+    expect(note.textContent).toBe(
+      "未设置主密码, 自动锁定不会生效. 先在上方开启主密码.",
+    );
+    expect(section.contains(note)).toBe(true);
+    expect((section.textContent ?? "").indexOf("休眠锁定操作")).toBeLessThan(
+      (section.textContent ?? "").indexOf(note.textContent ?? ""),
+    );
+  });
+
+  it("英文界面下自动锁定三行的名称, 说明与原因都是英文", async () => {
+    const { environment } = await renderDialog({
+      ...TEST_SECURITY,
+      isAutoLockUnavailable: true,
+    });
+
+    await act(() => environment.i18n.changeLanguage("en"));
+
+    const section = within(screen.getByRole("region", { name: "Security" }));
+    expect(section.getByText("Lock when idle")).toBeDefined();
+    expect(section.getByText("Lock when the screen locks")).toBeDefined();
+    expect(section.getByText("Lock when the system sleeps")).toBeDefined();
+    expect(
+      section.getByText("Locks the vault when Windows locks the screen."),
+    ).toBeDefined();
+    expect(
+      section.getByText(
+        "No master password is set, so auto-lock has no effect. Turn on the master password above first.",
+      ),
+    ).toBeDefined();
   });
 });
 

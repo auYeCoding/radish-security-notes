@@ -1,3 +1,4 @@
+import type { AutoLockReason } from "@shared/vault/auto-lock-reason";
 import type {
   RecoveryBridge,
   RecoveryKeyViewResult,
@@ -25,6 +26,11 @@ export interface VaultState {
    * 用户是否在解锁页或失败页选择了凭恢复词恢复.
    */
   readonly isRestoreRequested: boolean;
+  /**
+   * 保险库被主进程自动锁定的原因, 解锁页据此说明为什么被锁. 只有自动锁定时有值, 手动锁定, 启动时
+   * 就是锁定的情形为 undefined, 解锁成功后清除.
+   */
+  readonly lockReason: AutoLockReason | undefined;
 }
 
 /**
@@ -55,6 +61,12 @@ export interface VaultActions {
    * @returns 锁定结果, 成功时状态变为已锁定, 失败时状态不变 (有任务进行中, 未设主密码等).
    */
   lock: () => Promise<VaultOperationResult>;
+  /**
+   * 跟上主进程的自动锁定: 当前是已解锁时变为已锁定并记下原因, 清除待确认的恢复词与恢复请求, 与手动
+   * 锁定成功后的状态一致. 当前不是已解锁时忽略.
+   * @param reason 自动锁定的原因.
+   */
+  applyAutoLock: (reason: AutoLockReason) => void;
   /**
    * 用户重输恢复词确认通过, 丢弃待确认的恢复词, 进入三栏主界面.
    */

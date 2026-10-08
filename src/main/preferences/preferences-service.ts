@@ -1,3 +1,4 @@
+import type { AutoLockSettings } from "@shared/preferences/auto-lock-settings";
 import type { SupportedLanguage } from "@shared/preferences/language";
 import type { PreferencesSnapshot } from "@shared/preferences/preferences-snapshot";
 import type { ThemeSource } from "@shared/preferences/theme-source";
@@ -60,6 +61,7 @@ export class PreferencesService {
       themeSource: store.getThemeSource(),
       language: store.getLanguage(systemLocale),
       isSidebarCollapsed: store.isSidebarCollapsed(),
+      autoLock: store.getAutoLock(),
       isPseudoLocalizationEnabled,
     };
   }
@@ -90,6 +92,22 @@ export class PreferencesService {
    */
   setSidebarCollapsed(isCollapsed: boolean): void {
     this.dependencies.store.setSidebarCollapsed(isCollapsed);
+  }
+
+  /**
+   * 读取当前的自动锁定设置, 自动锁定控制每个检查周期都据此判断.
+   * @returns 自动锁定设置.
+   */
+  getAutoLockSettings(): AutoLockSettings {
+    return this.dependencies.store.getAutoLock();
+  }
+
+  /**
+   * 保存自动锁定设置.
+   * @param settings 完整的自动锁定设置.
+   */
+  setAutoLockSettings(settings: AutoLockSettings): void {
+    this.dependencies.store.setAutoLock(settings);
   }
 
   /**

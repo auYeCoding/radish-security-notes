@@ -17,7 +17,7 @@ export type VaultStateSetter = (partial: Partial<VaultState>) => void;
  */
 export interface VaultResultReflection {
   /**
-   * 让状态跟随解锁或恢复的结果: 成功变为已解锁, 失败按原因处理.
+   * 让状态跟随解锁或恢复的结果: 成功变为已解锁并清除自动锁定的原因, 失败按原因处理.
    * @param result 操作结果.
    * @returns 原样返回操作结果.
    */
@@ -49,6 +49,15 @@ export interface VaultResultReflection {
 }
 
 /**
+ * 解锁或恢复成功后写入的状态: 已解锁, 不再处于恢复流程, 自动锁定的原因作废.
+ */
+const UNLOCKED_STATE: Partial<VaultState> = {
+  status: "unlocked",
+  isRestoreRequested: false,
+  lockReason: undefined,
+};
+
+/**
  * 创建让保险库状态跟随操作结果的函数.
  * @param set 写入状态的函数.
  * @param readStatus 向主进程读取当前状态的函数.
@@ -71,7 +80,7 @@ export function createVaultResultReflection(
     result: VaultOperationResult,
   ): Promise<VaultOperationResult> => {
     if (result.ok) {
-      set({ status: "unlocked", isRestoreRequested: false });
+      set(UNLOCKED_STATE);
     } else {
       await reflectFailure(result);
     }

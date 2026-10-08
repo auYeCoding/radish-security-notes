@@ -1,3 +1,4 @@
+import type { AutoLockSettings } from "./auto-lock-settings";
 import type { SupportedLanguage } from "./language";
 import type { PreferencesSnapshot } from "./preferences-snapshot";
 import type { ThemeSource } from "./theme-source";
@@ -29,4 +30,10 @@ export interface PreferencesBridge {
    * @returns 保存完成后兑现.
    */
   setSidebarCollapsed: (isCollapsed: boolean) => Promise<void>;
+  /**
+   * 设置自动锁定设置, 主进程校验后保存, 下一次检查起生效.
+   * @param settings 完整的自动锁定设置.
+   * @returns 保存完成后兑现.
+   */
+  setAutoLock: (settings: AutoLockSettings) => Promise<void>;
 }

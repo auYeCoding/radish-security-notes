@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
+import {
+  DEFAULT_AUTO_LOCK_SETTINGS,
+  type AutoLockSettings,
+} from "@shared/preferences/auto-lock-settings";
+
 import { createPreferencesTestEnvironment } from "@renderer/testing/preferences-test-environment";
 
 describe("createPreferencesStore", () => {
@@ -72,5 +77,41 @@ describe("createPreferencesStore: 侧栏折叠状态", () => {
     );
 
     expect(store.getState().isSidebarCollapsed).toBe(false);
+  });
+});
+
+describe("createPreferencesStore: 自动锁定设置", () => {
+  const customSettings: AutoLockSettings = {
+    isIdleLockEnabled: false,
+    idleMinutes: 30,
+    isScreenLockEnabled: false,
+    isSleepLockEnabled: true,
+  };
+
+  it("初始状态来自偏好快照里的自动锁定设置", async () => {
+    const { store } = await createPreferencesTestEnvironment();
+
+    expect(store.getState().autoLock).toEqual(DEFAULT_AUTO_LOCK_SETTINGS);
+  });
+
+  it("修改设置时先经主进程保存, 再更新状态", async () => {
+    const { store, bridge } = await createPreferencesTestEnvironment();
+
+    await store.getState().setAutoLock(customSettings);
+
+    expect(bridge.setAutoLock).toHaveBeenCalledWith(customSettings);
+    expect(store.getState().autoLock).toEqual(customSettings);
+  });
+
+  it("主进程保存失败时状态保持不变", async () => {
+    const { store } = await createPreferencesTestEnvironment({
+      setAutoLock: vi.fn(() => Promise.reject(new Error("保存失败"))),
+    });
+
+    await expect(store.getState().setAutoLock(customSettings)).rejects.toThrow(
+      "保存失败",
+    );
+
+    expect(store.getState().autoLock).toEqual(DEFAULT_AUTO_LOCK_SETTINGS);
   });
 });

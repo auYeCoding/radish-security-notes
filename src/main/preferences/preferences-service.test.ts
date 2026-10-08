@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createI18nInstance } from "@shared/i18n/create-i18n-instance";
+import {
+  DEFAULT_AUTO_LOCK_SETTINGS,
+  type AutoLockSettings,
+} from "@shared/preferences/auto-lock-settings";
 
 import { createInMemoryKeyValueBackend } from "../testing/in-memory-key-value-backend";
 import type { NativeThemePort } from "../theme/native-theme-port";
@@ -60,6 +64,7 @@ describe("PreferencesService", () => {
       themeSource: "system",
       language: "zh",
       isSidebarCollapsed: false,
+      autoLock: DEFAULT_AUTO_LOCK_SETTINGS,
       isPseudoLocalizationEnabled: false,
     });
   });
@@ -93,5 +98,30 @@ describe("PreferencesService", () => {
     expect(store.getLanguage("en-US")).toBe("zh");
     expect(service.getSnapshot().language).toBe("zh");
     expect(listener).toHaveBeenCalledWith("zh");
+  });
+});
+
+describe("PreferencesService: 自动锁定设置", () => {
+  const customSettings: AutoLockSettings = {
+    isIdleLockEnabled: false,
+    idleMinutes: 30,
+    isScreenLockEnabled: true,
+    isSleepLockEnabled: false,
+  };
+
+  it("没有保存过时读到默认设置", async () => {
+    const { service } = await createService("en-US");
+
+    expect(service.getAutoLockSettings()).toEqual(DEFAULT_AUTO_LOCK_SETTINGS);
+  });
+
+  it("保存后能读回, 快照也带回它", async () => {
+    const { service, store } = await createService("en-US");
+
+    service.setAutoLockSettings(customSettings);
+
+    expect(store.getAutoLock()).toEqual(customSettings);
+    expect(service.getAutoLockSettings()).toEqual(customSettings);
+    expect(service.getSnapshot().autoLock).toEqual(customSettings);
   });
 });

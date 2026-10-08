@@ -1,3 +1,4 @@
+import type { AutoLockSettings } from "@shared/preferences/auto-lock-settings";
 import type { PreferencesBridge } from "@shared/preferences/preferences-bridge";
 import type { PreferencesSnapshot } from "@shared/preferences/preferences-snapshot";
 import type { SupportedLanguage } from "@shared/preferences/language";
@@ -6,7 +7,7 @@ import type { i18n } from "i18next";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 /**
- * 偏好状态: 用户当前选择的主题来源, 界面语言与侧栏折叠状态.
+ * 偏好状态: 用户当前选择的主题来源, 界面语言, 侧栏折叠状态与自动锁定设置.
  */
 export interface PreferencesState {
   /**
@@ -21,6 +22,10 @@ export interface PreferencesState {
    * 侧栏当前是否折叠.
    */
   readonly isSidebarCollapsed: boolean;
+  /**
+   * 当前的自动锁定设置.
+   */
+  readonly autoLock: AutoLockSettings;
 }
 
 /**
@@ -45,6 +50,12 @@ export interface PreferencesActions {
    * @returns 主进程保存后兑现.
    */
   setSidebarCollapsed: (isCollapsed: boolean) => Promise<void>;
+  /**
+   * 修改自动锁定设置.
+   * @param settings 完整的新设置.
+   * @returns 主进程保存后兑现.
+   */
+  setAutoLock: (settings: AutoLockSettings) => Promise<void>;
 }
 
 /**
@@ -83,6 +94,7 @@ export function createPreferencesStore(
     themeSource: initial.themeSource,
     language: initial.language,
     isSidebarCollapsed: initial.isSidebarCollapsed,
+    autoLock: initial.autoLock,
     setThemeSource: async (themeSource) => {
       await bridge.setThemeSource(themeSource);
       set({ themeSource });
@@ -95,6 +107,10 @@ export function createPreferencesStore(
     setSidebarCollapsed: async (isCollapsed) => {
       await bridge.setSidebarCollapsed(isCollapsed);
       set({ isSidebarCollapsed: isCollapsed });
+    },
+    setAutoLock: async (settings) => {
+      await bridge.setAutoLock(settings);
+      set({ autoLock: settings });
     },
   }));
 }

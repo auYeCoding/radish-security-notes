@@ -45,5 +45,8 @@ export function createPreferencesBridge(
         isCollapsed,
       );
     },
+    setAutoLock: async (settings) => {
+      await ipcRenderer.invoke(IPC_CHANNELS.preferencesSetAutoLock, settings);
+    },
   };
 }

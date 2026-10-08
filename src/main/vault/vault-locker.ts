@@ -41,9 +41,20 @@ export interface VaultLockerDependencies {
 }
 
 /**
- * 保险库锁定器: 已解锁并由主密码保护的保险库, 在没有任务进行中时关闭数据库, 丢弃内存里的解密
- * 状态, 回到锁定. 数据密钥在解锁时打开数据库后就已清零, 锁定时没有缓冲区可清, 关闭连接并丢弃
- * 引用之后主进程里不再留有可用的密钥. 关闭失败仍进入锁定, 失败原因不写日志.
+ * 锁定选项.
+ */
+export interface VaultLockOptions {
+  /**
+   * 是否忽略进行中的任务直接锁定, 只有自动锁定推迟到上限后使用. 导入与恢复的数据库写入是单个同步
+   * 事务, 导出经原子写文件, 强制锁定只会让进行中的任务失败, 不会留下写一半的数据.
+   */
+  readonly shouldIgnoreRunningTasks?: boolean;
+}
+
+/**
+ * 保险库锁定器: 已解锁并由主密码保护的保险库, 在没有任务进行中时 (或明确要求忽略任务时) 关闭数据库,
+ * 丢弃内存里的解密状态, 回到锁定. 数据密钥在解锁时打开数据库后就已清零, 锁定时没有缓冲区可清,
+ * 关闭连接并丢弃引用之后主进程里不再留有可用的密钥. 关闭失败仍进入锁定, 失败原因不写日志.
  */
 export class VaultLocker {
   /**
@@ -54,16 +65,18 @@ export class VaultLocker {
 
   /**
    * 锁定保险库.
+   * @param options 锁定选项, 不给时有任务进行中就拒绝.
    * @returns 成功; 状态不符或互斥被占用时为 `unexpected-state`; 未由主密码保护时为
-   * `master-password-required`; 有任务进行中时为 `tasks-running`, 这三种失败都不改变保险库状态.
+   * `master-password-required`; 有任务进行中且没有要求忽略时为 `tasks-running`, 这三种失败都不改变
+   * 保险库状态.
    */
-  async lock(): Promise<VaultOperationResult> {
+  async lock(options: VaultLockOptions = {}): Promise<VaultOperationResult> {
     const { exclusion, isUnlocked } = this.dependencies;
     if (!isUnlocked() || !exclusion.tryAcquire()) {
       return vaultOperationFailed("unexpected-state");
     }
     try {
-      return await this.lockExclusively();
+      return await this.lockExclusively(options);
     } finally {
       exclusion.release();
     }
@@ -71,15 +84,21 @@ export class VaultLocker {
 
   /**
    * 在持有互斥的情况下锁定: 校验保护方式与任务, 通过后同步完成关库, 置状态与释放.
+   * @param options 锁定选项.
    * @returns 锁定结果.
    */
-  private async lockExclusively(): Promise<VaultOperationResult> {
+  private async lockExclusively(
+    options: VaultLockOptions,
+  ): Promise<VaultOperationResult> {
     const { keyFileStore, registry } = this.dependencies;
     const record = await keyFileStore.read().catch(() => undefined);
     if (record?.protection !== MASTER_PASSWORD_PROTECTION) {
       return vaultOperationFailed("master-password-required");
     }
-    if (registry.hasRunningTask()) {
+    if (
+      options.shouldIgnoreRunningTasks !== true &&
+      registry.hasRunningTask()
+    ) {
       return vaultOperationFailed("tasks-running");
     }
     attemptSilently(this.dependencies.discardDatabase);

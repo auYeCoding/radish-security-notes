@@ -52,6 +52,10 @@ interface ParticipantsRig {
    * 暂停自动备份的间谍.
    */
   readonly pauseAutoBackup: ReturnType<typeof vi.fn>;
+  /**
+   * 删除附件明文临时副本的间谍.
+   */
+  readonly discardAttachmentCopies: ReturnType<typeof vi.fn>;
 }
 
 /**
@@ -68,11 +72,13 @@ function createParticipants(): ParticipantsRig {
   const discardImport = vi.fn();
   const discardRestore = vi.fn();
   const pauseAutoBackup = vi.fn();
+  const discardAttachmentCopies = vi.fn();
   return {
     busy,
     discardImport,
     discardRestore,
     pauseAutoBackup,
+    discardAttachmentCopies,
     participants: {
       importService: {
         hasRunningTask: () => busy.importing,
@@ -85,6 +91,7 @@ function createParticipants(): ParticipantsRig {
       },
       emailBackupService: { hasRunningTask: () => busy.emailing },
       pauseAutoBackupUntilUnlocked: pauseAutoBackup,
+      discardAttachmentTemporaryCopies: discardAttachmentCopies,
     },
   };
 }
@@ -135,5 +142,42 @@ describe("registerLockParticipants", () => {
     expect(discardImport).not.toHaveBeenCalled();
     expect(discardRestore).not.toHaveBeenCalled();
     expect(pauseAutoBackup).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerLockParticipants: 附件明文临时副本", () => {
+  it("锁定时删除附件明文临时副本, 登记时不会提前删除", () => {
+    const registry = createLockRegistry();
+    const { participants, discardAttachmentCopies } = createParticipants();
+
+    registerLockParticipants(registry, participants);
+    expect(discardAttachmentCopies).not.toHaveBeenCalled();
+
+    registry.releaseAll();
+
+    expect(discardAttachmentCopies).toHaveBeenCalledTimes(1);
+  });
+
+  it("删除副本抛错时其它释放动作照常执行, 错误不外泄", () => {
+    const registry = createLockRegistry();
+    const { participants, discardImport, pauseAutoBackup } =
+      createParticipants();
+    registerLockParticipants(registry, {
+      ...participants,
+      discardAttachmentTemporaryCopies: () => {
+        throw new Error("文件被占用");
+      },
+    });
+
+    expect(() => registry.releaseAll()).not.toThrow();
+    expect(discardImport).toHaveBeenCalledTimes(1);
+    expect(pauseAutoBackup).toHaveBeenCalledTimes(1);
+  });
+
+  it("附件副本不算进行中的任务", () => {
+    const registry = createLockRegistry();
+    registerLockParticipants(registry, createParticipants().participants);
+
+    expect(registry.hasRunningTask()).toBe(false);
   });
 });

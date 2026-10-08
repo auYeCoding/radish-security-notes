@@ -42,6 +42,10 @@ import {
   createPreferencesRuntime,
   type PreferencesRuntime,
 } from "./preferences-runtime";
+import {
+  createAutoLockRuntime,
+  type AutoLockRuntime,
+} from "./auto-lock-runtime";
 import { createAttachmentRuntime } from "./attachment-runtime";
 import { createBatchService } from "./batch-runtime";
 import { createEmailBackupRuntime } from "./email-backup-runtime";
@@ -52,7 +56,10 @@ import { createFolderService } from "./folder-runtime";
 import { createImportRuntime } from "./import-runtime";
 import { createLinkRuntime } from "./link-runtime";
 import { createRecoveryRuntime } from "./recovery-runtime";
-import { registerLockParticipants } from "./register-lock-participants";
+import {
+  registerLockParticipants,
+  type LockParticipants,
+} from "./register-lock-participants";
 import { createRestoreRuntime } from "./restore-runtime";
 import { createTagService } from "./tag-runtime";
 import { createVaultRuntime, type VaultRuntime } from "./vault-runtime";
@@ -192,6 +199,31 @@ function registerVaultSecurityIpc(
 }
 
 /**
+ * 启用保险库锁定: 把参与锁定的业务模块登记进锁定登记处, 并启动自动锁定 (空闲, 系统锁屏, 系统休眠).
+ * 自动锁定读偏好里的设置, 锁定成功后向主窗口的页面推送原因.
+ * @param vault 保险库运行时对象.
+ * @param runtime 偏好运行时对象.
+ * @param mainWindowHolder 主窗口持有者.
+ * @param participants 参与锁定的业务模块.
+ * @returns 自动锁定运行时对象, 应用退出时停止它.
+ */
+function activateVaultLock(
+  vault: VaultRuntime,
+  runtime: PreferencesRuntime,
+  mainWindowHolder: MainWindowHolder<BrowserWindow>,
+  participants: LockParticipants,
+): AutoLockRuntime {
+  registerLockParticipants(vault.lockRegistry, participants);
+  const autoLock = createAutoLockRuntime({
+    vault: vault.service,
+    preferences: runtime.service,
+    mainWindowHolder,
+  });
+  autoLock.start();
+  return autoLock;
+}
+
+/**
  * 启动应用: 先应用主题并建好 i18n, 判定保险库状态, 再注册 IPC, 最后创建主窗口.
  * 在 app ready 之后调用.
  * @returns 启动完成后兑现.
@@ -226,16 +258,18 @@ export async function startApplication(): Promise<void> {
   );
   const emailBackup = createEmailBackupRuntime(vault, runtime.i18n);
   registerEmailBackupIpc(guardedIpcMain, emailBackup.service);
-  registerLockParticipants(vault.lockRegistry, {
+  const autoLock = activateVaultLock(vault, runtime, mainWindowHolder, {
     ...dataTransfer,
     emailBackupService: emailBackup.service,
     pauseAutoBackupUntilUnlocked: emailBackup.pauseAutoBackupUntilUnlocked,
+    discardAttachmentTemporaryCopies: attachments.discardTemporaryCopies,
   });
   emailBackup.discardTemporaryFiles();
   emailBackup.startAutoBackup();
   const openExternalLink = createLinkRuntime();
   registerLinkIpc(guardedIpcMain, openExternalLink);
   app.on("will-quit", () => {
+    autoLock.stop();
     attachments.discardTemporaryCopies();
     emailBackup.stopAutoBackup();
     emailBackup.discardTemporaryFiles();

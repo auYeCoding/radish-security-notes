@@ -1,4 +1,5 @@
 import { createI18nInstance } from "@shared/i18n/create-i18n-instance";
+import { DEFAULT_AUTO_LOCK_SETTINGS } from "@shared/preferences/auto-lock-settings";
 import type { PreferencesBridge } from "@shared/preferences/preferences-bridge";
 import type { PreferencesSnapshot } from "@shared/preferences/preferences-snapshot";
 import type { i18n } from "i18next";
@@ -19,6 +20,7 @@ export const TEST_INITIAL_SNAPSHOT: PreferencesSnapshot = {
   themeSource: "system",
   language: "zh",
   isSidebarCollapsed: false,
+  autoLock: DEFAULT_AUTO_LOCK_SETTINGS,
   isPseudoLocalizationEnabled: false,
 };
 
@@ -70,6 +72,7 @@ export async function createPreferencesTestEnvironment(
     setThemeSource: vi.fn(() => Promise.resolve()),
     setLanguage: vi.fn(() => Promise.resolve()),
     setSidebarCollapsed: vi.fn(() => Promise.resolve()),
+    setAutoLock: vi.fn(() => Promise.resolve()),
     ...bridgeOverrides,
   };
   const i18nInstance = await createI18nInstance({

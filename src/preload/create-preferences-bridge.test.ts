@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
+import { DEFAULT_AUTO_LOCK_SETTINGS } from "@shared/preferences/auto-lock-settings";
 
 import { createPreferencesBridge } from "./create-preferences-bridge";
 
@@ -48,6 +49,24 @@ describe("createPreferencesBridge", () => {
     expect(invoke).toHaveBeenCalledWith(
       IPC_CHANNELS.preferencesSetSidebarCollapsed,
       true,
+    );
+  });
+});
+
+describe("createPreferencesBridge: 自动锁定设置", () => {
+  it("setAutoLock 调用对应通道并带上完整设置", async () => {
+    const invoke = vi.fn(() => Promise.resolve(undefined));
+    const bridge = createPreferencesBridge({ invoke });
+    const settings = {
+      ...DEFAULT_AUTO_LOCK_SETTINGS,
+      isSleepLockEnabled: false,
+    };
+
+    await bridge.setAutoLock(settings);
+
+    expect(invoke).toHaveBeenCalledWith(
+      IPC_CHANNELS.preferencesSetAutoLock,
+      settings,
     );
   });
 });

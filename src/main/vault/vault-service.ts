@@ -31,7 +31,7 @@ import { dataKeyToRecoveryWords } from "./recovery-phrase";
 import type { SafeStoragePort } from "./safe-storage-port";
 import type { SystemKeyPersistence } from "./system-key-persistence";
 import { unprotectWithSystem } from "./system-key-protector";
-import { VaultLocker } from "./vault-locker";
+import { VaultLocker, type VaultLockOptions } from "./vault-locker";
 import { VaultRecovery } from "./vault-recovery";
 import type { VaultPaths } from "./vault-paths";
 
@@ -326,11 +326,12 @@ export class VaultService {
   /**
    * 锁定保险库: 已解锁且由主密码保护, 没有导入, 导出, 邮箱备份, 恢复进行中时, 关闭数据库并丢弃
    * 解密状态, 之后要再次输入主密码才能进入. 关闭失败仍进入锁定. 与设置, 解锁, 恢复, 切换主密码,
-   * 查看恢复密钥互斥.
+   * 查看恢复密钥互斥. 自动锁定推迟到上限后可以要求忽略进行中的任务.
+   * @param options 锁定选项, 不给时有任务进行中就拒绝.
    * @returns 锁定结果, 被拒绝时带原因, 保险库状态不变.
    */
-  lock(): Promise<VaultOperationResult> {
-    return this.locker.lock();
+  lock(options?: VaultLockOptions): Promise<VaultOperationResult> {
+    return this.locker.lock(options);
   }
 
   /**

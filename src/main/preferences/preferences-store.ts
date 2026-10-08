@@ -1,4 +1,8 @@
 import {
+  normalizeAutoLockSettings,
+  type AutoLockSettings,
+} from "@shared/preferences/auto-lock-settings";
+import {
   isSupportedLanguage,
   resolveLanguageFromLocale,
   type SupportedLanguage,
@@ -18,10 +22,11 @@ const PREFERENCE_KEYS = {
   themeSource: "themeSource",
   language: "language",
   isSidebarCollapsed: "isSidebarCollapsed",
+  autoLock: "autoLock",
 } as const;
 
 /**
- * 用户偏好存储: 保存并读取主题来源, 界面语言与侧栏折叠状态, 读到不合法的值时回退到默认.
+ * 用户偏好存储: 保存并读取主题来源, 界面语言, 侧栏折叠状态与自动锁定设置, 读到不合法的值时回退到默认.
  */
 export class PreferencesStore {
   /**
@@ -81,5 +86,23 @@ export class PreferencesStore {
    */
   setSidebarCollapsed(isCollapsed: boolean): void {
     this.backend.set(PREFERENCE_KEYS.isSidebarCollapsed, isCollapsed);
+  }
+
+  /**
+   * 读取自动锁定设置.
+   * @returns 已保存的设置, 没有保存过时为默认设置, 存储里个别字段不合法时该字段回落默认.
+   */
+  getAutoLock(): AutoLockSettings {
+    return normalizeAutoLockSettings(
+      this.backend.get(PREFERENCE_KEYS.autoLock),
+    );
+  }
+
+  /**
+   * 保存自动锁定设置.
+   * @param settings 要保存的完整设置.
+   */
+  setAutoLock(settings: AutoLockSettings): void {
+    this.backend.set(PREFERENCE_KEYS.autoLock, settings);
   }
 }

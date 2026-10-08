@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { IPC_CHANNELS } from "@shared/ipc/ipc-channels";
+import { DEFAULT_AUTO_LOCK_SETTINGS } from "@shared/preferences/auto-lock-settings";
 
 import type { PreferencesService } from "../preferences/preferences-service";
 import { registerPreferencesIpc, type IpcMainPort } from "./preferences-ipc";
@@ -45,11 +46,13 @@ function createFakeService(): PreferencesService {
       themeSource: "system",
       language: "en",
       isSidebarCollapsed: false,
+      autoLock: DEFAULT_AUTO_LOCK_SETTINGS,
       isPseudoLocalizationEnabled: false,
     })),
     setThemeSource: vi.fn(),
     setLanguage: vi.fn(() => Promise.resolve()),
     setSidebarCollapsed: vi.fn(),
+    setAutoLockSettings: vi.fn(),
     onLanguageChanged: vi.fn(),
   } as unknown as PreferencesService;
 }
@@ -113,5 +116,37 @@ describe("registerPreferencesIpc", () => {
       ipcMain.invoke(IPC_CHANNELS.preferencesSetSidebarCollapsed, "true"),
     ).toThrow("无效的侧栏折叠状态");
     expect(service.setSidebarCollapsed).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("registerPreferencesIpc: 自动锁定设置", () => {
+  it("完整合法的设置交给服务", () => {
+    const ipcMain = createFakeIpcMain();
+    const service = createFakeService();
+    registerPreferencesIpc(ipcMain, service);
+    const settings = { ...DEFAULT_AUTO_LOCK_SETTINGS, idleMinutes: 5 };
+
+    ipcMain.invoke(IPC_CHANNELS.preferencesSetAutoLock, settings);
+
+    expect(service.setAutoLockSettings).toHaveBeenCalledWith(settings);
+  });
+
+  it.each([
+    ["字符串", "on"],
+    ["缺少字段", { isIdleLockEnabled: true }],
+    ["时长不在档位里", { ...DEFAULT_AUTO_LOCK_SETTINGS, idleMinutes: 7 }],
+    [
+      "开关不是布尔值",
+      { ...DEFAULT_AUTO_LOCK_SETTINGS, isScreenLockEnabled: "yes" },
+    ],
+  ])("%s被拒绝且不触达服务", (_name, settings) => {
+    const ipcMain = createFakeIpcMain();
+    const service = createFakeService();
+    registerPreferencesIpc(ipcMain, service);
+
+    expect(() =>
+      ipcMain.invoke(IPC_CHANNELS.preferencesSetAutoLock, settings),
+    ).toThrow("无效的自动锁定设置");
+    expect(service.setAutoLockSettings).not.toHaveBeenCalled();
   });
 });

@@ -26,11 +26,24 @@ const STATE_LABEL_KEYS = {
 } as const satisfies Record<MasterPasswordState, string>;
 
 /**
+ * 主密码开关的属性.
+ */
+interface MasterPasswordSwitchProps {
+  /**
+   * 开启或关闭主密码成功之后的回调, 调用方借它让依赖主密码状态的其它设置项立即跟着变化.
+   */
+  readonly onChanged?: () => void;
+}
+
+/**
  * 主密码开关: 开关反映主进程里密钥文件当前的保护方式. 点开关不直接翻转, 只打开开启或关闭对话框,
- * 取消或失败时开关保持原状, 成功后重新向主进程读取状态. 读取中与无法读取时开关不可改.
+ * 取消或失败时开关保持原状, 成功后重新向主进程读取状态并通知调用方. 读取中与无法读取时开关不可改.
+ * @param props 组件属性.
  * @returns 开关与按需打开的对话框元素.
  */
-export function MasterPasswordSwitch(): React.JSX.Element {
+export function MasterPasswordSwitch(
+  props: MasterPasswordSwitchProps,
+): React.JSX.Element {
   const { t } = useTranslation();
   const { state, refresh } = useMasterPasswordState();
   const [openDialog, setOpenDialog] = useState<OpenDialog>(undefined);
@@ -38,6 +51,7 @@ export function MasterPasswordSwitch(): React.JSX.Element {
   const handleSucceeded = (): void => {
     closeDialog();
     refresh();
+    props.onChanged?.();
   };
   return (
     <>
