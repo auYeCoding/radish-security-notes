@@ -1,6 +1,8 @@
 import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area";
 import { cn } from "cn";
 
+import { FAST_STATE_TRANSITION } from "@renderer/components/ui/state-motion";
+
 /**
  * 可滚动区域, 带统一样式的滚动条与焦点环.
  * @param root0 组件属性, 含 className, children 与根元素原生属性.
@@ -19,7 +21,10 @@ function ScrollArea({
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
-        className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1"
+        className={cn(
+          FAST_STATE_TRANSITION,
+          "size-full rounded-[inherit] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1",
+        )}
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
@@ -45,7 +50,8 @@ function ScrollBar({
       data-orientation={orientation}
       orientation={orientation}
       className={cn(
-        "flex touch-none p-px transition-colors select-none data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent",
+        FAST_STATE_TRANSITION,
+        "flex touch-none p-px select-none data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent",
         className,
       )}
       {...props}
