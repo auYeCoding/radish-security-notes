@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { usePreferencesStore } from "@renderer/stores/use-preferences-store";
 import { THEME_SOURCES, isThemeSource } from "@shared/preferences/theme-source";
 
@@ -24,7 +25,7 @@ export function ThemeSwitcher(): React.JSX.Element {
       }))}
       value={themeSource}
       isValue={isThemeSource}
-      onChange={(next) => void setThemeSource(next)}
+      onChange={(next) => detachPromise(setThemeSource(next))}
     />
   );
 }

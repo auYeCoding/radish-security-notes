@@ -119,6 +119,7 @@ const MODULE_CASES: readonly ModuleCase[] = [
     register: registerWithRecording(registerVaultIpc),
     channels: [
       IPC_CHANNELS.vaultGetStatus,
+      IPC_CHANNELS.vaultGetFailure,
       IPC_CHANNELS.vaultSetupWithMasterPassword,
       IPC_CHANNELS.vaultSetupWithoutMasterPassword,
       IPC_CHANNELS.vaultUnlock,
@@ -126,6 +127,11 @@ const MODULE_CASES: readonly ModuleCase[] = [
     ],
     passingCalls: [
       { channel: IPC_CHANNELS.vaultGetStatus, args: [], method: "getStatus" },
+      {
+        channel: IPC_CHANNELS.vaultGetFailure,
+        args: [],
+        method: "getFailure",
+      },
       { channel: IPC_CHANNELS.vaultLock, args: [], method: "lock" },
       {
         channel: IPC_CHANNELS.vaultUnlock,

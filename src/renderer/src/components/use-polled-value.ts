@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
+
 /**
  * 在处理期间定期读取一个值, 例如主进程里一次长操作的进度. 值通过请求应答读取, 不依赖主进程推送.
  * 不处理时不轮询, 处理结束或组件卸载时停止并丢弃读到的值, 迟到的应答被忽略.
@@ -25,8 +27,11 @@ export function usePolledValue<Value>(
         setValue(next);
       }
     };
-    void poll();
-    const timer = setInterval(() => void poll(), intervalMilliseconds);
+    detachPromise(poll());
+    const timer = setInterval(
+      () => detachPromise(poll()),
+      intervalMilliseconds,
+    );
     return () => {
       isCurrent = false;
       clearInterval(timer);

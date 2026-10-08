@@ -2,6 +2,7 @@ import {
   normalizeAutoLockSettings,
   type AutoLockSettings,
 } from "@shared/preferences/auto-lock-settings";
+import { DEFAULT_CONTENT_PROTECTION_ENABLED } from "@shared/preferences/content-protection";
 import {
   isSupportedLanguage,
   resolveLanguageFromLocale,
@@ -23,10 +24,12 @@ const PREFERENCE_KEYS = {
   language: "language",
   isSidebarCollapsed: "isSidebarCollapsed",
   autoLock: "autoLock",
+  isContentProtectionEnabled: "isContentProtectionEnabled",
 } as const;
 
 /**
- * 用户偏好存储: 保存并读取主题来源, 界面语言, 侧栏折叠状态与自动锁定设置, 读到不合法的值时回退到默认.
+ * 用户偏好存储: 保存并读取主题来源, 界面语言, 侧栏折叠状态, 自动锁定设置与内容保护开关, 读到
+ * 不合法的值时回退到默认.
  */
 export class PreferencesStore {
   /**
@@ -104,5 +107,24 @@ export class PreferencesStore {
    */
   setAutoLock(settings: AutoLockSettings): void {
     this.backend.set(PREFERENCE_KEYS.autoLock, settings);
+  }
+
+  /**
+   * 读取是否启用内容保护.
+   * @returns 已保存的开关, 没有保存过或存储里的值不是布尔值时为默认值 (关闭).
+   */
+  isContentProtectionEnabled(): boolean {
+    const stored = this.backend.get(PREFERENCE_KEYS.isContentProtectionEnabled);
+    return typeof stored === "boolean"
+      ? stored
+      : DEFAULT_CONTENT_PROTECTION_ENABLED;
+  }
+
+  /**
+   * 保存是否启用内容保护.
+   * @param isEnabled 要保存的开关.
+   */
+  setContentProtectionEnabled(isEnabled: boolean): void {
+    this.backend.set(PREFERENCE_KEYS.isContentProtectionEnabled, isEnabled);
   }
 }

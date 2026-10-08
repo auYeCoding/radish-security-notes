@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 
 import type { RestoreProgressSnapshot } from "@shared/restore/restore-types";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { useRestoreBridge } from "@renderer/stores/use-restore-bridge";
 
 import {
@@ -75,7 +76,7 @@ export function useRestoreFlow(): RestoreFlow {
   const refreshAfterRestore = useRefreshAfterRestore();
   const progress = useRestoreProgress(state.step === "working");
   const work = useRestoreWork({ bridge, state, setState, refreshAfterRestore });
-  const release = useCallback(() => void bridge.cancel(), [bridge]);
+  const release = useCallback(() => detachPromise(bridge.cancel()), [bridge]);
   return {
     state,
     progress,

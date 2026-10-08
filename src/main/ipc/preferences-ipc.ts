@@ -62,4 +62,13 @@ export function registerPreferencesIpc(
     }
     service.setAutoLockSettings(settings);
   });
+  ipcMain.handle(
+    IPC_CHANNELS.preferencesSetContentProtection,
+    (_event, isEnabled) => {
+      if (typeof isEnabled !== "boolean") {
+        throw new Error("无效的内容保护开关");
+      }
+      service.setContentProtection(isEnabled);
+    },
+  );
 }

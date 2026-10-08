@@ -59,11 +59,12 @@ export async function protectWithSystem(
 }
 
 /**
- * 用系统解开被保护的数据密钥. 系统指出密文应重新加密时, 用同一个数据密钥生成新记录.
+ * 用系统解开被保护的数据密钥. 系统指出密文应重新加密时, 用同一个数据密钥生成新记录; 生成新记录
+ * 失败时清零内存里的数据密钥再抛出, 调用方拿不到也就不会遗留一份没有用完的密钥.
  * @param record 密钥文件中的系统保护记录.
  * @param safeStorage safeStorage 接口.
  * @returns 数据密钥, 以及可能的新记录.
- * @throws Error 当系统解密失败或解出的内容不是数据密钥时.
+ * @throws Error 当系统解密失败, 解出的内容不是数据密钥, 或重新加密失败时.
  */
 export async function unprotectWithSystem(
   record: SystemKeyRecord,
@@ -76,8 +77,13 @@ export async function unprotectWithSystem(
   if (!shouldReEncrypt) {
     return { dataKey, refreshedRecord: undefined };
   }
-  return {
-    dataKey,
-    refreshedRecord: await protectWithSystem(dataKey, safeStorage),
-  };
+  try {
+    return {
+      dataKey,
+      refreshedRecord: await protectWithSystem(dataKey, safeStorage),
+    };
+  } catch (error) {
+    dataKey.fill(0);
+    throw error;
+  }
 }

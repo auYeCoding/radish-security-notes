@@ -1,12 +1,20 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { createFakeSafeStorage } from "../testing/vault-test-fixtures";
-import { generateDataKey } from "./data-key";
+import { dataKeyFromHexadecimal, generateDataKey } from "./data-key";
 import {
   SystemProtectionUnavailableError,
   protectWithSystem,
   unprotectWithSystem,
 } from "./system-key-protector";
+
+vi.mock("./data-key", async (importOriginal) => {
+  const original = await importOriginal<typeof import("./data-key")>();
+  return {
+    ...original,
+    dataKeyFromHexadecimal: vi.fn(original.dataKeyFromHexadecimal),
+  };
+});
 
 describe("protectWithSystem 与 unprotectWithSystem 正常使用", () => {
   it("系统保护后能解出原来的数据密钥", async () => {
@@ -44,6 +52,39 @@ describe("protectWithSystem 与 unprotectWithSystem 正常使用", () => {
       createFakeSafeStorage(),
     );
     expect(refreshed.dataKey.equals(dataKey)).toBe(true);
+  });
+});
+
+describe("unprotectWithSystem 失败路径清零数据密钥", () => {
+  it("系统要求重新加密但重新加密失败时, 解出的数据密钥清零后才抛出", async () => {
+    const record = await protectWithSystem(
+      generateDataKey(),
+      createFakeSafeStorage(),
+    );
+    const failing = createFakeSafeStorage({
+      shouldReEncrypt: true,
+      isAvailable: false,
+    });
+
+    await expect(unprotectWithSystem(record, failing)).rejects.toBeInstanceOf(
+      SystemProtectionUnavailableError,
+    );
+
+    const decoded = vi.mocked(dataKeyFromHexadecimal).mock.results.at(-1);
+    expect(decoded?.type).toBe("return");
+    expect((decoded?.value as Buffer).every((byte) => byte === 0)).toBe(true);
+  });
+
+  it("重新加密成功时数据密钥不被清零", async () => {
+    const dataKey = generateDataKey();
+    const record = await protectWithSystem(dataKey, createFakeSafeStorage());
+
+    const result = await unprotectWithSystem(
+      record,
+      createFakeSafeStorage({ shouldReEncrypt: true }),
+    );
+
+    expect(result.dataKey.equals(dataKey)).toBe(true);
   });
 });
 

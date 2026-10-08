@@ -72,7 +72,10 @@ export const COLLAPSIBLE_TEXT_STATE_CLASSES: Readonly<
 
 /**
  * 入口行前后占位的共同类名: 用前后两个伪元素把切换按钮夹在中间, 前占位份额固定,
- * 后占位份额随状态过渡.
+ * 后占位份额随状态过渡. 后占位的三个过渡类名是 `COLLAPSE_SPACE_TRANSITION` 的三个类名加
+ * `after:` 前缀. 这里仍写出完整的字面量而不拼接生成: Tailwind 靠静态扫描源码里完整的类名生成
+ * 样式, 拼接出的类名扫描不到, 样式不会生成, 单元测试也发现不了. 两处是否一致由
+ * `collapse-motion.test.ts` 断言.
  */
 export const TOGGLE_ROW_SPACER_CLASSES =
   "before:grow before:basis-0 after:basis-0 after:transition-flex-space after:duration-(--motion-base) after:ease-(--motion-ease)";

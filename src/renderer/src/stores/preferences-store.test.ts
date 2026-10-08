@@ -48,6 +48,38 @@ describe("createPreferencesStore", () => {
   });
 });
 
+describe("createPreferencesStore: 内容保护", () => {
+  it("初始快照里内容保护是关的", async () => {
+    const { store } = await createPreferencesTestEnvironment();
+
+    expect(store.getState().isContentProtectionEnabled).toBe(false);
+  });
+
+  it("启用与关闭时先经主进程保存, 再更新状态", async () => {
+    const { store, bridge } = await createPreferencesTestEnvironment();
+
+    await store.getState().setContentProtectionEnabled(true);
+    expect(bridge.setContentProtection).toHaveBeenLastCalledWith(true);
+    expect(store.getState().isContentProtectionEnabled).toBe(true);
+
+    await store.getState().setContentProtectionEnabled(false);
+    expect(bridge.setContentProtection).toHaveBeenLastCalledWith(false);
+    expect(store.getState().isContentProtectionEnabled).toBe(false);
+  });
+
+  it("主进程保存失败时状态保持不变", async () => {
+    const { store } = await createPreferencesTestEnvironment({
+      setContentProtection: vi.fn(() => Promise.reject(new Error("保存失败"))),
+    });
+
+    await expect(
+      store.getState().setContentProtectionEnabled(true),
+    ).rejects.toThrow("保存失败");
+
+    expect(store.getState().isContentProtectionEnabled).toBe(false);
+  });
+});
+
 describe("createPreferencesStore: 侧栏折叠状态", () => {
   it("初始快照里侧栏是展开的", async () => {
     const { store } = await createPreferencesTestEnvironment();

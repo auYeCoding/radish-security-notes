@@ -6,6 +6,7 @@ import type {
   ImportProgressSnapshot,
 } from "@shared/import/import-types";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { useImportBridge } from "@renderer/stores/use-import-bridge";
 
 import {
@@ -84,7 +85,7 @@ export function useImportFlow(): ImportFlow {
   const progress = useImportProgress(state.step === "working");
   const work = useImportWork({ bridge, state, setState, refreshAfterImport });
   const resultActions = useImportResultActions(bridge, setState);
-  const release = useCallback(() => void bridge.cancel(), [bridge]);
+  const release = useCallback(() => detachPromise(bridge.cancel()), [bridge]);
   return {
     state,
     progress,

@@ -43,6 +43,11 @@ function createFakeIpcMain(): FakeIpcMain {
 function createFakeService(): VaultService {
   return {
     getStatus: vi.fn(() => "locked"),
+    getFailure: vi.fn(() => ({
+      cause: "database-missing",
+      stage: "startup",
+      errorName: undefined,
+    })),
     setupWithMasterPassword: vi.fn(() => Promise.resolve({ ok: true })),
     setupWithoutMasterPassword: vi.fn(() => Promise.resolve({ ok: true })),
     unlock: vi.fn(() =>
@@ -110,6 +115,19 @@ describe("registerVaultIpc", () => {
     );
     expect(service.setupWithMasterPassword).not.toHaveBeenCalled();
     expect(service.unlock).not.toHaveBeenCalled();
+  });
+});
+
+describe("registerVaultIpc 失败信息", () => {
+  it("读取失败信息通道返回服务的失败信息", () => {
+    const ipcMain = createFakeIpcMain();
+    registerVaultIpc(ipcMain, createFakeService());
+
+    expect(ipcMain.invoke(IPC_CHANNELS.vaultGetFailure)).toEqual({
+      cause: "database-missing",
+      stage: "startup",
+      errorName: undefined,
+    });
   });
 });
 

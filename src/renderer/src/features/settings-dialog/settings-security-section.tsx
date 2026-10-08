@@ -31,6 +31,10 @@ export interface SettingsSecurityEntries {
    * 自动锁定当前是否不可用 (没有设主密码). 不可用时三行的说明之后有一行原因.
    */
   readonly isAutoLockUnavailable: boolean;
+  /**
+   * 内容保护行的操作元素.
+   */
+  readonly contentProtectionAction: React.ReactNode;
 }
 
 /**
@@ -46,7 +50,7 @@ interface SettingsSecuritySectionProps {
 /**
  * 设置对话框的 "安全" 分区: 依次是 "主密码", "恢复密钥", "空闲自动锁定", "锁屏时锁定" 与 "休眠时锁定"
  * 五行, 名称与说明是本分区自己的文案, 右侧是装配层提供的开关与按钮. 没有设主密码时自动锁定不生效,
- * 三个自动锁定行之后有一行说明原因.
+ * 三个自动锁定行之后有一行说明原因. 最后是 "内容保护" 一行, 不依赖主密码.
  * @param props 组件属性.
  * @returns 安全分区元素.
  */
@@ -86,6 +90,11 @@ export function SettingsSecuritySection(
           {t("settings.security.autoLock.unavailable")}
         </p>
       )}
+      <SettingsRow
+        name={t("settings.security.contentProtection.name")}
+        description={t("settings.security.contentProtection.description")}
+        action={props.entries.contentProtectionAction}
+      />
     </SettingsSection>
   );
 }

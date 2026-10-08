@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { usePreferencesStore } from "@renderer/stores/use-preferences-store";
 import {
   SUPPORTED_LANGUAGES,
@@ -27,7 +28,7 @@ export function LanguageSwitcher(): React.JSX.Element {
       }))}
       value={language}
       isValue={isSupportedLanguage}
-      onChange={(next) => void setLanguage(next)}
+      onChange={(next) => detachPromise(setLanguage(next))}
     />
   );
 }

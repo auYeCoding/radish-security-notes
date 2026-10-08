@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
+
 import { useWindowControlsBridge } from "./use-window-controls-bridge";
 
 /**
@@ -16,11 +18,13 @@ export function useWindowMaximized(): boolean {
       hasReceivedPush = true;
       setIsMaximized(nextIsMaximized);
     });
-    void bridge.isMaximized().then((initialIsMaximized) => {
+    const syncInitialState = async (): Promise<void> => {
+      const initialIsMaximized = await bridge.isMaximized();
       if (!hasReceivedPush) {
         setIsMaximized(initialIsMaximized);
       }
-    });
+    };
+    detachPromise(syncInitialState());
     return unsubscribe;
   }, [bridge]);
   return isMaximized;

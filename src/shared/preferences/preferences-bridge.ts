@@ -36,4 +36,10 @@ export interface PreferencesBridge {
    * @returns 保存完成后兑现.
    */
   setAutoLock: (settings: AutoLockSettings) => Promise<void>;
+  /**
+   * 设置是否启用内容保护, 主进程保存并立即应用到全部窗口.
+   * @param isEnabled 是否启用.
+   * @returns 保存并应用完成后兑现.
+   */
+  setContentProtection: (isEnabled: boolean) => Promise<void>;
 }

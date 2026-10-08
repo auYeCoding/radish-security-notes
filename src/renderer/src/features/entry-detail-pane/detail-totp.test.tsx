@@ -240,6 +240,18 @@ describe("详情验证码的位数, 周期与失败", () => {
     expect(totpBridge.getCode).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("progressbar")).toBeNull();
   });
+
+  it("桥拒绝取码时同样显示读取失败, 不再重试", async () => {
+    const getCode = vi.fn(() => Promise.reject(new Error("ipc down")));
+    const { totpBridge } = await renderPane({
+      totpBridgeOverrides: { getCode },
+    });
+
+    await advance(5000);
+
+    expect(screen.getByText("无法读取验证码.")).toBeDefined();
+    expect(totpBridge.getCode).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("详情验证码的点击复制", () => {

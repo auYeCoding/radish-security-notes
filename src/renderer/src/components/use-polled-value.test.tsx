@@ -51,3 +51,30 @@ describe("usePolledValue", () => {
     expect(read).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("usePolledValue 读取被拒绝", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("某次读取被拒绝时不抛出, 值保持, 下一次轮询恢复", async () => {
+    const read = vi
+      .fn<() => Promise<number>>()
+      .mockResolvedValueOnce(1)
+      .mockRejectedValueOnce(new Error("ipc down"))
+      .mockResolvedValue(3);
+    const { result } = renderHook(() => usePolledValue(true, read, INTERVAL));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    expect(result.current).toBe(1);
+
+    await act(() => vi.advanceTimersByTimeAsync(INTERVAL));
+    expect(result.current).toBe(1);
+    await act(() => vi.advanceTimersByTimeAsync(INTERVAL));
+
+    expect(result.current).toBe(3);
+  });
+});

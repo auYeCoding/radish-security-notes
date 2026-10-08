@@ -15,6 +15,7 @@ export function registerVaultIpc(
   service: VaultService,
 ): void {
   ipcMain.handle(IPC_CHANNELS.vaultGetStatus, () => service.getStatus());
+  ipcMain.handle(IPC_CHANNELS.vaultGetFailure, () => service.getFailure());
   ipcMain.handle(
     IPC_CHANNELS.vaultSetupWithMasterPassword,
     (_event, masterPassword) =>

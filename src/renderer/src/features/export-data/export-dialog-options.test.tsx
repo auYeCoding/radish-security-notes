@@ -139,3 +139,20 @@ describe("导出对话框: 选择范围", () => {
     ).toBe(true);
   });
 });
+
+describe("导出对话框的统计被拒绝", () => {
+  it("桥拒绝统计时按统计失败处理, 下一步不可用", async () => {
+    await openExportDialog({
+      exportBridgeOverrides: {
+        describeScope: () => Promise.reject(new Error("ipc down")),
+      },
+    });
+
+    expect(
+      screen.getByText("无法统计导出范围, 请关闭对话框后重试."),
+    ).toBeDefined();
+    expect(
+      screen.getByRole("button", { name: "下一步" }).hasAttribute("disabled"),
+    ).toBe(true);
+  });
+});

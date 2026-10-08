@@ -6,23 +6,25 @@ import {
   type VaultOperationResult,
 } from "@shared/vault/vault-operation-result";
 import { isMasterPasswordLongEnough } from "@shared/vault/master-password-policy";
+import type {
+  VaultFailureInfo,
+  VaultFailureStage,
+} from "@shared/vault/vault-failure";
 import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 import type { VaultStatus } from "@shared/vault/vault-status";
 
-import { KeyUnwrapError } from "./aes-gcm-key-wrapper";
 import type { Argon2Parameters } from "./argon2-parameters";
 import { generateDataKey } from "./data-key";
+import { unprotectWithPassword } from "./data-key-unprotector";
 import type { VaultOrm } from "./database/drizzle-adapter";
 import {
   openVaultDatabase,
   type VaultDatabase,
 } from "./database/open-vault-database";
-import { fileExists } from "./file-exists";
 import type { KeyFileStore } from "./key-file-store";
 import { MASTER_PASSWORD_PROTECTION } from "./key-record";
 import { KeyProtectionWriter } from "./key-protection-writer";
 import type { LockRegistry } from "./lock-registry";
-import { unprotectWithMasterPassword } from "./master-password-key-protector";
 import { MasterPasswordSwitch } from "./master-password-switch";
 import { createOperationExclusion } from "./operation-exclusion";
 import type { DataKeyRecovery } from "./recover-data-key";
@@ -30,7 +32,9 @@ import { RecoveryKeyViewer } from "./recovery-key-viewer";
 import { dataKeyToRecoveryWords } from "./recovery-phrase";
 import type { SafeStoragePort } from "./safe-storage-port";
 import type { SystemKeyPersistence } from "./system-key-persistence";
-import { unprotectWithSystem } from "./system-key-protector";
+import { unlockSystemProtectedKey } from "./unlock-system-protected-key";
+import { VaultFailureRecorder } from "./vault-failure-recorder";
+import { detectVaultFileProblem } from "./vault-file-check";
 import { VaultLocker, type VaultLockOptions } from "./vault-locker";
 import { VaultRecovery } from "./vault-recovery";
 import type { VaultPaths } from "./vault-paths";
@@ -119,6 +123,11 @@ export class VaultService {
   private readonly locker: VaultLocker;
 
   /**
+   * 记录进入失败状态的原因, 阶段和错误类名, 供失败页说明原因.
+   */
+  private readonly failure = new VaultFailureRecorder();
+
+  /**
    * 创建保险库服务.
    * @param dependencies 服务依赖.
    */
@@ -156,14 +165,15 @@ export class VaultService {
   }
 
   /**
-   * 判定启动状态: 没有任何文件时需要设置, 主密码保护时等待解锁, 系统保护时直接解锁.
+   * 判定启动状态: 没有任何文件时需要设置, 密钥文件与数据库文件对不上时失败, 主密码保护时等待
+   * 解锁, 系统保护时直接解锁.
    * @returns 判定完成后兑现.
    */
   async initialize(): Promise<void> {
     try {
       this.status = await this.determineInitialStatus();
     } catch (error) {
-      this.status = "failed";
+      this.failWithError("startup", error);
       this.dependencies.onFailure(error);
     }
   }
@@ -177,13 +187,21 @@ export class VaultService {
   }
 
   /**
+   * 读取失败的原因, 阶段和错误类名, 失败页据此说明原因. 信息里没有主密码, 数据密钥和错误消息正文.
+   * @returns 当前是失败状态且有记录时的失败信息, 否则为 undefined.
+   */
+  getFailure(): VaultFailureInfo | undefined {
+    return this.status === "failed" ? this.failure.get() : undefined;
+  }
+
+  /**
    * 首次设置主密码: 生成数据密钥, 用主密码保护后写入密钥文件, 再创建加密数据库. 成功时
    * 带回由数据密钥编码的恢复词, 这是主进程唯一一次生成它, 之后不再保存.
    * @param masterPassword 用户设置的主密码.
    * @returns 设置结果.
    */
   setupWithMasterPassword(masterPassword: string): Promise<VaultSetupResult> {
-    return this.guard(async () => {
+    return this.guard("setup", async () => {
       if (this.status !== "needs-setup") {
         return vaultOperationFailed("unexpected-state");
       }
@@ -209,7 +227,7 @@ export class VaultService {
    * @returns 设置结果.
    */
   setupWithoutMasterPassword(): Promise<VaultSetupResult> {
-    return this.guard(async () => {
+    return this.guard("setup", async () => {
       if (this.status !== "needs-setup") {
         return vaultOperationFailed("unexpected-state");
       }
@@ -230,7 +248,7 @@ export class VaultService {
    * @returns 解锁结果.
    */
   unlock(masterPassword: string): Promise<VaultOperationResult> {
-    return this.guard(async () => {
+    return this.guard("unlock", async () => {
       const record = await this.dependencies.keyFileStore.read();
       if (
         this.status !== "locked" ||
@@ -238,18 +256,13 @@ export class VaultService {
       ) {
         return vaultOperationFailed("unexpected-state");
       }
-      try {
-        const dataKey = await unprotectWithMasterPassword(
-          record,
-          masterPassword,
-        );
-        return this.completeUnlock(dataKey);
-      } catch (error) {
-        if (error instanceof KeyUnwrapError) {
-          return vaultOperationFailed("wrong-password");
-        }
-        throw error;
+      if (await this.failOnFileProblem("unlock", true)) {
+        return vaultOperationFailed("unexpected-state");
       }
+      const unprotected = await unprotectWithPassword(record, masterPassword);
+      return unprotected.outcome === "unprotected"
+        ? this.completeUnlock(unprotected.dataKey)
+        : vaultOperationFailed("wrong-password");
     });
   }
 
@@ -359,39 +372,73 @@ export class VaultService {
   }
 
   /**
-   * 按密钥文件判定启动状态, 系统保护时顺带完成解锁.
+   * 判定启动状态: 密钥文件与数据库文件对不上时失败, 没有任何文件时需要设置, 主密码保护时等待
+   * 解锁, 系统保护时顺带完成解锁.
    * @returns 启动状态.
    */
   private async determineInitialStatus(): Promise<VaultStatus> {
     const record = await this.dependencies.keyFileStore.read();
+    if (await this.failOnFileProblem("startup", record !== undefined)) {
+      return "failed";
+    }
     if (record === undefined) {
-      const hasOrphanDatabase = await fileExists(
-        this.dependencies.paths.databaseFile,
-      );
-      return hasOrphanDatabase ? "failed" : "needs-setup";
+      return "needs-setup";
     }
     if (record.protection === MASTER_PASSWORD_PROTECTION) {
       return "locked";
     }
-    const { dataKey, refreshedRecord } = await unprotectWithSystem(
-      record,
-      this.dependencies.safeStorage,
+    this.openDatabase(
+      await unlockSystemProtectedKey(
+        record,
+        this.dependencies.safeStorage,
+        this.dependencies.keyFileStore,
+      ),
     );
-    if (refreshedRecord !== undefined) {
-      await this.dependencies.keyFileStore.write(refreshedRecord);
-    }
-    this.openDatabase(dataKey);
     return "unlocked";
   }
 
   /**
-   * 用数据密钥打开数据库并转入已解锁状态.
+   * 检查密钥文件与数据库文件是否对得上, 对不上就转入失败状态并记下原因, 不创建, 覆盖或删除
+   * 任何文件.
+   * @param stage 检查发生的阶段.
+   * @param hasKeyRecord 密钥文件是否存在.
+   * @returns 对不上并已转入失败状态时为 true.
+   */
+  private async failOnFileProblem(
+    stage: VaultFailureStage,
+    hasKeyRecord: boolean,
+  ): Promise<boolean> {
+    const problem = await detectVaultFileProblem(
+      this.dependencies.paths,
+      hasKeyRecord,
+    );
+    if (problem === undefined) {
+      return false;
+    }
+    this.status = "failed";
+    this.failure.recordCause(stage, problem);
+    return true;
+  }
+
+  /**
+   * 转入失败状态并记下失败发生的阶段与错误类名.
+   * @param stage 失败发生的阶段.
+   * @param error 底层错误.
+   */
+  private failWithError(stage: VaultFailureStage, error: unknown): void {
+    this.status = "failed";
+    this.failure.recordError(stage, error);
+  }
+
+  /**
+   * 用数据密钥打开数据库并转入已解锁状态, 之前的失败记录随之作废.
    * @param dataKey 数据密钥, 打开后清零.
    * @returns 成功的结果.
    */
   private completeUnlock(dataKey: Buffer): VaultOperationResult {
     this.openDatabase(dataKey);
     this.status = "unlocked";
+    this.failure.clear();
     return VAULT_OPERATION_SUCCEEDED;
   }
 
@@ -428,7 +475,7 @@ export class VaultService {
   private guardRecovery(
     operation: () => Promise<VaultOperationResult>,
   ): Promise<VaultOperationResult> {
-    return this.guard(async () =>
+    return this.guard("restore", async () =>
       this.canRecover()
         ? operation()
         : vaultOperationFailed("unexpected-state"),
@@ -452,11 +499,13 @@ export class VaultService {
   /**
    * 执行一个操作. 同一时间只允许一个操作: 已有操作在执行时直接按状态不符拒绝, 避免两次
    * 设置同时通过状态检查, 后写入的密钥文件盖掉先写入的, 让已创建的数据库永远打不开.
-   * 意外失败时转入失败状态, 回调通知并返回失败结果.
+   * 意外失败时转入失败状态并记下阶段与错误类名, 回调通知并返回失败结果.
+   * @param stage 操作所属的阶段, 失败时记入诊断信息.
    * @param operation 要执行的操作.
    * @returns 操作结果.
    */
   private async guard<Result extends VaultOperationResult | VaultSetupResult>(
+    stage: VaultFailureStage,
     operation: () => Promise<Result>,
   ): Promise<Result | VaultOperationFailure> {
     if (!this.exclusion.tryAcquire()) {
@@ -465,7 +514,7 @@ export class VaultService {
     try {
       return await operation();
     } catch (error) {
-      this.status = "failed";
+      this.failWithError(stage, error);
       this.dependencies.onFailure(error);
       return vaultOperationFailed("unexpected-error");
     } finally {

@@ -28,6 +28,7 @@ const SETUP_SUCCEEDED: VaultSetupResult = { ok: true, recoveryWords: WORDS };
 function createBridge(overrides: Partial<VaultBridge> = {}): VaultBridge {
   return {
     getStatus: vi.fn(() => Promise.resolve("locked" as VaultStatus)),
+    getFailure: vi.fn(() => Promise.resolve(undefined)),
     setupWithMasterPassword: vi.fn(() => Promise.resolve(SETUP_SUCCEEDED)),
     setupWithoutMasterPassword: vi.fn(() => Promise.resolve(SETUP_SUCCEEDED)),
     unlock: vi.fn(() => Promise.resolve(VAULT_OPERATION_SUCCEEDED)),

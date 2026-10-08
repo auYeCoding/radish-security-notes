@@ -1,9 +1,10 @@
 import { app } from "electron";
 
+import { refuseRemoteDebugging } from "./app/refuse-remote-debugging";
 import { claimPrimaryInstance } from "./app/single-instance-lock";
 import { startApplication } from "./app/start-application";
 
-if (claimPrimaryInstance(app)) {
+if (!refuseRemoteDebugging(app) && claimPrimaryInstance(app)) {
   app.whenReady().then(startApplication);
 }
 

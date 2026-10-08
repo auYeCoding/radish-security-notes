@@ -54,6 +54,12 @@ describe("RestoreProtectionStep 设置新主密码", () => {
     expect(screen.queryByRole("checkbox")).toBeNull();
   });
 
+  it("主密码字段下写明最少字符数与建议字符数", async () => {
+    await renderProtectionStep();
+
+    expect(screen.getByText("至少 8 个字符, 建议 12 个以上")).toBeDefined();
+  });
+
   it("主密码太短或两次不一致时提示, 不调用桥", async () => {
     const { recoveryBridge } = await renderProtectionStep();
 

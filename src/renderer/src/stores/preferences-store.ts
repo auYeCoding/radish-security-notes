@@ -7,7 +7,7 @@ import type { i18n } from "i18next";
 import { createStore, type StoreApi } from "zustand/vanilla";
 
 /**
- * 偏好状态: 用户当前选择的主题来源, 界面语言, 侧栏折叠状态与自动锁定设置.
+ * 偏好状态: 用户当前选择的主题来源, 界面语言, 侧栏折叠状态, 自动锁定设置与内容保护开关.
  */
 export interface PreferencesState {
   /**
@@ -26,6 +26,10 @@ export interface PreferencesState {
    * 当前的自动锁定设置.
    */
   readonly autoLock: AutoLockSettings;
+  /**
+   * 是否启用内容保护: 启用后截屏与录屏软件抓不到应用窗口.
+   */
+  readonly isContentProtectionEnabled: boolean;
 }
 
 /**
@@ -56,6 +60,12 @@ export interface PreferencesActions {
    * @returns 主进程保存后兑现.
    */
   setAutoLock: (settings: AutoLockSettings) => Promise<void>;
+  /**
+   * 启用或关闭内容保护.
+   * @param isEnabled 是否启用.
+   * @returns 主进程保存并应用到窗口后兑现.
+   */
+  setContentProtectionEnabled: (isEnabled: boolean) => Promise<void>;
 }
 
 /**
@@ -95,6 +105,7 @@ export function createPreferencesStore(
     language: initial.language,
     isSidebarCollapsed: initial.isSidebarCollapsed,
     autoLock: initial.autoLock,
+    isContentProtectionEnabled: initial.isContentProtectionEnabled,
     setThemeSource: async (themeSource) => {
       await bridge.setThemeSource(themeSource);
       set({ themeSource });
@@ -111,6 +122,10 @@ export function createPreferencesStore(
     setAutoLock: async (settings) => {
       await bridge.setAutoLock(settings);
       set({ autoLock: settings });
+    },
+    setContentProtectionEnabled: async (isEnabled) => {
+      await bridge.setContentProtection(isEnabled);
+      set({ isContentProtectionEnabled: isEnabled });
     },
   }));
 }

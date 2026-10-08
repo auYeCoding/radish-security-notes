@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { ExportScope } from "@shared/export/export-request";
-import type { ExportResult } from "@shared/export/export-result";
+import { exportFailed, type ExportResult } from "@shared/export/export-result";
 import type { ExportScopeSummary } from "@shared/export/export-types";
 
 import { useExportBridge } from "@renderer/stores/use-export-bridge";
@@ -73,11 +73,14 @@ export function useScopeSummary(scope: ExportScope): ScopeSummaryState {
   );
   useEffect(() => {
     let isCurrent = true;
-    void bridge.describeScope(scope).then((result) => {
+    const resolve = (result: ExportResult<ExportScopeSummary>): void => {
       if (isCurrent) {
         setResolved({ scope, result });
       }
-    });
+    };
+    void bridge
+      .describeScope(scope)
+      .then(resolve, () => resolve(exportFailed("unexpected-error")));
     return () => {
       isCurrent = false;
     };

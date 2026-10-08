@@ -67,7 +67,7 @@ describe("OnboardingScreen 内容", () => {
     expect(
       screen.getByText("主密码用于在每次打开应用时解锁数据."),
     ).toBeDefined();
-    expect(screen.getByText("至少 8 个字符")).toBeDefined();
+    expect(screen.getByText("至少 8 个字符, 建议 12 个以上")).toBeDefined();
     expect(
       screen.getByText(
         "主密码不会保存. 忘记后只能用接下来展示的 24 个恢复词找回数据, 请务必保管好.",

@@ -45,6 +45,13 @@ export class PreferencesService {
   > = [];
 
   /**
+   * 内容保护开关变化的订阅者.
+   */
+  private readonly contentProtectionListeners: Array<
+    (isEnabled: boolean) => void
+  > = [];
+
+  /**
    * 创建偏好服务.
    * @param dependencies 服务依赖.
    */
@@ -62,6 +69,7 @@ export class PreferencesService {
       language: store.getLanguage(systemLocale),
       isSidebarCollapsed: store.isSidebarCollapsed(),
       autoLock: store.getAutoLock(),
+      isContentProtectionEnabled: store.isContentProtectionEnabled(),
       isPseudoLocalizationEnabled,
     };
   }
@@ -111,10 +119,35 @@ export class PreferencesService {
   }
 
   /**
+   * 读取当前是否启用内容保护, 创建窗口时据此设置.
+   * @returns 已启用时为 true.
+   */
+  isContentProtectionEnabled(): boolean {
+    return this.dependencies.store.isContentProtectionEnabled();
+  }
+
+  /**
+   * 保存是否启用内容保护并通知订阅者, 订阅者把它应用到全部窗口.
+   * @param isEnabled 是否启用.
+   */
+  setContentProtection(isEnabled: boolean): void {
+    this.dependencies.store.setContentProtectionEnabled(isEnabled);
+    this.contentProtectionListeners.forEach((listener) => listener(isEnabled));
+  }
+
+  /**
    * 订阅界面语言的变化.
    * @param listener 语言变化时的回调.
    */
   onLanguageChanged(listener: (language: SupportedLanguage) => void): void {
     this.languageListeners.push(listener);
+  }
+
+  /**
+   * 订阅内容保护开关的变化.
+   * @param listener 开关变化时的回调.
+   */
+  onContentProtectionChanged(listener: (isEnabled: boolean) => void): void {
+    this.contentProtectionListeners.push(listener);
   }
 }

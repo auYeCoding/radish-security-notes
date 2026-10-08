@@ -14,7 +14,10 @@ import { FolderStoreProvider } from "@renderer/stores/folder-store-provider";
 import { createPreferencesStore } from "@renderer/stores/preferences-store";
 import { PreferencesStoreProvider } from "@renderer/stores/preferences-store-provider";
 import { TagStoreProvider } from "@renderer/stores/tag-store-provider";
-import { createVaultStore } from "@renderer/stores/vault-store";
+import {
+  createVaultStore,
+  type VaultStore,
+} from "@renderer/stores/vault-store";
 import { VaultStoreProvider } from "@renderer/stores/vault-store-provider";
 import {
   DARK_COLOR_SCHEME_QUERY,
@@ -27,6 +30,23 @@ import { resetWorkspaceOnLock } from "./reset-workspace-on-lock";
 import { watchAutoLock } from "./watch-auto-lock";
 
 /**
+ * 向主进程取保险库的启动状态, 状态是失败时再取失败信息, 建好保险库 store.
+ * @returns 保险库 store.
+ */
+async function createInitialVaultStore(): Promise<VaultStore> {
+  const bridge = window.api.vault;
+  const initialStatus = await bridge.getStatus();
+  const initialFailure =
+    initialStatus === "failed" ? await bridge.getFailure() : undefined;
+  return createVaultStore({
+    bridge,
+    recoveryBridge: window.api.recovery,
+    initialStatus,
+    initialFailure,
+  });
+}
+
+/**
  * 启动渲染进程: 向主进程取偏好快照与保险库状态, 建好 i18n, 偏好 store, 保险库 store 与工作区的
  * 全部 store (条目, 自定义条目类型, 文件夹, 标签, 批量选中), 让保险库 store 跟上主进程的自动锁定,
  * 让工作区 store 跟随保险库锁定而重置,
@@ -37,12 +57,7 @@ import { watchAutoLock } from "./watch-auto-lock";
 export async function bootstrapRenderer(container: HTMLElement): Promise<void> {
   const bridge = window.api.preferences;
   const snapshot = await bridge.getSnapshot();
-  const vaultBridge = window.api.vault;
-  const vaultStore = createVaultStore({
-    bridge: vaultBridge,
-    recoveryBridge: window.api.recovery,
-    initialStatus: await vaultBridge.getStatus(),
-  });
+  const vaultStore = await createInitialVaultStore();
   const stores = createWorkspaceStores(window.api);
   resetWorkspaceOnLock(vaultStore, stores);
   watchAutoLock(vaultStore, window.api.vaultEvents);

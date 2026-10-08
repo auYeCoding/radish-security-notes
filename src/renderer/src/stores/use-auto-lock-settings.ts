@@ -5,13 +5,19 @@ import type {
   AutoLockSettings,
 } from "@shared/preferences/auto-lock-settings";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
+
 import { usePreferencesStore } from "./use-preferences-store";
 
 /**
- * 自动锁定设置里三个开关的字段名.
+ * 自动锁定设置里开关的字段名, 由设置类型里取值为布尔的字段派生, 新增或改名开关字段时随之变化,
+ * 不再手写一份.
  */
-export type AutoLockSwitchKey =
-  "isIdleLockEnabled" | "isScreenLockEnabled" | "isSleepLockEnabled";
+export type AutoLockSwitchKey = {
+  [Key in keyof AutoLockSettings]: AutoLockSettings[Key] extends boolean
+    ? Key
+    : never;
+}[keyof AutoLockSettings];
 
 /**
  * 当前的自动锁定设置与修改它的方法.
@@ -41,13 +47,13 @@ export function useAutoLockSettings(): AutoLockSettingsHandle {
   const setAutoLock = usePreferencesStore((state) => state.setAutoLock);
   const setSwitch = useCallback(
     (key: AutoLockSwitchKey, isOn: boolean) => {
-      setAutoLock({ ...settings, [key]: isOn }).catch(() => undefined);
+      detachPromise(setAutoLock({ ...settings, [key]: isOn }));
     },
     [settings, setAutoLock],
   );
   const setIdleMinutes = useCallback(
     (idleMinutes: AutoLockIdleMinutes) => {
-      setAutoLock({ ...settings, idleMinutes }).catch(() => undefined);
+      detachPromise(setAutoLock({ ...settings, idleMinutes }));
     },
     [settings, setAutoLock],
   );

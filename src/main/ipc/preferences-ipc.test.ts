@@ -47,12 +47,14 @@ function createFakeService(): PreferencesService {
       language: "en",
       isSidebarCollapsed: false,
       autoLock: DEFAULT_AUTO_LOCK_SETTINGS,
+      isContentProtectionEnabled: false,
       isPseudoLocalizationEnabled: false,
     })),
     setThemeSource: vi.fn(),
     setLanguage: vi.fn(() => Promise.resolve()),
     setSidebarCollapsed: vi.fn(),
     setAutoLockSettings: vi.fn(),
+    setContentProtection: vi.fn(),
     onLanguageChanged: vi.fn(),
   } as unknown as PreferencesService;
 }
@@ -116,6 +118,36 @@ describe("registerPreferencesIpc", () => {
       ipcMain.invoke(IPC_CHANNELS.preferencesSetSidebarCollapsed, "true"),
     ).toThrow("无效的侧栏折叠状态");
     expect(service.setSidebarCollapsed).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("registerPreferencesIpc: 内容保护", () => {
+  it("布尔的开关交给服务", () => {
+    const ipcMain = createFakeIpcMain();
+    const service = createFakeService();
+    registerPreferencesIpc(ipcMain, service);
+
+    ipcMain.invoke(IPC_CHANNELS.preferencesSetContentProtection, true);
+    ipcMain.invoke(IPC_CHANNELS.preferencesSetContentProtection, false);
+
+    expect(service.setContentProtection).toHaveBeenNthCalledWith(1, true);
+    expect(service.setContentProtection).toHaveBeenNthCalledWith(2, false);
+  });
+
+  it.each([
+    ["字符串", "true"],
+    ["数字", 1],
+    ["未定义", undefined],
+    ["对象", { isEnabled: true }],
+  ])("%s被拒绝且不触达服务", (_name, value) => {
+    const ipcMain = createFakeIpcMain();
+    const service = createFakeService();
+    registerPreferencesIpc(ipcMain, service);
+
+    expect(() =>
+      ipcMain.invoke(IPC_CHANNELS.preferencesSetContentProtection, value),
+    ).toThrow("无效的内容保护开关");
+    expect(service.setContentProtection).not.toHaveBeenCalled();
   });
 });
 

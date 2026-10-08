@@ -1,7 +1,10 @@
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { MASTER_PASSWORD_MIN_LENGTH } from "@shared/vault/master-password-policy";
+import {
+  MASTER_PASSWORD_MIN_LENGTH,
+  MASTER_PASSWORD_RECOMMENDED_LENGTH,
+} from "@shared/vault/master-password-policy";
 
 import { describeNewPasswordError } from "./new-password-error";
 import { PasswordField } from "./password-field";
@@ -29,8 +32,9 @@ interface NewPasswordFieldsProps {
 }
 
 /**
- * 设置新主密码的两个字段: 主密码与确认输入, 校验错误显示在对应字段下方. 引导页与凭恢复词
- * 恢复后的设置页共用.
+ * 设置新主密码的两个字段: 主密码与确认输入, 校验错误显示在对应字段下方, 主密码字段下方的说明
+ * 写明最少字符数与建议字符数 (只提示, 不拦截). 引导页, 开启主密码对话框与凭恢复词恢复后的设置页
+ * 共用.
  * @param props 组件属性.
  * @returns 两个字段元素.
  */
@@ -45,6 +49,7 @@ export function NewPasswordFields(
         label={t("vault.newPassword.passwordLabel")}
         description={t("vault.newPassword.passwordHint", {
           minLength: MASTER_PASSWORD_MIN_LENGTH,
+          recommendedLength: MASTER_PASSWORD_RECOMMENDED_LENGTH,
         })}
         autoComplete="new-password"
         error={describeNewPasswordError(props.passwordErrorCode, t)}

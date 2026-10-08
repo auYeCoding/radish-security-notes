@@ -60,7 +60,7 @@ export interface AttachmentRuntime {
    */
   readonly previewer: AttachmentPreviewer;
   /**
-   * 删除专属目录里的全部明文临时副本, 应用退出时调用.
+   * 删除专属目录里的全部明文临时副本, 保险库锁定与应用退出时调用.
    */
   readonly discardTemporaryCopies: () => void;
 }

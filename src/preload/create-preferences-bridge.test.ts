@@ -53,6 +53,27 @@ describe("createPreferencesBridge", () => {
   });
 });
 
+describe("createPreferencesBridge: 内容保护", () => {
+  it("setContentProtection 调用对应通道并带上开关", async () => {
+    const invoke = vi.fn(() => Promise.resolve(undefined));
+    const bridge = createPreferencesBridge({ invoke });
+
+    await bridge.setContentProtection(true);
+    await bridge.setContentProtection(false);
+
+    expect(invoke).toHaveBeenNthCalledWith(
+      1,
+      IPC_CHANNELS.preferencesSetContentProtection,
+      true,
+    );
+    expect(invoke).toHaveBeenNthCalledWith(
+      2,
+      IPC_CHANNELS.preferencesSetContentProtection,
+      false,
+    );
+  });
+});
+
 describe("createPreferencesBridge: 自动锁定设置", () => {
   it("setAutoLock 调用对应通道并带上完整设置", async () => {
     const invoke = vi.fn(() => Promise.resolve(undefined));

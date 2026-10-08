@@ -23,7 +23,7 @@ const TEST_ENTRIES = {
 };
 
 /**
- * 安全分区五行右侧的操作按钮, 自动锁定可用.
+ * 安全分区六行右侧的操作按钮, 自动锁定可用.
  */
 const TEST_SECURITY: SettingsSecurityEntries = {
   masterPasswordAction: <Button>主密码操作</Button>,
@@ -32,6 +32,7 @@ const TEST_SECURITY: SettingsSecurityEntries = {
   screenLockAction: <Button>锁屏锁定操作</Button>,
   sleepLockAction: <Button>休眠锁定操作</Button>,
   isAutoLockUnavailable: false,
+  contentProtectionAction: <Button>内容保护操作</Button>,
 };
 
 /**

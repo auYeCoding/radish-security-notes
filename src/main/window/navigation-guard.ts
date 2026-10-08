@@ -5,10 +5,20 @@ import {
 } from "./navigation-policy";
 
 /**
- * 需要防护的页面导航事件: 主框架发起的导航, 任何框架发起的导航, 服务端重定向.
+ * 需要防护的页面导航事件名, 与 Electron `WebContents` 的事件名一致: 主框架发起的导航, 任何框架
+ * 发起的导航, 服务端重定向. 事件名只在这里写出, 类型, 重载签名与监听都引用它.
+ */
+export const NAVIGATION_EVENTS = {
+  mainFrame: "will-navigate",
+  anyFrame: "will-frame-navigate",
+  redirect: "will-redirect",
+} as const;
+
+/**
+ * 需要防护的页面导航事件.
  */
 export type NavigationEventName =
-  "will-navigate" | "will-frame-navigate" | "will-redirect";
+  (typeof NAVIGATION_EVENTS)[keyof typeof NAVIGATION_EVENTS];
 
 /**
  * 页面发起导航或重定向时收到的事件对象, 带目标地址与是否发生在主框架, 调用 `preventDefault`
@@ -57,21 +67,30 @@ export interface NavigationListenerRegistrar {
    * @param listener 收到事件时的处理函数.
    * @returns 实现自己决定的返回值.
    */
-  (event: "will-navigate", listener: NavigationListener): unknown;
+  (
+    event: typeof NAVIGATION_EVENTS.mainFrame,
+    listener: NavigationListener,
+  ): unknown;
   /**
    * 监听任何框架发起的导航.
    * @param event 事件名.
    * @param listener 收到事件时的处理函数.
    * @returns 实现自己决定的返回值.
    */
-  (event: "will-frame-navigate", listener: NavigationListener): unknown;
+  (
+    event: typeof NAVIGATION_EVENTS.anyFrame,
+    listener: NavigationListener,
+  ): unknown;
   /**
    * 监听服务端重定向.
    * @param event 事件名.
    * @param listener 收到事件时的处理函数.
    * @returns 实现自己决定的返回值.
    */
-  (event: "will-redirect", listener: NavigationListener): unknown;
+  (
+    event: typeof NAVIGATION_EVENTS.redirect,
+    listener: NavigationListener,
+  ): unknown;
 }
 
 /**
@@ -112,9 +131,9 @@ export function guardWindowNavigation(
       details.preventDefault();
     }
   };
-  target.on("will-navigate", blockForeignNavigation);
-  target.on("will-frame-navigate", blockForeignNavigation);
-  target.on("will-redirect", blockForeignNavigation);
+  target.on(NAVIGATION_EVENTS.mainFrame, blockForeignNavigation);
+  target.on(NAVIGATION_EVENTS.anyFrame, blockForeignNavigation);
+  target.on(NAVIGATION_EVENTS.redirect, blockForeignNavigation);
   target.setWindowOpenHandler((details) => {
     void openExternalLink(details.url);
     return { action: "deny" };

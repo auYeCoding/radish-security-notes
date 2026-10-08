@@ -1,4 +1,5 @@
 import { WindowControls } from "@renderer/components/window-controls";
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { useWindowControlsBridge } from "@renderer/stores/use-window-controls-bridge";
 import { useWindowMaximized } from "@renderer/stores/use-window-maximized";
 
@@ -13,9 +14,9 @@ export function ConnectedWindowControls(): React.JSX.Element {
   return (
     <WindowControls
       isMaximized={isMaximized}
-      onMinimize={() => void bridge.minimize()}
-      onToggleMaximize={() => void bridge.toggleMaximize()}
-      onClose={() => void bridge.close()}
+      onMinimize={() => detachPromise(bridge.minimize())}
+      onToggleMaximize={() => detachPromise(bridge.toggleMaximize())}
+      onClose={() => detachPromise(bridge.close())}
     />
   );
 }

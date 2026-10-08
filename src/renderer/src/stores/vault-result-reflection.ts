@@ -2,15 +2,12 @@ import type {
   VaultOperationFailure,
   VaultOperationResult,
 } from "@shared/vault/vault-operation-result";
+import type { VaultFailureInfo } from "@shared/vault/vault-failure";
 import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 import type { VaultStatus } from "@shared/vault/vault-status";
 
-import type { VaultState } from "./vault-store-types";
-
-/**
- * 写入保险库状态的函数.
- */
-export type VaultStateSetter = (partial: Partial<VaultState>) => void;
+import { createFailureReflection } from "./vault-failure-reflection";
+import type { VaultState, VaultStateSetter } from "./vault-store-types";
 
 /**
  * 让保险库状态跟随主进程操作结果的一组函数.
@@ -41,7 +38,8 @@ export interface VaultResultReflection {
     result: VaultSetupResult,
   ) => Promise<VaultSetupResult>;
   /**
-   * 让状态跟随失败结果: 意外错误变为失败并退出恢复流程, 状态不符时重新向主进程取状态.
+   * 让状态跟随失败结果: 意外错误变为失败并退出恢复流程, 状态不符时重新向主进程取状态. 状态是失败
+   * 时再向主进程取失败信息, 取不到按没有处理.
    * @param failure 失败结果.
    * @returns 处理完成后兑现.
    */
@@ -49,33 +47,28 @@ export interface VaultResultReflection {
 }
 
 /**
- * 解锁或恢复成功后写入的状态: 已解锁, 不再处于恢复流程, 自动锁定的原因作废.
+ * 解锁或恢复成功后写入的状态: 已解锁, 不再处于恢复流程, 自动锁定的原因和失败信息作废.
  */
 const UNLOCKED_STATE: Partial<VaultState> = {
   status: "unlocked",
   isRestoreRequested: false,
   lockReason: undefined,
+  failure: undefined,
 };
 
 /**
  * 创建让保险库状态跟随操作结果的函数.
  * @param set 写入状态的函数.
  * @param readStatus 向主进程读取当前状态的函数.
+ * @param readFailure 向主进程读取失败信息的函数.
  * @returns 一组反映结果的函数.
  */
 export function createVaultResultReflection(
   set: VaultStateSetter,
   readStatus: () => Promise<VaultStatus>,
+  readFailure: () => Promise<VaultFailureInfo | undefined>,
 ): VaultResultReflection {
-  const reflectFailure = async (
-    failure: VaultOperationFailure,
-  ): Promise<void> => {
-    if (failure.reason === "unexpected-error") {
-      set({ status: "failed", isRestoreRequested: false });
-    } else if (failure.reason === "unexpected-state") {
-      set({ status: await readStatus(), isRestoreRequested: false });
-    }
-  };
+  const reflectFailure = createFailureReflection(set, readStatus, readFailure);
   const reflect = async (
     result: VaultOperationResult,
   ): Promise<VaultOperationResult> => {

@@ -57,3 +57,19 @@ describe("createVaultBridge", () => {
     expect(result).toEqual({ ok: true });
   });
 });
+
+describe("createVaultBridge 失败信息", () => {
+  it("getFailure 调用读取失败信息通道且不带参数并返回结果", async () => {
+    const failure = {
+      cause: "key-file-missing",
+      stage: "startup",
+      errorName: undefined,
+    };
+    const invoke = vi.fn(() => Promise.resolve(failure));
+
+    const result = await createVaultBridge({ invoke }).getFailure();
+
+    expect(invoke).toHaveBeenCalledWith(IPC_CHANNELS.vaultGetFailure);
+    expect(result).toEqual(failure);
+  });
+});

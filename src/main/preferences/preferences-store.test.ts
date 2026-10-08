@@ -82,6 +82,36 @@ describe("PreferencesStore: 侧栏折叠状态", () => {
   });
 });
 
+describe("PreferencesStore: 内容保护", () => {
+  it("没有保存过时是关闭的", () => {
+    const store = new PreferencesStore(createInMemoryKeyValueBackend());
+
+    expect(store.isContentProtectionEnabled()).toBe(false);
+  });
+
+  it("保存后能读回, 关闭也能读回, 重新创建存储后仍在 (同一后端)", () => {
+    const backend = createInMemoryKeyValueBackend();
+    const store = new PreferencesStore(backend);
+
+    store.setContentProtectionEnabled(true);
+    expect(store.isContentProtectionEnabled()).toBe(true);
+    expect(new PreferencesStore(backend).isContentProtectionEnabled()).toBe(
+      true,
+    );
+
+    store.setContentProtectionEnabled(false);
+    expect(store.isContentProtectionEnabled()).toBe(false);
+  });
+
+  it("存储里的值不是布尔值时按默认值 (关闭) 处理", () => {
+    const store = new PreferencesStore(
+      createInMemoryKeyValueBackend({ isContentProtectionEnabled: "yes" }),
+    );
+
+    expect(store.isContentProtectionEnabled()).toBe(false);
+  });
+});
+
 describe("PreferencesStore: 自动锁定设置", () => {
   const customSettings: AutoLockSettings = {
     isIdleLockEnabled: false,

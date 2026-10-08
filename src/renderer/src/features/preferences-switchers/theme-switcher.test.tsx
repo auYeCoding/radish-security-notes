@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   createPreferencesTestEnvironment,
@@ -72,5 +72,21 @@ describe("ThemeSwitcher 点击", () => {
 
     expect(bridge.setThemeSource).not.toHaveBeenCalled();
     expect(pressedStateOf("跟随系统")).toBe("true");
+  });
+});
+
+describe("ThemeSwitcher 保存失败", () => {
+  it("桥拒绝保存时选中项保持原样, 不产生未处理的拒绝", async () => {
+    const setThemeSource = vi.fn(() => Promise.reject(new Error("ipc down")));
+    const environment = await createPreferencesTestEnvironment({
+      setThemeSource,
+    });
+    render(<ThemeSwitcher />, { wrapper: environment.Providers });
+
+    await userEvent.setup().click(screen.getByRole("button", { name: "深色" }));
+
+    await waitFor(() => expect(setThemeSource).toHaveBeenCalledWith("dark"));
+    expect(pressedStateOf("跟随系统")).toBe("true");
+    expect(pressedStateOf("深色")).toBe("false");
   });
 });

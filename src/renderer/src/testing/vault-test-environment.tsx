@@ -1,5 +1,6 @@
 import type { RecoveryBridge } from "@shared/vault/recovery-bridge";
 import type { VaultBridge } from "@shared/vault/vault-bridge";
+import type { VaultFailureInfo } from "@shared/vault/vault-failure";
 import { VAULT_OPERATION_SUCCEEDED } from "@shared/vault/vault-operation-result";
 import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 import type { VaultStatus } from "@shared/vault/vault-status";
@@ -64,6 +65,11 @@ export interface VaultTestEnvironmentOptions {
    */
   readonly status?: VaultStatus;
   /**
+   * 主进程记录的失败信息, 假保险库桥的 `getFailure` 返回它, 初始状态为失败时也作为 store 的
+   * 初始失败信息. 默认没有.
+   */
+  readonly failure?: VaultFailureInfo;
+  /**
    * 覆盖假保险库桥上的方法, 例如让解锁失败.
    */
   readonly bridgeOverrides?: Partial<VaultBridge>;
@@ -113,6 +119,7 @@ export async function createVaultTestEnvironment(
   const preferences = await createPreferencesTestEnvironment();
   const vaultBridge: VaultBridge = {
     getStatus: vi.fn(() => Promise.resolve(status)),
+    getFailure: vi.fn(() => Promise.resolve(options.failure)),
     setupWithMasterPassword: vi.fn(() => Promise.resolve(TEST_SETUP_SUCCEEDED)),
     setupWithoutMasterPassword: vi.fn(() =>
       Promise.resolve(TEST_SETUP_SUCCEEDED),
@@ -137,6 +144,7 @@ export async function createVaultTestEnvironment(
     bridge: vaultBridge,
     recoveryBridge,
     initialStatus: status,
+    initialFailure: options.failure,
   });
   const Providers = (props: VaultTestProvidersProps): React.JSX.Element => (
     <preferences.Providers>

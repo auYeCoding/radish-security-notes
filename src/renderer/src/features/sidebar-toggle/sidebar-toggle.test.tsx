@@ -1,6 +1,6 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   createPreferencesTestEnvironment,
@@ -44,6 +44,26 @@ describe("侧栏切换按钮", () => {
     const button = await screen.findByRole("button", { name: "展开侧栏" });
     expect(button.getAttribute("aria-expanded")).toBe("false");
     expect(environment.store.getState().isSidebarCollapsed).toBe(true);
+  });
+});
+
+describe("侧栏切换按钮: 保存失败", () => {
+  it("桥拒绝保存时按钮保持原样, 不产生未处理的拒绝", async () => {
+    const setSidebarCollapsed = vi.fn(() =>
+      Promise.reject(new Error("ipc down")),
+    );
+    await renderToggle({ setSidebarCollapsed });
+
+    await userEvent
+      .setup()
+      .click(screen.getByRole("button", { name: "收起侧栏" }));
+
+    await waitFor(() => expect(setSidebarCollapsed).toHaveBeenCalledWith(true));
+    expect(
+      screen
+        .getByRole("button", { name: "收起侧栏" })
+        .getAttribute("aria-expanded"),
+    ).toBe("true");
   });
 });
 

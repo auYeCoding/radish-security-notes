@@ -2,6 +2,7 @@ import { PanelLeftCloseIcon, PanelLeftOpenIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { IconActionButton } from "@renderer/components/icon-action-button";
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { usePreferencesStore } from "@renderer/stores/use-preferences-store";
 
 /**
@@ -19,7 +20,7 @@ export function SidebarToggle(): React.JSX.Element {
     <IconActionButton
       label={isCollapsed ? t("sidebar.expand") : t("sidebar.collapse")}
       isExpanded={!isCollapsed}
-      onClick={() => void setSidebarCollapsed(!isCollapsed)}
+      onClick={() => detachPromise(setSidebarCollapsed(!isCollapsed))}
     >
       {isCollapsed ? (
         <PanelLeftOpenIcon aria-hidden="true" />

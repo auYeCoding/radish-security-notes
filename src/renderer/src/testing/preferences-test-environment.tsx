@@ -21,6 +21,7 @@ export const TEST_INITIAL_SNAPSHOT: PreferencesSnapshot = {
   language: "zh",
   isSidebarCollapsed: false,
   autoLock: DEFAULT_AUTO_LOCK_SETTINGS,
+  isContentProtectionEnabled: false,
   isPseudoLocalizationEnabled: false,
 };
 
@@ -73,6 +74,7 @@ export async function createPreferencesTestEnvironment(
     setLanguage: vi.fn(() => Promise.resolve()),
     setSidebarCollapsed: vi.fn(() => Promise.resolve()),
     setAutoLock: vi.fn(() => Promise.resolve()),
+    setContentProtection: vi.fn(() => Promise.resolve()),
     ...bridgeOverrides,
   };
   const i18nInstance = await createI18nInstance({

@@ -48,5 +48,11 @@ export function createPreferencesBridge(
     setAutoLock: async (settings) => {
       await ipcRenderer.invoke(IPC_CHANNELS.preferencesSetAutoLock, settings);
     },
+    setContentProtection: async (isEnabled) => {
+      await ipcRenderer.invoke(
+        IPC_CHANNELS.preferencesSetContentProtection,
+        isEnabled,
+      );
+    },
   };
 }

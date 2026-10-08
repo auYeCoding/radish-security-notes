@@ -1263,6 +1263,11 @@
           "name": "Lock when the system sleeps",
           "description": "Locks the vault when Windows goes to sleep or hibernates."
         }
+      },
+      "contentProtection": {
+        "name": "Content protection",
+        "description": "When on, screenshot, screen recording, screen sharing and remote assistance software cannot see this window, and neither can your own screenshots. On Windows 10 version 2004 and later the window does not appear at all; older versions show a black block.",
+        "toggleLabel": "Enabled"
       }
     }
   },
@@ -1287,7 +1292,7 @@
     "newPassword": {
       "passwordLabel": "Master password",
       "confirmationLabel": "Confirm master password",
-      "passwordHint": "At least {minLength} characters",
+      "passwordHint": "At least {minLength} characters; {recommendedLength} or more is recommended",
       "error": {
         "tooShort": "The master password needs at least {minLength} characters.",
         "mismatch": "The two passwords do not match."
@@ -1345,7 +1350,17 @@
     "failure": {
       "title": "Unable to open your data",
       "description": "A data file is missing or damaged, or the system cannot open the protected key. Close the app and try again. Do not delete the vault folder in the data directory. If you saved your recovery words, you can restore with them.",
-      "restore": "Restore with recovery words"
+      "restore": "Restore with recovery words",
+      "cause": {
+        "keyFileMissing": "The data file vault.db was found, but the key file vault-key.json is missing. The app will not create a new key file, so your data is not overwritten. If you saved your recovery words, you can restore with them. You can also put vault-key.json back into the vault folder of the data directory from the Recycle Bin or a backup, then restart the app. Do not delete the vault folder.",
+        "databaseMissing": "The key file vault-key.json was found, but the data file vault.db is missing. The app will not create an empty data file, so you do not mistake it for erased data. Put vault.db back into the vault folder of the data directory from the Recycle Bin or a backup, then restart the app. Recovery words only unlock the data; they cannot bring it back when the data file is missing.",
+        "databaseUnreadable": "Both the key file and the data file exist, but the data file cannot be opened. It may be damaged, or it may not be the one that belongs to this key file. Close the app, do not delete the vault folder, put the matching vault.db back from a backup, then restart the app."
+      },
+      "diagnostics": {
+        "label": "Diagnostic information (copy it when you report a problem)",
+        "copy": "Copy diagnostic information",
+        "copied": "Copied"
+      }
     },
     "recovery": {
       "title": "Recovery key",

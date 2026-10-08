@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import type { ExportProgressSnapshot } from "@shared/export/export-types";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { useExportBridge } from "@renderer/stores/use-export-bridge";
 
 import { toExportScope, type ExportDraft } from "./export-draft";
@@ -115,7 +116,7 @@ export function useExportFlow(): ExportFlow {
   const progress = useExportProgress(state.step === "working");
   const work = useExportWork({ bridge, state, setState, scope });
   const resultActions = useExportResultActions(bridge, setState);
-  const release = useCallback(() => void bridge.cancel(), [bridge]);
+  const release = useCallback(() => detachPromise(bridge.cancel()), [bridge]);
   return {
     state,
     scopeIds,

@@ -55,7 +55,7 @@ export type DataKeyUnprotection =
  * @returns 已解出或主密码不对.
  * @throws Error 当解开失败的原因不是主密码不对时.
  */
-async function unprotectWithPassword(
+export async function unprotectWithPassword(
   record: MasterPasswordKeyRecord,
   masterPassword: string,
 ): Promise<DataKeyUnprotected | DataKeyWrongPassword> {

@@ -44,7 +44,13 @@ const RAW_CSS_FILES = [/\.css\?raw$/];
 const SHARED_ALIAS = { "@shared": resolve("src/shared") };
 
 /**
- * Vitest 配置, 分 main 与 renderer 两个项目, 覆盖率用 v8.
+ * 单个测试的超时, 单位毫秒. Vitest 默认的 5 秒在整套测试满载并行时出现过超时 (0053 与基线运行里
+ * 都遇到过), 取默认值的三倍, 只放宽被机器负载拖慢的情形, 真正卡住的测试仍会在十几秒内报错.
+ */
+export const TEST_TIMEOUT_MILLISECONDS = 15000;
+
+/**
+ * Vitest 配置, 分 main 与 renderer 两个项目, 两个项目共用同一个测试超时, 覆盖率用 v8.
  */
 export default defineConfig({
   test: {
@@ -56,6 +62,7 @@ export default defineConfig({
         test: {
           name: "main",
           environment: "node",
+          testTimeout: TEST_TIMEOUT_MILLISECONDS,
           include: MAIN_TEST_FILES,
           css: { include: RAW_CSS_FILES },
         },
@@ -71,6 +78,7 @@ export default defineConfig({
         test: {
           name: "renderer",
           environment: "jsdom",
+          testTimeout: TEST_TIMEOUT_MILLISECONDS,
           include: RENDERER_TEST_FILES,
           setupFiles: RENDERER_SETUP_FILES,
         },

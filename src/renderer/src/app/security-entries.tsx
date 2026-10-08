@@ -1,5 +1,6 @@
 import { AutoLockIdleControls } from "@renderer/features/auto-lock-settings/auto-lock-idle-controls";
 import { AutoLockToggle } from "@renderer/features/auto-lock-settings/auto-lock-toggle";
+import { ContentProtectionToggle } from "@renderer/features/content-protection-settings/content-protection-toggle";
 import { MasterPasswordSwitch } from "@renderer/features/master-password-switch/master-password-switch";
 import { RecoveryKeyViewer } from "@renderer/features/recovery-key-viewer/recovery-key-viewer";
 import type { SettingsSecurityEntries } from "@renderer/features/settings-dialog/settings-security-section";
@@ -20,7 +21,7 @@ interface SecurityEntriesOptions {
 
 /**
  * 装配设置对话框 "安全" 分区各行右侧的操作元素: 主密码开关, 查看恢复密钥, 空闲自动锁定, 锁屏时锁定,
- * 休眠时锁定. 没设主密码时三个自动锁定控件不可用.
+ * 休眠时锁定, 内容保护. 没设主密码时三个自动锁定控件不可用, 内容保护不受主密码影响.
  * @param options 主密码状态与开关主密码成功后的回调.
  * @returns 安全分区的操作元素.
  */
@@ -49,5 +50,6 @@ export function createSecurityEntries(
       />
     ),
     isAutoLockUnavailable: isMasterPasswordMissing,
+    contentProtectionAction: <ContentProtectionToggle />,
   };
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { ImportProgressSnapshot } from "@shared/import/import-types";
 
+import { detachPromise } from "@renderer/lib/detach-promise";
 import { useImportBridge } from "@renderer/stores/use-import-bridge";
 
 /**
@@ -32,9 +33,9 @@ export function useImportProgress(
         setSnapshot(next);
       }
     };
-    void poll();
+    detachPromise(poll());
     const timer = setInterval(
-      () => void poll(),
+      () => detachPromise(poll()),
       IMPORT_PROGRESS_POLL_MILLISECONDS,
     );
     return () => {

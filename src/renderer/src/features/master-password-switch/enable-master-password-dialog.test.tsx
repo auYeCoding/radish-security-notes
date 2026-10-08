@@ -172,6 +172,26 @@ describe("开启主密码对话框: 执行中", () => {
   });
 });
 
+describe("开启主密码对话框: 长度提示", () => {
+  it("字段下写明最少字符数与建议字符数, 中英文都有, 不拦截达到最少字符数的主密码", async () => {
+    const { environment } = await renderEnableDialog();
+    const dialog = within(
+      await screen.findByRole("dialog", { name: "开启主密码" }),
+    );
+    expect(dialog.getByText("至少 8 个字符, 建议 12 个以上")).toBeDefined();
+
+    await submitPasswords("eight-ch", "eight-ch");
+
+    expect(environment.masterPasswordBridge.enable).toHaveBeenCalledWith(
+      "eight-ch",
+    );
+    await act(() => environment.i18n.changeLanguage("en"));
+    expect(
+      dialog.getByText("At least 8 characters; 12 or more is recommended"),
+    ).toBeDefined();
+  });
+});
+
 describe("开启主密码对话框: 取消与英文界面", () => {
   it("点取消通知调用方关闭, 不调用桥", async () => {
     const { environment, onClose } = await renderEnableDialog();

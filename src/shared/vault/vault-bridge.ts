@@ -1,3 +1,4 @@
+import type { VaultFailureInfo } from "./vault-failure";
 import type { VaultOperationResult } from "./vault-operation-result";
 import type { VaultSetupResult } from "./vault-setup-result";
 import type { VaultStatus } from "./vault-status";
@@ -11,6 +12,12 @@ export interface VaultBridge {
    * @returns 启动状态.
    */
   getStatus: () => Promise<VaultStatus>;
+  /**
+   * 读取保险库进入失败状态的原因, 阶段和错误类名, 失败页据此说明原因. 不含主密码, 数据密钥和
+   * 错误消息正文.
+   * @returns 当前是失败状态且有记录时的失败信息, 否则为 undefined.
+   */
+  getFailure: () => Promise<VaultFailureInfo | undefined>;
   /**
    * 首次设置主密码, 主进程创建加密数据库并解锁.
    * @param masterPassword 用户设置的主密码.

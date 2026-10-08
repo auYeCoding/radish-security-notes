@@ -23,6 +23,10 @@ export interface PreferencesSnapshot {
    */
   readonly autoLock: AutoLockSettings;
   /**
+   * 是否启用内容保护: 启用后截屏与录屏软件抓不到应用窗口. 没有保存过时为默认值 (关闭).
+   */
+  readonly isContentProtectionEnabled: boolean;
+  /**
    * 是否启用开发用的伪本地化.
    */
   readonly isPseudoLocalizationEnabled: boolean;

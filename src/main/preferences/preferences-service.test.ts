@@ -65,6 +65,7 @@ describe("PreferencesService", () => {
       language: "zh",
       isSidebarCollapsed: false,
       autoLock: DEFAULT_AUTO_LOCK_SETTINGS,
+      isContentProtectionEnabled: false,
       isPseudoLocalizationEnabled: false,
     });
   });
@@ -98,6 +99,40 @@ describe("PreferencesService", () => {
     expect(store.getLanguage("en-US")).toBe("zh");
     expect(service.getSnapshot().language).toBe("zh");
     expect(listener).toHaveBeenCalledWith("zh");
+  });
+});
+
+describe("PreferencesService: 内容保护", () => {
+  it("没有保存过时是关闭的", async () => {
+    const { service } = await createService("en-US");
+
+    expect(service.isContentProtectionEnabled()).toBe(false);
+    expect(service.getSnapshot().isContentProtectionEnabled).toBe(false);
+  });
+
+  it("保存后能读回, 快照也带回它, 并通知订阅者", async () => {
+    const { service, store } = await createService("en-US");
+    const listener = vi.fn();
+    service.onContentProtectionChanged(listener);
+
+    service.setContentProtection(true);
+
+    expect(store.isContentProtectionEnabled()).toBe(true);
+    expect(service.isContentProtectionEnabled()).toBe(true);
+    expect(service.getSnapshot().isContentProtectionEnabled).toBe(true);
+    expect(listener).toHaveBeenCalledExactlyOnceWith(true);
+  });
+
+  it("关闭时同样保存并通知订阅者", async () => {
+    const { service } = await createService("en-US");
+    service.setContentProtection(true);
+    const listener = vi.fn();
+    service.onContentProtectionChanged(listener);
+
+    service.setContentProtection(false);
+
+    expect(service.isContentProtectionEnabled()).toBe(false);
+    expect(listener).toHaveBeenCalledExactlyOnceWith(false);
   });
 });
 

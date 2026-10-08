@@ -1263,6 +1263,11 @@
           "name": "休眠时锁定",
           "description": "Windows 进入睡眠或休眠时自动锁定保险库."
         }
+      },
+      "contentProtection": {
+        "name": "内容保护",
+        "description": "开启后, 截屏, 录屏, 屏幕共享和远程协助软件看不到本窗口, 你自己的截图也一样. Windows 10 2004 及以上整个窗口不出现, 更旧的版本显示为黑块.",
+        "toggleLabel": "启用"
       }
     }
   },
@@ -1287,7 +1292,7 @@
     "newPassword": {
       "passwordLabel": "主密码",
       "confirmationLabel": "确认主密码",
-      "passwordHint": "至少 {minLength} 个字符",
+      "passwordHint": "至少 {minLength} 个字符, 建议 {recommendedLength} 个以上",
       "error": {
         "tooShort": "主密码至少需要 {minLength} 个字符.",
         "mismatch": "两次输入的主密码不一致."
@@ -1345,7 +1350,17 @@
     "failure": {
       "title": "无法打开数据",
       "description": "数据文件缺失或已损坏, 或系统无法解开受保护的密钥. 请关闭应用后重试, 不要删除数据目录中的 vault 文件夹. 如果保存了恢复词, 可以凭它恢复.",
-      "restore": "用恢复词恢复"
+      "restore": "用恢复词恢复",
+      "cause": {
+        "keyFileMissing": "找到了数据文件 vault.db, 但密钥文件 vault-key.json 不见了. 应用不会自动新建密钥文件, 以免覆盖你的数据. 如果保存了恢复词, 可以凭它恢复; 也可以把 vault-key.json 从回收站或备份放回数据目录的 vault 文件夹, 再重启应用. 不要删除 vault 文件夹.",
+        "databaseMissing": "找到了密钥文件 vault-key.json, 但数据文件 vault.db 不见了. 应用不会自动新建空的数据文件, 以免让你误以为数据已被清空. 请把 vault.db 从回收站或备份放回数据目录的 vault 文件夹, 再重启应用. 恢复词只能解开数据, 数据文件不在时无法凭它恢复.",
+        "databaseUnreadable": "密钥文件和数据文件都在, 但数据文件打不开, 可能已损坏, 也可能不是与这个密钥文件配套的那一份. 请关闭应用, 不要删除 vault 文件夹, 把配套的 vault.db 从备份放回后再重启应用."
+      },
+      "diagnostics": {
+        "label": "诊断信息 (遇到问题时可复制后提交)",
+        "copy": "复制诊断信息",
+        "copied": "已复制"
+      }
     },
     "recovery": {
       "title": "恢复密钥",

@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { WindowControlsBridge } from "@shared/window/window-controls-bridge";
 
@@ -102,6 +102,17 @@ describe("useWindowMaximized", () => {
 
     act(() => bridge.emitMaximizedChange(true));
     await act(async () => resolveInitial(false));
+
+    expect(result.current).toBe(true);
+  });
+
+  it("读取初始状态被拒绝时保持未最大化, 不产生未处理的拒绝", async () => {
+    const isMaximized = vi.fn(() => Promise.reject(new Error("ipc down")));
+    const { bridge, result } = renderMaximized({ isMaximized });
+    await waitFor(() => expect(isMaximized).toHaveBeenCalled());
+
+    expect(result.current).toBe(false);
+    act(() => bridge.emitMaximizedChange(true));
 
     expect(result.current).toBe(true);
   });

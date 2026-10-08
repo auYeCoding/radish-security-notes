@@ -7,6 +7,15 @@ files:
   - resources/**
 asarUnpack:
   - resources/**
+# 打包时由 electron-builder 调用 @electron/fuses 翻转 Electron 熔丝: 关闭 ELECTRON_RUN_AS_NODE, Node 调试器参数
+# 与 NODE_OPTIONS 三个调试入口, 只从 asar 加载应用代码并校验 asar 的完整性. 块内只写 "键: 布尔" 平铺行,
+# src/main/build-config/electron-fuses.test.ts 按这个形状读取并逐键断言.
+electronFuses:
+  runAsNode: false
+  enableNodeCliInspectArguments: false
+  enableNodeOptionsEnvironmentVariable: false
+  onlyLoadAppFromAsar: true
+  enableEmbeddedAsarIntegrityValidation: true
 win:
   executableName: radish-security-notes
   # 平台专属的 files 只有排除项时会重新加入 "**/*", 所以重复写出白名单.

@@ -5,6 +5,7 @@ import type {
   RecoveryTextFileStatus,
 } from "@shared/vault/recovery-bridge";
 import type { VaultBridge } from "@shared/vault/vault-bridge";
+import type { VaultFailureInfo } from "@shared/vault/vault-failure";
 import type { VaultOperationResult } from "@shared/vault/vault-operation-result";
 import type { VaultSetupResult } from "@shared/vault/vault-setup-result";
 import type { VaultStatus } from "@shared/vault/vault-status";
@@ -31,7 +32,17 @@ export interface VaultState {
    * 就是锁定的情形为 undefined, 解锁成功后清除.
    */
   readonly lockReason: AutoLockReason | undefined;
+  /**
+   * 保险库进入失败状态的原因, 阶段和错误类名, 失败页据此说明原因. 只有状态是失败时可能有值, 取回
+   * 之前或主进程没有记录时为 undefined.
+   */
+  readonly failure: VaultFailureInfo | undefined;
 }
+
+/**
+ * 写入保险库状态的函数.
+ */
+export type VaultStateSetter = (partial: Partial<VaultState>) => void;
 
 /**
  * 保险库动作: 经主进程设置主密码, 跳过, 解锁, 凭恢复词恢复, 并让状态跟随结果.
@@ -142,4 +153,8 @@ export interface VaultStoreDependencies {
    * 启动时从主进程取得的保险库状态.
    */
   readonly initialStatus: VaultStatus;
+  /**
+   * 启动时从主进程取得的失败信息, 初始状态不是失败或主进程没有记录时不给.
+   */
+  readonly initialFailure?: VaultFailureInfo;
 }

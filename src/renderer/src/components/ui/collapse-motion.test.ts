@@ -82,6 +82,17 @@ describe("折叠过渡常量的取值", () => {
     );
   });
 
+  it("入口行后占位的三个过渡类名与空间过渡的三个类名一一对应, 只多 after: 前缀", () => {
+    const prefixed = COLLAPSE_SPACE_TRANSITION.split(" ").map(
+      (className) => `after:${className}`,
+    );
+
+    expect(prefixed).toHaveLength(3);
+    expect(TOGGLE_ROW_SPACER_CLASSES.split(" ")).toEqual(
+      expect.arrayContaining(prefixed),
+    );
+  });
+
   it("尺寸与空间过渡取基础档, 淡入淡出取快档, 入口行占位取基础档", () => {
     expect(extractDurationTokens(COLLAPSE_EXTENT_TRANSITION, "")).toEqual([
       "motion-base",

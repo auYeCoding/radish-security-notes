@@ -30,6 +30,7 @@ import { registerTotpIpc } from "../ipc/totp-ipc";
 import { registerVaultIpc } from "../ipc/vault-ipc";
 import { registerWindowControlsIpc } from "../ipc/window-controls-ipc";
 import { resolveWindowBackground } from "../theme/window-background";
+import { applyWindowContentProtection } from "../window/content-protection-sync";
 import { createMainWindow } from "../window/create-main-window";
 import {
   createMainWindowHolder,
@@ -70,10 +71,13 @@ import { createVaultRuntime, type VaultRuntime } from "./vault-runtime";
 const APP_USER_MODEL_ID = "com.electron";
 
 /**
- * 让全部窗口的标题与背景色跟随语言和主题的变化.
+ * 让全部窗口的标题, 背景色与内容保护跟随语言, 主题和内容保护开关的变化.
  * @param runtime 偏好运行时对象.
  */
 function keepWindowsInSync(runtime: PreferencesRuntime): void {
+  runtime.service.onContentProtectionChanged((isEnabled) =>
+    applyWindowContentProtection(BrowserWindow.getAllWindows(), isEnabled),
+  );
   runtime.service.onLanguageChanged(() =>
     applyWindowTitle(
       BrowserWindow.getAllWindows(),
@@ -89,7 +93,8 @@ function keepWindowsInSync(runtime: PreferencesRuntime): void {
 }
 
 /**
- * 按当前主题与语言创建主窗口, 登记到主窗口持有者, 并让它的最大化状态推送给页面.
+ * 按当前主题与语言创建主窗口, 按偏好设置内容保护 (窗口在渲染完成前不显示, 所以不会有未保护的
+ * 一帧), 登记到主窗口持有者, 并让它的最大化状态推送给页面.
  * @param runtime 偏好运行时对象.
  * @param openExternalLink 外部链接打开器.
  * @param mainWindowHolder 主窗口持有者.
@@ -107,6 +112,10 @@ function openMainWindow(
     ),
     openExternalLink,
   });
+  applyWindowContentProtection(
+    [mainWindow],
+    runtime.service.isContentProtectionEnabled(),
+  );
   mainWindowHolder.set(mainWindow);
   watchMaximizedState(mainWindow);
 }
