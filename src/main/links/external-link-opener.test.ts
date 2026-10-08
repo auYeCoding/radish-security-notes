@@ -5,7 +5,8 @@ import { createExternalLinkOpener } from "./external-link-opener";
 describe("createExternalLinkOpener", () => {
   it.each([
     "https://example.test/a?b=1",
-    "http://example.test",
+    "http://192.168.1.1/admin",
+    "http://localhost:8080/",
     "mailto:someone@example.test",
   ])("允许的地址 %s 交给系统打开并返回 true", async (url) => {
     const openExternal = vi.fn(() => Promise.resolve());
@@ -22,6 +23,8 @@ describe("createExternalLinkOpener", () => {
     "data:text/html,<script>alert(1)</script>",
     "ms-msdt:/id",
     "ftp://example.test",
+    "http://example.test",
+    "http://8.8.8.8/",
     "/relative",
     "#anchor",
     "",

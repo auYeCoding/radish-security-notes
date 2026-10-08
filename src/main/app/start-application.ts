@@ -29,6 +29,7 @@ import {
   type MainWindowHolder,
 } from "../window/main-window-holder";
 import { watchMaximizedState } from "../window/maximized-state-notifier";
+import { watchSecondInstance } from "../window/second-instance-activation";
 import { applyWindowBackground, applyWindowTitle } from "../window/window-sync";
 import {
   createPreferencesRuntime,
@@ -96,8 +97,8 @@ function openMainWindow(
 }
 
 /**
- * 启动主窗口: 注册窗口控制的 IPC, 让全部窗口的标题与背景色跟随语言和主题, 创建主窗口, 并在没有
- * 窗口时被重新激活的情形下再创建一个.
+ * 启动主窗口: 让第二个实例启动时唤起已有的主窗口, 注册窗口控制的 IPC, 让全部窗口的标题与背景色
+ * 跟随语言和主题, 创建主窗口, 并在没有窗口时被重新激活的情形下再创建一个.
  * @param runtime 偏好运行时对象.
  * @param openExternalLink 外部链接打开器.
  */
@@ -106,6 +107,7 @@ function launchMainWindow(
   openExternalLink: ExternalLinkOpener,
 ): void {
   const mainWindowHolder = createMainWindowHolder<BrowserWindow>();
+  watchSecondInstance(app, mainWindowHolder);
   registerWindowControlsIpc(ipcMain, mainWindowHolder);
   keepWindowsInSync(runtime);
   openMainWindow(runtime, openExternalLink, mainWindowHolder);

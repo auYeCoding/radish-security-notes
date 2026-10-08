@@ -64,6 +64,33 @@ describe("createMainWindow 导航防护", () => {
     );
     expect(electronMocks.setWindowOpenHandler).toHaveBeenCalledTimes(1);
   });
+
+  it("导航, 重定向与子框架导航三种事件都有防护", () => {
+    createMainWindow(WINDOW_OPTIONS);
+
+    ["will-navigate", "will-redirect", "will-frame-navigate"].forEach(
+      (eventName) =>
+        expect(electronMocks.webContentsOn).toHaveBeenCalledWith(
+          eventName,
+          expect.any(Function),
+        ),
+    );
+  });
+});
+
+describe("createMainWindow 沙箱", () => {
+  it("渲染进程开启沙箱, 并带上 preload 脚本", () => {
+    createMainWindow(WINDOW_OPTIONS);
+
+    expect(electronMocks.createWindow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        webPreferences: expect.objectContaining({
+          sandbox: true,
+          preload: expect.stringContaining("index.js"),
+        }),
+      }),
+    );
+  });
 });
 
 describe("createMainWindow 无框窗口", () => {

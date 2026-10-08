@@ -8,7 +8,7 @@ import type { MarkdownElementProps } from "./markdown-element-props";
 import { MarkdownLinkContext } from "./markdown-link-context";
 
 /**
- * Markdown 里的链接: 地址符合外部链接策略 (http, https, mailto) 时显示成链接样式的按钮, 页面里没有
+ * Markdown 里的链接: 地址符合外部链接策略 (https, mailto, 局域网的 http) 时显示成链接样式的按钮, 页面里没有
  * 真正的链接元素, 点击只请求打开, 由确认框确认后才交给系统; 其它地址 (脚本, 文件, 数据, 自定义协议,
  * 相对路径, 锚点) 只显示链接文字, 不能点.
  * @param props 组件属性.

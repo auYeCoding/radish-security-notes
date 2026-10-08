@@ -1,4 +1,3 @@
-import { electronAPI } from "@electron-toolkit/preload";
 import type { RendererApi } from "@shared/ipc/renderer-api";
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 
@@ -48,12 +47,10 @@ const api: RendererApi = {
 
 if (process.contextIsolated) {
   try {
-    contextBridge.exposeInMainWorld("electron", electronAPI);
     contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
     console.error(error);
   }
 } else {
-  window.electron = electronAPI;
   window.api = api;
 }
