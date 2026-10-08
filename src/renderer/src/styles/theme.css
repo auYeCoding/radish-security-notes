@@ -50,4 +50,8 @@
 
   --default-transition-duration: var(--motion-base);
   --default-transition-timing-function: var(--motion-ease);
+
+  --transition-property-extent: width, height;
+  --transition-property-flex-space:
+    flex-grow, margin-inline-start, padding-inline-start, padding-inline-end;
 }

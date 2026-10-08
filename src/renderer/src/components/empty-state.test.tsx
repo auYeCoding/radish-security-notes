@@ -11,9 +11,14 @@ describe("空状态说明", () => {
     const message = screen.getByText("还没有标签");
     expect(message.classList.contains("sr-only")).toBe(false);
     expect(message.classList.contains("text-muted-foreground")).toBe(true);
+    expect(
+      message
+        .closest("[data-slot='collapsible-box']")
+        ?.getAttribute("data-state"),
+    ).toBe("expanded");
   });
 
-  it("侧栏折叠时文字改为屏幕外隐藏, 读屏软件仍能读到", () => {
+  it("侧栏折叠时沿高度收起并淡出, 文字仍在无障碍树里, 读屏软件仍能读到", () => {
     render(
       <SidebarCollapseContext.Provider value={true}>
         <EmptyState message="还没有标签" />
@@ -21,7 +26,11 @@ describe("空状态说明", () => {
     );
 
     const message = screen.getByText("还没有标签");
-    expect(message.classList.contains("sr-only")).toBe(true);
-    expect(message.classList.contains("text-muted-foreground")).toBe(false);
+    const box = message.closest("[data-slot='collapsible-box']");
+    expect(message.classList.contains("sr-only")).toBe(false);
+    expect(box?.getAttribute("data-state")).toBe("collapsed");
+    expect(box?.classList.contains("h-0")).toBe(true);
+    expect(box?.hasAttribute("inert")).toBe(false);
+    expect(box?.hasAttribute("aria-hidden")).toBe(false);
   });
 });

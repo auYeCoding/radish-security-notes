@@ -180,7 +180,8 @@ describe("折叠态的侧栏内容", () => {
     expect(rows).toHaveLength(7);
     rows.forEach((row) => {
       const text = row.querySelector("[data-slot='sidebar-nav-item-text']");
-      expect(text?.classList.contains("sr-only")).toBe(true);
+      expect(text?.classList.contains("grow-0")).toBe(true);
+      expect(text?.classList.contains("sr-only")).toBe(false);
     });
     ["重要 1", "全部条目 3", "未分类 1", "公司 2", "家庭 0"].forEach((name) =>
       expect(
@@ -309,12 +310,14 @@ describe("折叠态的设置入口", () => {
     await waitFor(() =>
       expect(button.querySelector("[data-slot='status-dot']")).not.toBeNull(),
     );
+    const dot = button.querySelector("[data-slot='status-dot']");
+    expect(dot?.classList.contains("opacity-100")).toBe(true);
 
     await userEvent
       .setup()
       .click(screen.getByRole("button", { name: "展开侧栏" }));
 
-    expect(button.querySelector("[data-slot='status-dot']")).toBeNull();
+    expect(dot?.classList.contains("opacity-0")).toBe(true);
     expect(await within(button).findByText("自动备份失败")).toBeDefined();
   });
 });

@@ -11,6 +11,10 @@
 @import "./print-recovery-kit.css";
 
 @layer base {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

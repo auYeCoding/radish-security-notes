@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { FolderIcon } from "lucide-react";
 import { describe, expect, it, vi } from "vitest";
 
+import { expectMotionClasses } from "@renderer/testing/expect-motion-classes";
 import {
   createPreferencesTestEnvironment,
   type PreferencesTestEnvironment,
@@ -11,6 +12,7 @@ import {
 import { SidebarCollapseContext } from "./sidebar-collapse-context";
 import { SidebarNavItem, type SidebarSelectionKind } from "./sidebar-nav-item";
 import { Button } from "./ui/button";
+import { COLLAPSIBLE_TEXT_STATE_CLASSES } from "./ui/collapse-motion";
 
 /**
  * 等待悬停提示出现的最长时间, 单位毫秒, 比查询的默认超时长, 全部测试并行运行时也不误报.
@@ -101,12 +103,13 @@ function findTooltip(text: string): Promise<HTMLElement> {
 }
 
 describe("侧栏行入口: 展开态", () => {
-  it("显示图标, 名称, 条目数和行尾操作, 文字容器不是屏幕外隐藏", async () => {
+  it("显示图标, 名称, 条目数和行尾操作, 文字容器占满剩余宽度", async () => {
     await renderRow({ isCollapsed: false });
 
     const row = screen.getByRole("listitem");
     const text = row.querySelector("[data-slot='sidebar-nav-item-text']");
-    expect(text?.classList.contains("sr-only")).toBe(false);
+    expectMotionClasses(text, COLLAPSIBLE_TEXT_STATE_CLASSES.expanded);
+    expect(text?.classList.contains("grow-0")).toBe(false);
     expect(within(row).getByText("工作")).toBeDefined();
     expect(within(row).getByText("3")).toBeDefined();
     expect(
@@ -141,17 +144,24 @@ describe("侧栏行入口: 展开态", () => {
 });
 
 describe("侧栏行入口: 折叠态的结构", () => {
-  it("文字容器收起为屏幕外隐藏, 不渲染行尾操作", async () => {
+  it("文字容器收窄并淡出但仍在, 行尾操作淡出且不可聚焦与点击", async () => {
     await renderRow({ isCollapsed: true });
 
     const row = screen.getByRole("listitem");
     const text = row.querySelector("[data-slot='sidebar-nav-item-text']");
-    expect(text?.classList.contains("sr-only")).toBe(true);
+    expectMotionClasses(text, COLLAPSIBLE_TEXT_STATE_CLASSES.collapsed);
+    expect(text?.classList.contains("sr-only")).toBe(false);
     expect(text?.textContent).toBe("工作3");
     expect(within(row).getAllByRole("button")).toHaveLength(1);
     expect(
       within(row).queryByRole("button", { name: "工作的更多操作" }),
     ).toBeNull();
+    const actionsBox = within(row)
+      .getByText("工作的更多操作")
+      .closest("[data-slot='collapsible-box']");
+    expect(actionsBox?.getAttribute("data-state")).toBe("collapsed");
+    expect(actionsBox?.hasAttribute("inert")).toBe(true);
+    expect(actionsBox?.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("按钮仍有无障碍名称, 图标在按钮里水平居中", async () => {

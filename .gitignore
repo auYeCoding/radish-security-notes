@@ -40,6 +40,9 @@ lib-cov
 # 测试覆盖率报告目录
 coverage
 
+# Vitest 单独运行测试时的输出目录
+.vitest
+
 # LCOV 格式的覆盖率文件
 *.lcov
 

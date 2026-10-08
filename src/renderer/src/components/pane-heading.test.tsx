@@ -42,13 +42,19 @@ describe("窗格标题", () => {
     expect(screen.queryByRole("separator")).toBeNull();
   });
 
-  it("侧栏折叠时不显示标题文字, 辅助内容和操作, 只留一条分隔线", () => {
+  it("侧栏折叠时标题文字, 辅助内容和操作收起并不可访问, 只留一条分隔线", () => {
     renderHeading(true);
 
     expect(screen.queryByRole("heading")).toBeNull();
-    expect(screen.queryByText("标签")).toBeNull();
-    expect(screen.queryByText("3")).toBeNull();
     expect(screen.queryByRole("button", { name: "新建标签" })).toBeNull();
     expect(screen.getAllByRole("separator")).toHaveLength(1);
+    ["标签", "3", "新建标签"].forEach((text) => {
+      const box = screen
+        .getByText(text)
+        .closest("[data-slot='collapsible-box']");
+      expect(box?.getAttribute("data-state")).toBe("collapsed");
+      expect(box?.getAttribute("aria-hidden")).toBe("true");
+      expect(box?.hasAttribute("inert")).toBe(true);
+    });
   });
 });

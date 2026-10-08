@@ -1,4 +1,10 @@
 import { SidebarCollapseContext } from "@renderer/components/sidebar-collapse-context";
+import {
+  COLLAPSE_EXTENT_TRANSITION,
+  TOGGLE_ROW_ALIGNMENT_CLASSES,
+  TOGGLE_ROW_SPACER_CLASSES,
+} from "@renderer/components/ui/collapse-motion";
+import type { CollapseState } from "@renderer/components/ui/collapse-motion";
 import { FolderPane } from "@renderer/features/folder-pane/folder-pane";
 import { NewFolderTrigger } from "@renderer/features/folder-create/new-folder-trigger";
 import { SidebarToggle } from "@renderer/features/sidebar-toggle/sidebar-toggle";
@@ -21,39 +27,35 @@ const EXPANDED_WIDTH_CLASSES = "w-(--sidebar-width)";
 const COLLAPSED_WIDTH_CLASSES = "w-(--sidebar-collapsed-width)";
 
 /**
- * 顶部入口行展开时的对齐类名: 切换按钮靠结束侧.
+ * 顶部入口行的共同类名: 切换按钮由前后两个占位夹在中间, 展开时后占位份额为零, 按钮靠结束侧,
+ * 折叠时两个占位份额相等, 按钮居中; 份额过渡让按钮随宽度平滑滑动.
  */
-const EXPANDED_TOGGLE_ROW_CLASSES = "justify-end";
-
-/**
- * 顶部入口行折叠时的对齐类名: 切换按钮居中.
- */
-const COLLAPSED_TOGGLE_ROW_CLASSES = "justify-center";
+const TOGGLE_ROW_CLASSES = `flex h-(--control-height) shrink-0 items-center px-3 ${TOGGLE_ROW_SPACER_CLASSES}`;
 
 /**
  * 左侧栏的装配: 顶部一行折叠与展开的切换按钮, 其下是标签与文件夹窗格 (标签分区标题行放新建按钮,
  * 每个标签行与文件夹行尾放更多菜单), 底部是设置按钮. 从偏好 store 读取折叠状态: 展开时用展开宽度,
- * 折叠时用折叠宽度, 并经上下文告诉里面的行, 分区标题与设置按钮改成只剩图标的样式. 只负责装配,
- * 不含业务逻辑.
+ * 折叠时用折叠宽度, 两个宽度之间按尺寸过渡变化, 过渡期间裁掉溢出的内容; 并经上下文告诉里面的行,
+ * 分区标题与设置按钮改成只剩图标的样式. 只负责装配, 不含业务逻辑.
  * @returns 侧栏元素.
  */
 export function Sidebar(): React.JSX.Element {
   const isCollapsed = usePreferencesStore((state) => state.isSidebarCollapsed);
+  const collapseState: CollapseState = isCollapsed ? "collapsed" : "expanded";
   return (
     <SidebarCollapseContext.Provider value={isCollapsed}>
       <aside
-        data-state={isCollapsed ? "collapsed" : "expanded"}
+        data-state={collapseState}
         className={cn(
-          "flex shrink-0 flex-col border-e border-sidebar-border bg-sidebar text-sidebar-foreground",
+          COLLAPSE_EXTENT_TRANSITION,
+          "flex shrink-0 flex-col overflow-hidden border-e border-sidebar-border bg-sidebar text-sidebar-foreground",
           isCollapsed ? COLLAPSED_WIDTH_CLASSES : EXPANDED_WIDTH_CLASSES,
         )}
       >
         <div
           className={cn(
-            "flex h-(--control-height) shrink-0 items-center px-3",
-            isCollapsed
-              ? COLLAPSED_TOGGLE_ROW_CLASSES
-              : EXPANDED_TOGGLE_ROW_CLASSES,
+            TOGGLE_ROW_CLASSES,
+            TOGGLE_ROW_ALIGNMENT_CLASSES[collapseState],
           )}
         >
           <SidebarToggle />

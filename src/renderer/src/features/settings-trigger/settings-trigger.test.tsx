@@ -83,25 +83,30 @@ describe("设置按钮", () => {
     expect(screen.getByRole("button", { name: "Settings" })).toBeDefined();
   });
 
-  it("展开时按钮上有图标和文字, 没有状态圆点和屏幕外隐藏", async () => {
+  it("展开时按钮上有图标和文字, 状态圆点已淡出, 文字区占满剩余宽度", async () => {
     await renderTrigger(<span>失败标记</span>);
 
     const button = screen.getByRole("button", { name: /设置/ });
     const text = button.querySelector("[data-slot='settings-trigger-text']");
+    const dot = button.querySelector("[data-slot='status-dot']");
     expect(button.querySelector("svg")).not.toBeNull();
+    expect(text?.classList.contains("grow")).toBe(true);
+    expect(text?.classList.contains("grow-0")).toBe(false);
     expect(text?.classList.contains("sr-only")).toBe(false);
-    expect(button.querySelector("[data-slot='status-dot']")).toBeNull();
+    expect(dot?.classList.contains("opacity-0")).toBe(true);
+    expect(dot?.getAttribute("aria-hidden")).toBe("true");
   });
 });
 
 describe("设置按钮: 侧栏折叠时", () => {
-  it("按钮只剩图标, 文字收起为屏幕外隐藏, 名称仍是 设置", async () => {
+  it("按钮只剩图标, 文字收窄并淡出但仍在, 名称仍是 设置", async () => {
     const { onOpen } = await renderTrigger(undefined, true);
 
     const button = screen.getByRole("button", { name: "设置" });
     const text = button.querySelector("[data-slot='settings-trigger-text']");
     expect(button.querySelector("svg")).not.toBeNull();
-    expect(text?.classList.contains("sr-only")).toBe(true);
+    expect(text?.classList.contains("grow-0")).toBe(true);
+    expect(text?.classList.contains("sr-only")).toBe(false);
     expect(text?.textContent).toBe("设置");
     await userEvent.setup().click(button);
     expect(onOpen).toHaveBeenCalledTimes(1);
