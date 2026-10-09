@@ -38,7 +38,11 @@ const APP_COMPONENT_COVERAGE: readonly (readonly [
   ["components/totp-code-button.tsx", ["FADE_IN_MOTION"]],
   ["components/copy-button.tsx", ["FADE_IN_MOTION"]],
   ["features/entry-batch-bar/batch-bar-actions.tsx", ["FADE_IN_MOTION"]],
-  ["features/entry-detail-pane/entry-detail-view.tsx", ["FADE_IN_MOTION"]],
+  [
+    "features/entry-detail-pane/entry-detail-view.tsx",
+    ["CONTENT_ENTER_MOTION"],
+  ],
+  ["features/entry-detail-pane/entry-detail-skeleton.tsx", ["FADE_IN_MOTION"]],
 ];
 
 /**

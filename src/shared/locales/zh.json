@@ -154,6 +154,7 @@
   "entryDetailPane": {
     "heading": "条目详情",
     "empty": "选择一个条目查看详情",
+    "loading": "正在读取条目详情",
     "loadFailed": "无法读取这个条目的详情."
   },
   "entryDetail": {

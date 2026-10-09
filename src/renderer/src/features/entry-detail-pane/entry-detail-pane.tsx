@@ -7,6 +7,7 @@ import type { EntryDetail } from "@shared/entries/entry-types";
 import type { EntrySelection } from "@renderer/stores/entry-state";
 import { useEntryStore } from "@renderer/stores/use-entry-store";
 
+import { EntryDetailSkeleton } from "./entry-detail-skeleton";
 import { EntryDetailView } from "./entry-detail-view";
 
 /**
@@ -45,25 +46,25 @@ function CenteredMessage(props: CenteredMessageProps): React.JSX.Element {
 }
 
 /**
- * 按选中状态选出详情窗格的内容: 没有选中时提示选择, 读取中不显示内容, 读取失败时说明原因,
+ * 按选中状态选出详情窗格的内容: 没有选中时提示选择, 读取中显示骨架, 读取失败时说明原因,
  * 读取完成后显示详情. 详情视图以条目编号与编辑次数作 key, 切换条目或保存编辑后重新挂载.
  * @param selection 当前选中状态.
  * @param revision 条目被编辑保存的次数.
  * @param translate 翻译函数.
  * @param renderers 生成标题行右侧操作与备注之后附件区的函数.
- * @returns 窗格内容, 读取中时为 null.
+ * @returns 窗格内容.
  */
 function renderSelection(
   selection: EntrySelection,
   revision: number,
   translate: TFunction,
   renderers: Pick<EntryDetailPaneProps, "renderActions" | "renderAttachments">,
-): React.JSX.Element | null {
+): React.JSX.Element {
   switch (selection.status) {
     case "none":
       return <CenteredMessage message={translate("entryDetailPane.empty")} />;
     case "loading":
-      return null;
+      return <EntryDetailSkeleton />;
     case "failed":
       return (
         <CenteredMessage message={translate("entryDetailPane.loadFailed")} />

@@ -154,6 +154,7 @@
   "entryDetailPane": {
     "heading": "Entry details",
     "empty": "Select an entry to see its details",
+    "loading": "Loading entry details",
     "loadFailed": "Unable to load the details of this entry."
   },
   "entryDetail": {

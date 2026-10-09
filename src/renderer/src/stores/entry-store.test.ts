@@ -97,6 +97,32 @@ describe("条目 store 选中", () => {
       id: "missing",
     });
   });
+
+  it("再次选中已经选中的条目时不重新读取, 详情保持原样", async () => {
+    const bridge = createFakeEntryBridge([FORUM, BANK]);
+    const get = vi.fn(bridge.get);
+    bridge.get = get;
+    const store = createEntryStore({ bridge });
+    await store.getState().select("forum");
+    const selection = store.getState().selection;
+
+    await store.getState().select("forum");
+
+    expect(get).toHaveBeenCalledTimes(1);
+    expect(store.getState().selection).toBe(selection);
+  });
+
+  it("上一次读取失败的条目再次选中时重新读取", async () => {
+    const bridge = createFakeEntryBridge();
+    const get = vi.fn(bridge.get);
+    bridge.get = get;
+    const store = createEntryStore({ bridge });
+    await store.getState().select("missing");
+
+    await store.getState().select("missing");
+
+    expect(get).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe("条目 store 选中竞争", () => {

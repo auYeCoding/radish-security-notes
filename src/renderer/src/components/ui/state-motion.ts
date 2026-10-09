@@ -30,3 +30,10 @@ export const MARK_TRANSITION =
  */
 export const FADE_IN_MOTION =
   "animate-in fade-in-0 duration-(--motion-fast) ease-(--motion-ease)";
+
+/**
+ * 基础档内容入场: 元素挂载时淡入并自下方上移一小段到位, 用于条目详情这类整块换入的主要内容,
+ * 比快档淡入更明显. 消失时直接卸载, 不做动画.
+ */
+export const CONTENT_ENTER_MOTION =
+  "animate-in fade-in-0 slide-in-from-bottom-2 duration-(--motion-base) ease-(--motion-ease)";
