@@ -81,10 +81,21 @@ describe("EntryDetailPane 展示", () => {
     await user.click(screen.getByRole("button", { name: "隐藏 密码" }));
     expect(screen.queryByText("forum-password")).toBeNull();
   });
+});
 
+describe("EntryDetailPane 读取中与读取失败", () => {
   it("读取详情期间显示骨架, 读取完成后换成详情", async () => {
+    let releaseDetail: () => void = () => undefined;
     const environment = await createEntryTestEnvironment({
       entries: TEST_ENTRIES,
+      entryBridgeOverrides: {
+        get: async () => {
+          await new Promise<void>((resolve) => {
+            releaseDetail = resolve;
+          });
+          return { ok: true, value: FORUM_ENTRY };
+        },
+      },
     });
     render(<EntryDetailPane />, { wrapper: environment.Providers });
 
@@ -93,6 +104,7 @@ describe("EntryDetailPane 展示", () => {
     expect(
       await screen.findByRole("status", { name: "正在读取条目详情" }),
     ).toBeDefined();
+    releaseDetail();
     await pending;
     expect(await screen.findByRole("heading", { name: "论坛" })).toBeDefined();
     expect(
