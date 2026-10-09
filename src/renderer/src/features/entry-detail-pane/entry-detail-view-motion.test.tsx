@@ -1,7 +1,7 @@
 import { act, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { FADE_IN_MOTION } from "@renderer/components/ui/state-motion";
+import { CONTENT_ENTER_MOTION } from "@renderer/components/ui/state-motion";
 import { TEST_ENTRIES } from "@renderer/testing/entry-fixtures";
 import {
   createEntryTestEnvironment,
@@ -51,13 +51,13 @@ function detailRootOf(container: HTMLElement): Element | null {
 }
 
 describe("条目详情内容的切换动效", () => {
-  it("详情内容挂载时快档淡入", async () => {
+  it("详情内容挂载时淡入并上移到位", async () => {
     const { container } = await renderPane("forum");
 
-    expectMotionClasses(detailRootOf(container), FADE_IN_MOTION);
+    expectMotionClasses(detailRootOf(container), CONTENT_ENTER_MOTION);
   });
 
-  it("切换到另一个条目时换成新的详情元素, 新元素同样淡入", async () => {
+  it("切换到另一个条目时换成新的详情元素, 新元素同样入场", async () => {
     const { environment, container } = await renderPane("forum");
     const previousRoot = detailRootOf(container);
 
@@ -66,7 +66,7 @@ describe("条目详情内容的切换动效", () => {
     await screen.findByRole("heading", { name: "银行" });
     const nextRoot = detailRootOf(container);
     expect(nextRoot).not.toBe(previousRoot);
-    expectMotionClasses(nextRoot, FADE_IN_MOTION);
+    expectMotionClasses(nextRoot, CONTENT_ENTER_MOTION);
   });
 
   it("没有选中条目时的提示文字不淡入", async () => {

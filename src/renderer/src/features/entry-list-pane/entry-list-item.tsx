@@ -14,24 +14,35 @@ import { intentOfRowClick } from "./entry-row-click";
 import { rowCheckboxLabelledBy } from "./entry-row-ids";
 
 /**
- * 列表项外层的类名. 类名在模块加载时合并好, 渲染时直接取用: 条目很多时全选会让每个列表项重新
+ * 列表项外层共用的类名. 类名在模块加载时合并好, 渲染时直接取用: 条目很多时全选会让每个列表项重新
  * 渲染, 每次都合并类名开销不小. 选中竖条与底色的出现和消失取快档状态过渡.
  */
-const ROW_CLASS_NAME = cn(
+const BASE_ROW_CLASS_NAME = cn(
   FAST_STATE_TRANSITION,
   "flex h-(--list-row-height) items-center border-s-2 border-s-transparent",
 );
 
 /**
- * 选中查看详情的列表项外层的类名.
+ * 未选中的列表项外层的类名. 鼠标悬停时整行 (含勾选框) 显示底色.
  */
-const SELECTED_ROW_CLASS_NAME = cn(ROW_CLASS_NAME, "border-s-brand bg-muted");
+const ROW_CLASS_NAME = cn(
+  BASE_ROW_CLASS_NAME,
+  "hover:bg-muted dark:hover:bg-muted/50",
+);
 
 /**
- * 列表项按钮的类名.
+ * 选中查看详情的列表项外层的类名.
+ */
+const SELECTED_ROW_CLASS_NAME = cn(
+  BASE_ROW_CLASS_NAME,
+  "border-s-brand bg-muted",
+);
+
+/**
+ * 列表项按钮的类名. 悬停底色由外层整行给出, 按钮自身不再显示.
  */
 const BUTTON_CLASS_NAME =
-  "h-full min-w-0 flex-1 flex-col items-start justify-center gap-0.5 rounded-none border-0 ps-2 pe-4 text-start";
+  "h-full min-w-0 flex-1 flex-col items-start justify-center gap-0.5 rounded-none border-0 ps-2 pe-4 text-start hover:bg-transparent dark:hover:bg-transparent";
 
 /**
  * 正被拖拽的列表项按钮的类名.

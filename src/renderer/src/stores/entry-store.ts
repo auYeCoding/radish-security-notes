@@ -14,7 +14,7 @@ import {
   copyEntryField,
   createEntry,
   loadEntries,
-  selectEntry,
+  selectEntryIfChanged,
 } from "./entry-store-actions";
 import {
   applyBatchFolder,
@@ -43,9 +43,9 @@ export interface EntryActions {
    */
   load: () => Promise<void>;
   /**
-   * 选中一个条目并读取它的详情.
+   * 选中一个条目并读取它的详情. 条目已经是选中的 (读取完成或正在读取) 时不重新读取.
    * @param id 条目编号.
-   * @returns 详情读取完成后兑现.
+   * @returns 详情读取完成后兑现, 不需要读取时立即兑现.
    */
   select: (id: string) => Promise<void>;
   /**
@@ -187,7 +187,7 @@ export function createEntryStore(
     return {
       ...INITIAL_ENTRY_STATE,
       load: () => loadEntries(access),
-      select: (id) => selectEntry(access, id),
+      select: (id) => selectEntryIfChanged(access, id),
       setQuery: (query) => applyQuery(access, query),
       search: () => runEntrySearch(access),
       create: (input) => createEntry(access, input),

@@ -82,6 +82,24 @@ describe("EntryDetailPane 展示", () => {
     expect(screen.queryByText("forum-password")).toBeNull();
   });
 
+  it("读取详情期间显示骨架, 读取完成后换成详情", async () => {
+    const environment = await createEntryTestEnvironment({
+      entries: TEST_ENTRIES,
+    });
+    render(<EntryDetailPane />, { wrapper: environment.Providers });
+
+    const pending = environment.entryStore.getState().select("forum");
+
+    expect(
+      await screen.findByRole("status", { name: "正在读取条目详情" }),
+    ).toBeDefined();
+    await pending;
+    expect(await screen.findByRole("heading", { name: "论坛" })).toBeDefined();
+    expect(
+      screen.queryByRole("status", { name: "正在读取条目详情" }),
+    ).toBeNull();
+  });
+
   it("读取详情失败时说明原因", async () => {
     await renderPane("forum", {
       entries: TEST_ENTRIES,

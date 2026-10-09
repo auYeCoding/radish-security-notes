@@ -91,6 +91,24 @@ export async function selectEntry(
 }
 
 /**
+ * 响应用户点选条目: 点的条目与当前选中的不同才读取详情; 点的正是已读取完成或正在读取的条目时
+ * 什么都不做, 详情不重新载入, 已显示的密码与验证码保持原样.
+ * @param access store 动作能用到的东西.
+ * @param id 用户点选的条目编号.
+ * @returns 读取完成后兑现, 不需要读取时立即兑现.
+ */
+export async function selectEntryIfChanged(
+  access: EntryStoreAccess,
+  id: string,
+): Promise<void> {
+  const { selection } = access.get();
+  if (selection.status !== "failed" && selectedIdOf(selection) === id) {
+    return;
+  }
+  await selectEntry(access, id);
+}
+
+/**
  * 新建一个条目. 成功后条目放到 store 数组最前 (显示位置由名称排序规则决定), 被选中并展示详情, 搜索关键字清空, 入口跟随条目 (新条目
  * 不属于当前入口时切到它所属的文件夹), 让新条目一定出现在列表里.
  * @param access store 动作能用到的东西.

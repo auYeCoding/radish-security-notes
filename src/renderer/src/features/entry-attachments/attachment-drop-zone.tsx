@@ -52,7 +52,7 @@ export function AttachmentDropZone(
       aria-label={props.label}
       className={cn(
         FAST_STATE_TRANSITION,
-        "flex max-w-xl flex-col gap-3 rounded-lg border border-dashed p-3",
+        "flex flex-col gap-3 rounded-lg border border-dashed p-3",
         isDragging ? "border-primary bg-muted" : "border-border",
       )}
       {...handlers}
