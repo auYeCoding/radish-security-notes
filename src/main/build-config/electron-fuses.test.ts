@@ -1,16 +1,8 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-/**
- * 打包配置文件的路径, 位于仓库根目录.
- */
-const BUILDER_CONFIG_FILE = resolve(
-  __dirname,
-  "../../..",
-  "electron-builder.yml",
-);
+import { BUILDER_CONFIG_FILE } from "./builder-config-file";
 
 /**
  * 熔丝块的键名, 取自 electron-builder 的 `electronFuses` 选项.

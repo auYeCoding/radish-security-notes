@@ -61,14 +61,10 @@ import {
   registerLockParticipants,
   type LockParticipants,
 } from "./register-lock-participants";
+import { APP_USER_MODEL_ID } from "./app-identity";
 import { createRestoreRuntime } from "./restore-runtime";
 import { createTagService } from "./tag-runtime";
 import { createVaultRuntime, type VaultRuntime } from "./vault-runtime";
-
-/**
- * 应用的用户模型标识, Windows 用它归并任务栏与通知.
- */
-const APP_USER_MODEL_ID = "com.electron";
 
 /**
  * 让全部窗口的标题, 背景色与内容保护跟随语言, 主题和内容保护开关的变化.

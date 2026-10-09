@@ -1,10 +1,26 @@
 {
   "name": "radish-security-notes",
   "version": "1.0.0",
-  "description": "An Electron application with React and TypeScript",
+  "description": "本地加密的桌面密码与笔记保险库 (Electron, React, TypeScript)",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "auYe",
+  "license": "MIT",
+  "homepage": "https://github.com/auYeCoding/radish-security-notes#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auYeCoding/radish-security-notes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/auYeCoding/radish-security-notes/issues"
+  },
+  "keywords": [
+    "password-manager",
+    "secure-notes",
+    "electron",
+    "sqlcipher",
+    "totp",
+    "windows"
+  ],
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache . && npm run lint:css",
@@ -16,7 +32,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
-    "dev": "npm run format && electron-vite dev",
+    "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",

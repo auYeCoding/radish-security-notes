@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: io.github.auyecoding.radish-security-notes
 productName: radish-security-notes
 directories:
   buildResources: build
@@ -23,7 +23,11 @@ win:
     - out/**
     - resources/**
     - "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/{darwin-arm64,darwin-x64,linux-arm64,linux-x64,linuxmusl-arm64,linuxmusl-x64,win32-arm64}.node"
+# 向导式安装包: 关闭一键安装, 安装时可以选择安装路径. allowToChangeInstallationDirectory 只对向导式安装包有效,
+# 与 oneClick: false 必须一起写, 否则打包报配置错误. src/main/build-config/nsis-installer.test.ts 断言这两行.
 nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
@@ -48,6 +52,3 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
