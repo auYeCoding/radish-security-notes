@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    name: Build and publish Windows packages
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Check that the tag matches package.json
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json version ${version}" >&2
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm test
+      - name: Build the installer and the portable executable
+        run: npm run build:win -- --publish never
+      - name: Write checksums and release notes
+        shell: bash
+        working-directory: dist
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          setup="radish-security-notes-${version}-setup.exe"
+          portable="radish-security-notes-${version}-portable.exe"
+          sha256sum "${setup}" "${portable}" > SHA256SUMS.txt
+          {
+            echo "## 下载 / Downloads"
+            echo
+            echo "| 文件 / File | 说明 / Description |"
+            echo "| --- | --- |"
+            echo "| \`${setup}\` | 安装包, 向导式安装, 可选安装路径 / Installer with a setup wizard |"
+            echo "| \`${portable}\` | 便携版, 免安装, 双击即用 / Portable, runs without installing |"
+            echo
+            echo "两个版本共用同一份数据 (\`%APPDATA%\` 下). 安装包没有代码签名, Windows SmartScreen 提示时点 \"更多信息\", 再点 \"仍要运行\"."
+            echo
+            echo "Both builds share the same data under \`%APPDATA%\`. The binaries are not code-signed: when Windows SmartScreen warns, choose \"More info\", then \"Run anyway\"."
+            echo
+            echo "## SHA256"
+            echo
+            echo '```text'
+            cat SHA256SUMS.txt
+            echo '```'
+          } > release-notes.md
+      - name: Publish the GitHub release
+        shell: bash
+        working-directory: dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          gh release create "${GITHUB_REF_NAME}" \
+            "radish-security-notes-${version}-setup.exe" \
+            "radish-security-notes-${version}-portable.exe" \
+            SHA256SUMS.txt \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file release-notes.md \
+            --generate-notes \
+            --verify-tag

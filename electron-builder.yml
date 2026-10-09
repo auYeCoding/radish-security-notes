@@ -18,6 +18,10 @@ electronFuses:
   enableEmbeddedAsarIntegrityValidation: true
 win:
   executableName: radish-security-notes
+  # 一次打出两个产物: 向导式安装包与免安装的便携版.
+  target:
+    - nsis
+    - portable
   # 平台专属的 files 只有排除项时会重新加入 "**/*", 所以重复写出白名单.
   files:
     - out/**
@@ -32,6 +36,9 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+# 便携版: 单个免安装的可执行文件, 不写注册表, 不建快捷方式. 数据仍在 Electron 用户数据目录, 与安装版共用.
+portable:
+  artifactName: ${name}-${version}-portable.${ext}
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
