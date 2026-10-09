@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 
 import type { NewEntryFormValues } from "@shared/entries/new-entry-schema";
 import type { FolderSummary } from "@shared/folders/folder-types";
-import { UNCATEGORIZED_KEY } from "@shared/folders/uncategorized-key";
 
 import { Field, FieldLabel } from "@renderer/components/ui/field";
 import {
@@ -16,11 +15,16 @@ import {
 } from "@renderer/components/ui/select";
 
 /**
+ * 下拉里 "无文件夹" 选项的取值: 下拉的取值必须是字符串, 用它代表表单里没有所属文件夹 (`undefined`).
+ */
+const NO_FOLDER_VALUE = "no-folder";
+
+/**
  * 下拉的一个选项.
  */
 interface FolderItem {
   /**
-   * 选项的取值, 是文件夹编号或 `UNCATEGORIZED_KEY`.
+   * 选项的取值, 是文件夹编号或 `NO_FOLDER_VALUE`.
    */
   readonly value: string;
   /**
@@ -40,7 +44,7 @@ interface FolderSelectFieldProps {
 }
 
 /**
- * 条目表单里的 "所属文件夹" 下拉: 选项是 "未分类" 加全部文件夹, 选 "未分类" 时表单取值里不带所属.
+ * 条目表单里的 "所属文件夹" 下拉: 选项是 "无文件夹" 加全部文件夹, 选 "无文件夹" 时表单取值里不带所属.
  * 新建与编辑共用, 必须在 `FormProvider` 里使用.
  * @param props 组件属性.
  * @returns 下拉字段元素.
@@ -53,7 +57,7 @@ export function FolderSelectField(
   const labelIdentifier = useId();
   const items = useMemo<readonly FolderItem[]>(
     () => [
-      { value: UNCATEGORIZED_KEY, label: t("entryForm.folderNone") },
+      { value: NO_FOLDER_VALUE, label: t("entryForm.folderNone") },
       ...props.folders.map((folder) => ({
         value: folder.id,
         label: folder.name,
@@ -72,9 +76,9 @@ export function FolderSelectField(
           </FieldLabel>
           <Select
             items={items}
-            value={field.value ?? UNCATEGORIZED_KEY}
+            value={field.value ?? NO_FOLDER_VALUE}
             onValueChange={(value) =>
-              field.onChange(value === UNCATEGORIZED_KEY ? undefined : value)
+              field.onChange(value === NO_FOLDER_VALUE ? undefined : value)
             }
           >
             <SelectTrigger aria-labelledby={labelIdentifier} className="w-full">

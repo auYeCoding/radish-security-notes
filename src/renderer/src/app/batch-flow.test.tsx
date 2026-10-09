@@ -29,7 +29,7 @@ const FOLDERS: readonly FolderSummary[] = [
 ];
 
 /**
- * 论坛与银行在办公文件夹里, 维基未分类, 论坛带重要与工作标签, 银行带工作标签.
+ * 论坛与银行在办公文件夹里, 维基没有所属文件夹, 论坛带重要与工作标签, 银行带工作标签.
  */
 const ENTRIES: readonly EntryDetail[] = [
   { ...FORUM_ENTRY, folderId: "office", tagIds: ["important", "work-tag"] },
@@ -69,6 +69,19 @@ function navButton(label: string, count: number): HTMLElement {
 }
 
 /**
+ * 读出条目 store 里每个条目现在带的标签编号.
+ * @param environment 条目环境.
+ * @returns 每个条目的编号与标签编号, 按 store 里的顺序排列.
+ */
+function tagIdsByEntry(
+  environment: EntryTestEnvironment,
+): [string, readonly string[] | undefined][] {
+  return environment.entryStore
+    .getState()
+    .entries.map((entry) => [entry.id, entry.tagIds]);
+}
+
+/**
  * 打开批量操作栏里的一个菜单, 点其中一项.
  * @param menuName 菜单按钮的名称.
  * @param itemName 菜单项的名称.
@@ -94,36 +107,43 @@ describe("批量移入文件夹与加标签", () => {
       await screen.findByRole("button", { name: /^家庭\s*2$/ }),
     ).toBeDefined();
     expect(navButton("办公", 1)).toBeDefined();
-    expect(navButton("未分类", 0)).toBeDefined();
+    expect(navButton("全部条目", 3)).toBeDefined();
+    expect(screen.queryByRole("button", { name: /未分类/ })).toBeNull();
     expect(getEntryListItems()).toHaveLength(3);
     expect(checkedIdsOf(environment)).toEqual([]);
     expect(screen.getByText("全选")).toBeDefined();
   });
 
-  it("批量加标签后侧栏的标签计数即时更新", async () => {
-    await renderWorkspace();
+  it("批量加标签后勾选的条目带上这个标签, 没勾选的条目不变", async () => {
+    const environment = await renderWorkspace();
     await checkRows(userEvent.setup(), ["论坛", "银行"]);
 
     await chooseBatchMenuItem("加标签", "个人");
 
-    expect(
-      await screen.findByRole("button", { name: /^个人\s*2$/ }),
-    ).toBeDefined();
-    expect(navButton("工作", 2)).toBeDefined();
+    await waitFor(() => {
+      expect(tagIdsByEntry(environment)).toEqual([
+        ["forum", ["important", "work-tag", "personal-tag"]],
+        ["bank", ["work-tag", "personal-tag"]],
+        ["wiki", undefined],
+      ]);
+    });
   });
 });
 
 describe("批量摘标签与删除", () => {
-  it("批量摘标签后侧栏的标签计数即时更新", async () => {
-    await renderWorkspace();
+  it("批量摘标签后勾选的条目不再带这个标签, 其它标签保留", async () => {
+    const environment = await renderWorkspace();
     await checkRows(userEvent.setup(), ["论坛", "银行"]);
 
     await chooseBatchMenuItem("摘标签", "工作");
 
-    expect(
-      await screen.findByRole("button", { name: /^工作\s*0$/ }),
-    ).toBeDefined();
-    expect(navButton("重要", 1)).toBeDefined();
+    await waitFor(() => {
+      expect(tagIdsByEntry(environment)).toEqual([
+        ["forum", ["important"]],
+        ["bank", undefined],
+        ["wiki", undefined],
+      ]);
+    });
   });
 
   it("批量删除后侧栏计数更新, 详情里的条目被删时选中相邻条目", async () => {

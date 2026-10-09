@@ -27,11 +27,10 @@ function isFollowing(first: Node, second: Node): boolean {
 }
 
 describe("AppShell 布局", () => {
-  it("显示三栏空壳: 标签与文件夹, 条目列表, 条目详情, 搜索入口与设置按钮, 应用名称在标题栏里而不在三栏界面里", async () => {
+  it("显示三栏空壳: 文件夹, 条目列表, 条目详情, 搜索入口与设置按钮, 应用名称在标题栏里而不在三栏界面里", async () => {
     await renderShell();
 
     expect(screen.queryByText("安全笔记")).toBeNull();
-    expect(screen.getByRole("heading", { name: "标签" })).toBeDefined();
     expect(screen.getByRole("heading", { name: "文件夹" })).toBeDefined();
     expect(screen.getByRole("heading", { name: "条目" })).toBeDefined();
     expect(screen.getByText("共 0 个条目")).toBeDefined();
@@ -40,13 +39,12 @@ describe("AppShell 布局", () => {
     expect(screen.getByRole("button", { name: "设置" })).toBeDefined();
   });
 
-  it("侧栏里标签在文件夹之上, 且没有主题与语言切换控件", async () => {
+  it("侧栏里只有文件夹分区, 没有标签分区, 也没有主题与语言切换控件", async () => {
     await renderShell();
 
     const sidebar = within(screen.getByRole("complementary"));
-    const tags = sidebar.getByRole("heading", { name: "标签" });
-    const folders = sidebar.getByRole("heading", { name: "文件夹" });
-    expect(isFollowing(tags, folders)).toBe(true);
+    expect(sidebar.getByRole("heading", { name: "文件夹" })).toBeDefined();
+    expect(sidebar.queryByRole("heading", { name: "标签" })).toBeNull();
     expect(sidebar.queryByRole("group", { name: "主题" })).toBeNull();
     expect(sidebar.queryByRole("group", { name: "语言" })).toBeNull();
   });
@@ -105,8 +103,9 @@ describe("AppShell 语言切换", () => {
       .setup()
       .click(screen.getByRole("button", { name: "English" }));
 
-    expect(await screen.findByRole("heading", { name: "Tags" })).toBeDefined();
-    expect(screen.getByRole("heading", { name: "Folders" })).toBeDefined();
+    expect(
+      await screen.findByRole("heading", { name: "Folders" }),
+    ).toBeDefined();
     expect(screen.getByRole("heading", { name: "Entries" })).toBeDefined();
     expect(screen.getByText("0 entries")).toBeDefined();
     expect(

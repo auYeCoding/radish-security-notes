@@ -16,7 +16,7 @@ export interface DeleteFolder {
    */
   readonly failureMessage: string | undefined;
   /**
-   * 确认删除: 删除文件夹, 其中条目移到未分类, 成功时调用成功回调, 失败时记下失败文案.
+   * 确认删除: 删除文件夹, 其中条目变为无文件夹, 成功时调用成功回调, 失败时记下失败文案.
    * @returns 删除完成后兑现.
    */
   readonly confirm: () => Promise<void>;

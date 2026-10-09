@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { ExportSummary } from "@shared/export/export-types";
 
 import { formatByteSize } from "@renderer/components/format-byte-size";
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import {
   SummaryList,
   type SummaryRow,
@@ -102,7 +103,7 @@ export function ExportResultStep(
     : "plaintextReminder";
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <DialogScrollBody className="gap-4">
         <h3 className="text-sm font-medium">{t("export.result.heading")}</h3>
         <SummaryList rows={toSummaryRows(summary, t, i18n.language)} />
         <ExportLossList losses={summary.losses} />
@@ -111,7 +112,7 @@ export function ExportResultStep(
           description={t(`export.result.${reminder}.description`)}
         />
         <ExportFailureAlert failure={props.notice?.failure} />
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button variant="outline" onClick={props.onRevealFile}>
           <FolderOpenIcon aria-hidden="true" data-icon="inline-start" />

@@ -1,5 +1,4 @@
 import type { EntrySummary } from "@shared/entries/entry-types";
-import { folderIdFromDropTarget } from "@shared/folders/folder-drop-target";
 import type { FolderSummary } from "@shared/folders/folder-types";
 import type { TFunction } from "i18next";
 
@@ -83,21 +82,16 @@ export function dragPreviewLabelOf(
 }
 
 /**
- * 按放置目标编号取目标的名称: 文件夹的名称, 或 "未分类".
+ * 按放置目标编号取目标的名称, 即目标文件夹的名称.
  * @param folders 全部文件夹.
  * @param targetId 放置目标编号.
- * @param translate 翻译函数.
  * @returns 目标名称, 找不到时为空串.
  */
 function targetNameOf(
   folders: readonly FolderSummary[],
   targetId: string,
-  translate: TFunction,
 ): string {
-  const folderId = folderIdFromDropTarget(targetId);
-  return folderId === undefined
-    ? translate("folderPane.uncategorized")
-    : (folders.find((folder) => folder.id === folderId)?.name ?? "");
+  return folders.find((folder) => folder.id === targetId)?.name ?? "";
 }
 
 /**
@@ -127,7 +121,7 @@ export function createEntryFolderAnnouncements(
         ? translate(`dragDrop.movedOverNothing${suffix}`, values)
         : translate(`dragDrop.movedOver${suffix}`, {
             ...values,
-            target: targetNameOf(folders, targetId, translate),
+            target: targetNameOf(folders, targetId),
           });
     },
     dropped: (sourceId, targetId) => {
@@ -136,7 +130,7 @@ export function createEntryFolderAnnouncements(
         ? translate(`dragDrop.droppedNowhere${suffix}`, values)
         : translate(`dragDrop.dropped${suffix}`, {
             ...values,
-            target: targetNameOf(folders, targetId, translate),
+            target: targetNameOf(folders, targetId),
           });
     },
     cancelled: (sourceId) => {

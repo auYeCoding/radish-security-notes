@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -20,6 +20,10 @@ interface AutoLockMinutesSelectProps {
    * 是否不可改.
    */
   readonly isDisabled: boolean;
+  /**
+   * 放在标签行右端的内容, 例如启用开关.
+   */
+  readonly labelAction?: ReactNode;
 }
 
 /**
@@ -34,7 +38,7 @@ function findMinutes(value: string): AutoLockIdleMinutes | undefined {
 }
 
 /**
- * 空闲时长下拉: 选项是 1, 5, 15, 30, 60 分钟, 选了就立即保存.
+ * 空闲时长下拉: 选项是 1, 5, 15, 30, 60 分钟, 选了就立即保存. 标签行右端可以放一个内容.
  * @param props 组件属性.
  * @returns 下拉字段元素.
  */
@@ -57,6 +61,7 @@ export function AutoLockMinutesSelect(
       items={items}
       value={String(settings.idleMinutes)}
       isDisabled={props.isDisabled}
+      labelAction={props.labelAction}
       onChange={(value) => {
         const minutes = findMinutes(value);
         if (minutes !== undefined) {

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { FieldGroup } from "@renderer/components/ui/field";
 
 import { CustomFieldsEditor } from "./custom-fields-editor";
@@ -33,7 +34,8 @@ interface EntryFormFieldsProps {
 
 /**
  * 条目表单的字段区, 新建与编辑共用: 依次是名称, 调用方给出的所属文件夹与标签选择, 该类型的字段,
- * 自定义字段, 备注与调用方给出的 TOTP 区. 超过限定高度时在区域内滚动. 必须在 `FormProvider` 里使用.
+ * 自定义字段, 备注与调用方给出的 TOTP 区. 超过对话框能给的高度时在区域内滚动, 对话框的标题与底部按钮行
+ * 固定. 必须在 `FormProvider` 里使用, 且放在可滚动对话框的表单里.
  * @param props 组件属性.
  * @returns 字段区元素.
  */
@@ -41,7 +43,7 @@ export function EntryFormFields(
   props: EntryFormFieldsProps,
 ): React.JSX.Element {
   return (
-    <div className="-m-1 max-h-96 overflow-y-auto p-1">
+    <DialogScrollBody>
       <FieldGroup>
         <EntryNameField />
         {props.folderField}
@@ -51,6 +53,6 @@ export function EntryFormFields(
         <NotesField />
         {props.totpField}
       </FieldGroup>
-    </div>
+    </DialogScrollBody>
   );
 }

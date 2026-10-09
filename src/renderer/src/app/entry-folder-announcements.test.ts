@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import type { EntrySummary } from "@shared/entries/entry-types";
 import type { FolderSummary } from "@shared/folders/folder-types";
-import { UNCATEGORIZED_KEY } from "@shared/folders/uncategorized-key";
 
 import {
   createEntryFolderAnnouncements,
@@ -51,9 +50,7 @@ describe("条目拖进文件夹的播报", () => {
     expect(announce.movedOver("forum", undefined)).toBe(
       "2 个条目不在任何文件夹上方.",
     );
-    expect(announce.dropped("forum", UNCATEGORIZED_KEY)).toBe(
-      "已把 2 个条目放入 未分类.",
-    );
+    expect(announce.dropped("forum", "home")).toBe("已把 2 个条目放入 家庭.");
     expect(announce.dropped("forum", undefined)).toBe(
       "2 个条目没有放入任何文件夹.",
     );

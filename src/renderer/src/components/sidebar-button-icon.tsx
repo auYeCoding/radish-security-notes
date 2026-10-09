@@ -28,11 +28,12 @@ interface SidebarButtonIconProps {
 }
 
 /**
- * 图标格在两种状态下的内边距: 展开时起始侧留 8px, 与文字隔开 6px; 折叠时都归零, 只剩居中的图标.
+ * 图标格在两种状态下的内边距: 展开时起始侧留 8px, 与文字隔开 6px; 折叠时起始侧取折叠态居中所需的
+ * 偏移 (组件 token), 与文字之间不再留间距, 只剩居中的图标.
  */
 const ICON_CELL_STATE_CLASSES: Readonly<Record<CollapseState, string>> = {
   expanded: "ps-2 pe-1.5",
-  collapsed: "ps-0 pe-0",
+  collapsed: "ps-(--sidebar-footer-icon-inset) pe-0",
 };
 
 /**
@@ -45,7 +46,8 @@ const DOT_FADE_STATE: Readonly<Record<CollapseState, CollapseState>> = {
 
 /**
  * 侧栏底部按钮里的图标格: 图标加可选的状态圆点. 内边距随折叠状态过渡, 展开时图标靠起始侧,
- * 折叠时居中; 状态圆点始终挂载, 折叠时淡入, 展开时淡出. 设置按钮与锁定按钮共用.
+ * 折叠时居中, 图标在两个终态之间沿一条直线滑到位; 状态圆点始终挂载, 折叠时淡入, 展开时淡出.
+ * 设置按钮与锁定按钮共用.
  * @param props 组件属性.
  * @returns 图标格元素.
  */

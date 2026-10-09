@@ -28,7 +28,7 @@ const FOLDERS: readonly FolderSummary[] = [
 ];
 
 /**
- * 论坛与银行在工作文件夹里, 维基未分类.
+ * 论坛与银行在工作文件夹里, 维基没有所属文件夹.
  */
 const FILED_ENTRIES: readonly EntryDetail[] = [
   { ...FORUM_ENTRY, folderId: "work" },
@@ -80,22 +80,23 @@ function listedNames(): string[] {
 }
 
 describe("侧栏文件夹列表", () => {
-  it("固定入口在前, 其后是自建文件夹, 每行显示条目数, 默认选中全部条目", async () => {
+  it("固定入口只有全部条目, 其后是自建文件夹, 每行显示条目数, 默认选中全部条目", async () => {
     await renderWorkspace();
 
     expect(navButton("全部条目", 3).getAttribute("aria-current")).toBe("true");
-    expect(navButton("未分类", 1).getAttribute("aria-current")).toBeNull();
     expect(navButton("工作", 2)).toBeDefined();
     expect(navButton("家庭", 0)).toBeDefined();
     expect(screen.queryByText("还没有文件夹")).toBeNull();
+    expect(screen.queryByRole("button", { name: /未分类/ })).toBeNull();
+    expect(screen.queryByText("未分类")).toBeNull();
   });
 
-  it("没有自建文件夹时说明还没有文件夹, 固定入口仍在", async () => {
+  it("没有自建文件夹时说明还没有文件夹, 全部条目仍在并显示总数, 没有未分类入口", async () => {
     await renderWorkspace({ folders: [], entries: [] });
 
     expect(screen.getByText("还没有文件夹")).toBeDefined();
     expect(navButton("全部条目", 0)).toBeDefined();
-    expect(navButton("未分类", 0)).toBeDefined();
+    expect(screen.queryByRole("button", { name: /未分类/ })).toBeNull();
   });
 
   it("读取文件夹失败时说明原因", async () => {
@@ -125,15 +126,14 @@ describe("侧栏文件夹列表", () => {
 });
 
 describe("点文件夹筛选条目", () => {
-  it("点文件夹只显示其中的条目, 点未分类只显示未分类的, 点全部条目恢复", async () => {
+  it("点文件夹只显示其中的条目, 点全部条目恢复, 没有所属文件夹的条目只在全部条目里", async () => {
     await renderWorkspace();
     const user = userEvent.setup();
 
+    expect(listedNames()).toEqual(["论坛", "维基", "银行"]);
     await user.click(navButton("工作", 2));
     expect(listedNames()).toEqual(["论坛", "银行"]);
     expect(navButton("工作", 2).getAttribute("aria-current")).toBe("true");
-    await user.click(navButton("未分类", 1));
-    expect(listedNames()).toEqual(["维基"]);
     await user.click(navButton("家庭", 0));
     expect(screen.getByText("这里还没有条目")).toBeDefined();
     await user.click(navButton("全部条目", 3));
@@ -168,7 +168,7 @@ describe("点文件夹筛选条目", () => {
     expect(screen.getByText("选择一个条目查看详情")).toBeDefined();
   });
 
-  it("详情标明所属文件夹, 未分类的条目标明未分类", async () => {
+  it("详情标明所属文件夹, 没有所属文件夹的条目标明无文件夹", async () => {
     await renderWorkspace();
     const user = userEvent.setup();
 
@@ -182,6 +182,6 @@ describe("点文件夹筛选条目", () => {
 
     expect(await screen.findByRole("heading", { name: "维基" })).toBeDefined();
     expect(screen.queryByText("文件夹: 工作")).toBeNull();
-    expect(screen.getByText("未分类", { selector: "p" })).toBeDefined();
+    expect(screen.getByText("无文件夹", { selector: "p" })).toBeDefined();
   });
 });

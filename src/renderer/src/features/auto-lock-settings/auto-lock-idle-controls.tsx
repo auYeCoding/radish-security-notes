@@ -14,7 +14,8 @@ interface AutoLockIdleControlsProps {
 }
 
 /**
- * 空闲自动锁定行的控件: 一个开关加一个时长下拉. 开关关闭时时长也不可改, 因为这时时长没有用.
+ * 空闲自动锁定行的控件: 一个时长下拉, 开关在下拉标签 "空闲时长" 所在的行, 靠右对齐. 开关关闭时时长也
+ * 不可改, 因为这时时长没有用.
  * @param props 组件属性.
  * @returns 控件元素.
  */
@@ -23,13 +24,15 @@ export function AutoLockIdleControls(
 ): React.JSX.Element {
   const { settings } = useAutoLockSettings();
   return (
-    <div className="flex min-w-40 flex-col gap-3">
-      <AutoLockToggle
-        settingKey="isIdleLockEnabled"
-        isDisabled={props.isDisabled}
-      />
+    <div className="min-w-40">
       <AutoLockMinutesSelect
         isDisabled={props.isDisabled || !settings.isIdleLockEnabled}
+        labelAction={
+          <AutoLockToggle
+            settingKey="isIdleLockEnabled"
+            isDisabled={props.isDisabled}
+          />
+        }
       />
     </div>
   );

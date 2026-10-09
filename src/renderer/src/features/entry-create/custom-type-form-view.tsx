@@ -9,6 +9,7 @@ import {
 } from "@shared/entries/custom-types/custom-entry-type-schema";
 
 import { EntryFormActions } from "@renderer/components/entry-form/entry-form-actions";
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { TextField } from "@renderer/components/text-field";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { FieldGroup } from "@renderer/components/ui/field";
@@ -49,7 +50,7 @@ interface CustomTypeFormViewProps {
 
 /**
  * 新建与编辑自定义条目类型共用的表单外壳: 顶部是返回按钮, 之后依次是类型名称与字段区, 最后是
- * 取消, 保存按钮. 字段区超过限定高度时在区域内滚动, 保存失败的原因显示在字段区上方的提示条里,
+ * 取消, 保存按钮. 字段区超过对话框能给的高度时在区域内滚动 (标题, 返回按钮与底部按钮行固定), 保存失败的原因显示在字段区上方的提示条里,
  * 校验错误显示在对应输入下方. 初始取值, 提交行为与保存按钮文字由调用方给出.
  * @param props 组件属性.
  * @returns 表单元素.
@@ -68,7 +69,7 @@ export function CustomTypeFormView(
     <FormProvider {...form}>
       <form
         noValidate
-        className="flex flex-col gap-5"
+        className="flex min-h-0 flex-col gap-5"
         onSubmit={(event) => void form.handleSubmit(props.onSubmit)(event)}
       >
         <CustomTypeBackBar onBack={props.onBack} isDisabled={isSubmitting} />
@@ -77,7 +78,7 @@ export function CustomTypeFormView(
             <AlertDescription>{props.failureMessage}</AlertDescription>
           </Alert>
         )}
-        <div className="-m-1 max-h-96 overflow-y-auto p-1">
+        <DialogScrollBody>
           <FieldGroup>
             <TextField
               {...form.register("name")}
@@ -87,7 +88,7 @@ export function CustomTypeFormView(
             />
             <CustomTypeFieldsEditor />
           </FieldGroup>
-        </div>
+        </DialogScrollBody>
         <EntryFormActions
           cancelLabel={t("entryCreate.customType.cancel")}
           submitLabel={props.submitLabel}

@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import type { EntrySummary } from "../entries/entry-types";
-import { UNCATEGORIZED_KEY } from "../folders/uncategorized-key";
 import { batchOfDragSource, resolveBatchDrop } from "./batch-drop-target";
 
 /**
- * 测试用的条目摘要: 甲与乙在工作文件夹里, 丙未分类.
+ * 测试用的条目摘要: 甲与乙在工作文件夹里, 丙没有所属文件夹.
  */
 const ENTRIES: readonly EntrySummary[] = [
   { id: "a", name: "甲", type: "login", account: "", folderId: "work" },
@@ -32,14 +31,14 @@ describe("resolveBatchDrop", () => {
     });
   });
 
-  it("已经在目标里的条目被剔除, 放在未分类上时目标文件夹为 undefined", () => {
+  it("已经在目标里的条目被剔除", () => {
     expect(resolveBatchDrop(ENTRIES, ["a", "b", "c"], "work")).toEqual({
       entryIds: ["c"],
       folderId: "work",
     });
-    expect(resolveBatchDrop(ENTRIES, ["a", "c"], UNCATEGORIZED_KEY)).toEqual({
-      entryIds: ["a"],
-      folderId: undefined,
+    expect(resolveBatchDrop(ENTRIES, ["a", "c"], "home")).toEqual({
+      entryIds: ["a", "c"],
+      folderId: "home",
     });
   });
 

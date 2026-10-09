@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 
 import { Field, FieldLabel } from "@renderer/components/ui/field";
 import {
@@ -47,18 +47,31 @@ interface SelectFieldProps {
    * 是否不可改.
    */
   readonly isDisabled?: boolean;
+  /**
+   * 放在标签行右端的内容, 例如一个开关; 没有时标签行只有标签.
+   */
+  readonly labelAction?: ReactNode;
 }
 
 /**
- * 带标签的下拉字段: 标签在上, 下拉占满一行, 标签是下拉的无障碍名称.
+ * 带标签的下拉字段: 标签在上, 下拉占满一行, 标签是下拉的无障碍名称. 给了 `labelAction` 时它与标签
+ * 在同一行, 靠右对齐.
  * @param props 组件属性.
  * @returns 下拉字段元素.
  */
 export function SelectField(props: SelectFieldProps): React.JSX.Element {
   const labelIdentifier = useId();
+  const label = <FieldLabel id={labelIdentifier}>{props.label}</FieldLabel>;
   return (
     <Field>
-      <FieldLabel id={labelIdentifier}>{props.label}</FieldLabel>
+      {props.labelAction === undefined ? (
+        label
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          {label}
+          {props.labelAction}
+        </div>
+      )}
       <Select
         items={props.items}
         value={props.value}

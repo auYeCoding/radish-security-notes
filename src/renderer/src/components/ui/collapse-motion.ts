@@ -4,9 +4,9 @@
 export type CollapseState = "expanded" | "collapsed";
 
 /**
- * 可折叠盒子收放的方向: 沿宽度收放, 或沿高度收放.
+ * 可折叠盒子收放的方向: 沿宽度收放, 或尺寸不变只淡入淡出 (`none`), 后者用于折叠前后占位必须一样的内容.
  */
-export type CollapseAxis = "width" | "height";
+export type CollapseAxis = "width" | "none";
 
 /**
  * 尺寸过渡: 宽度与高度在基础档内按动效曲线变化. 属性名 `extent` 在主题样式里登记,
@@ -43,15 +43,26 @@ export const COLLAPSE_FADE_CLASSES: Readonly<Record<CollapseState, string>> = {
 export const COLLAPSE_BOX_BASE_CLASSES = `overflow-hidden ${COLLAPSE_EXTENT_TRANSITION}`;
 
 /**
- * 可折叠盒子外层在两个方向, 两种状态下的尺寸类名: 展开取自动尺寸, 折叠取零.
- * 沿宽度收放的盒子是行内的伸缩子项, 不参与挤压.
+ * 可折叠盒子外层在两个方向, 两种状态下的尺寸类名: 沿宽度收放时展开取自动尺寸, 折叠取零,
+ * 盒子是行内的伸缩子项, 不参与挤压; `none` 两种状态都不设尺寸, 占位不随折叠变化.
  */
 export const COLLAPSE_BOX_AXIS_CLASSES: Readonly<
   Record<CollapseAxis, Readonly<Record<CollapseState, string>>>
 > = {
   width: { expanded: "w-auto shrink-0", collapsed: "w-0 shrink-0" },
-  height: { expanded: "h-auto", collapsed: "h-0" },
+  none: { expanded: "", collapsed: "" },
 };
+
+/**
+ * 叠放容器的类名: 单列网格, 淡入淡出的几层叠在同一个单元里, 容器高度取其中最高的一层, 不随
+ * 哪一层可见而变化.
+ */
+export const COLLAPSE_LAYER_STACK_CLASSES = "grid";
+
+/**
+ * 叠放的一层所在的网格单元.
+ */
+export const COLLAPSE_LAYER_CELL_CLASSES = "col-start-1 row-start-1";
 
 /**
  * 行内文字区外层的共同类名: 伸缩基准为零, 靠伸缩份额占满或让出剩余宽度, 裁掉多出的文字,

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import type { RestoreFailure } from "@shared/restore/restore-result";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
@@ -34,11 +35,13 @@ export function RestoreFailureStep(
   const { t } = useTranslation();
   return (
     <>
-      <Alert variant="destructive">
-        <AlertDescription>
-          {describeRestoreBackupFailure(props.failure, t)}
-        </AlertDescription>
-      </Alert>
+      <DialogScrollBody>
+        <Alert variant="destructive">
+          <AlertDescription>
+            {describeRestoreBackupFailure(props.failure, t)}
+          </AlertDescription>
+        </Alert>
+      </DialogScrollBody>
       <DialogFooter>
         <Button onClick={props.onBack}>{t("restore.failure.back")}</Button>
       </DialogFooter>

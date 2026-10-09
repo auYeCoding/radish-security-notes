@@ -28,7 +28,7 @@ const FOLDERS: readonly FolderSummary[] = [
 ];
 
 /**
- * 论坛与银行在工作文件夹里, 维基未分类.
+ * 论坛与银行在工作文件夹里, 维基没有所属文件夹.
  */
 const FILED_ENTRIES: readonly EntryDetail[] = [
   { ...FORUM_ENTRY, folderId: "work" },
@@ -169,21 +169,15 @@ describe("把条目拖进文件夹", () => {
     expect(getEntryListItems()).toHaveLength(3);
   });
 
-  it("放在未分类上后条目回到未分类", async () => {
+  it("放在全部条目上不是放入文件夹, 不调用接口, 条目仍在原文件夹里", async () => {
     const environment = await renderWorkspace();
-    placeLayout("未分类", "论坛");
+    placeLayout("全部条目", "论坛");
 
     await dragWithKeyboard("论坛");
 
-    await waitFor(() => {
-      expect(environment.folderBridge.assignEntry).toHaveBeenCalledWith(
-        "forum",
-        undefined,
-      );
-    });
-    expect(
-      await screen.findByRole("button", { name: /^未分类\s*2$/ }),
-    ).toBeDefined();
+    expect(environment.folderBridge.assignEntry).not.toHaveBeenCalled();
+    expect(navButton("工作", 2)).toBeDefined();
+    expect(navButton("全部条目", 3)).toBeDefined();
   });
 
   it("条目已在目标文件夹里时不调用接口", async () => {

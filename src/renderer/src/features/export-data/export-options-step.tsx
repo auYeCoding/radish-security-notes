@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
 
@@ -50,7 +51,7 @@ export function ExportOptionsStep(
   const { t } = useTranslation();
   return (
     <>
-      <div className="flex flex-col gap-5">
+      <DialogScrollBody className="gap-5">
         <ExportFormatChoice
           value={props.draft.format}
           onChange={(format) => props.onChange({ format })}
@@ -63,7 +64,7 @@ export function ExportOptionsStep(
         />
         <ExportContentOptions draft={props.draft} onChange={props.onChange} />
         <ExportEncryptionFields draft={props.draft} onChange={props.onChange} />
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button
           onClick={props.onNext}

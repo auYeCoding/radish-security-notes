@@ -7,7 +7,6 @@ import {
 } from "@shared/entries/entry-types";
 import { selectVisibleEntries } from "@shared/entries/visible-entries";
 import { followEntryView } from "@shared/folders/folder-view";
-import { followEntryTags } from "@shared/tags/tag-filter";
 
 import { selectEntry, type EntryStoreAccess } from "./entry-store-actions";
 import { selectedIdOf } from "./entry-state";
@@ -29,7 +28,7 @@ export function findNeighbour(
 /**
  * 更新一个条目. 成功后列表里该条目的摘要原位换成新值, 正在显示它的详情换成新详情, 编辑次数加
  * 一让详情视图重新挂载; 条目改到别的文件夹而不再属于当前入口时, 入口跟随条目切到它新所属的文件夹;
- * 条目不再带某些已选标签时, 取消这些已选标签; 搜索关键字与列表顺序不动.
+ * 搜索关键字与列表顺序不动.
  * @param access store 动作能用到的东西.
  * @param id 条目编号.
  * @param input 用户填写的名称, 类型字段, 备注, 自定义字段与 TOTP 的处理方式.
@@ -56,7 +55,6 @@ export async function updateEntry(
             : state.selection,
         detailRevision: state.detailRevision + 1,
         view: followEntryView(state.view, detail.folderId),
-        selectedTagIds: followEntryTags(state.selectedTagIds, detail.tagIds),
       });
     }
     return result;
@@ -66,7 +64,7 @@ export async function updateEntry(
 }
 
 /**
- * 删除一个条目. 成功后条目从列表移除; 删除的是当前选中的条目时, 按当前入口, 已选标签与搜索关键字下的可见列表
+ * 删除一个条目. 成功后条目从列表移除; 删除的是当前选中的条目时, 按当前入口与搜索关键字下的可见列表
  * 选中相邻条目并读取它的详情, 没有别的条目时回到没有选中的状态.
  * @param access store 动作能用到的东西.
  * @param id 条目编号.
@@ -82,11 +80,10 @@ export async function removeEntry(
     if (!result.ok) {
       return result;
     }
-    const { entries, searchMatches, selection, selectedTagIds, view } = get();
+    const { entries, searchMatches, selection, view } = get();
     const visible = selectVisibleEntries({
       entries,
       view,
-      tagIds: selectedTagIds,
       matches: searchMatches,
     });
     const neighbour = findNeighbour(visible, id);

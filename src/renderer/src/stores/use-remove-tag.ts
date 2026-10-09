@@ -6,8 +6,7 @@ import { useEntryStore } from "./use-entry-store";
 import { useTagStore } from "./use-tag-store";
 
 /**
- * 取得删除标签的方法: 先经标签接口在主进程删除, 成功后从列表移除标签, 并让条目在内存里摘掉
- * 它, 已选标签里的它也被去掉.
+ * 取得删除标签的方法: 先经标签接口在主进程删除, 成功后从列表移除标签, 并让条目在内存里摘掉它.
  * @returns 删除方法.
  */
 export function useRemoveTag(): (

@@ -13,7 +13,7 @@ export interface ExportScopeIds {
    */
   readonly allCount: number;
   /**
-   * 当前列表里的条目编号: 左侧栏所选文件夹与标签, 搜索框筛出的条目, 按列表里的先后排列.
+   * 当前列表里的条目编号: 左侧栏所选文件夹, 搜索框筛出的条目, 按列表里的先后排列.
    */
   readonly currentIds: readonly string[];
   /**

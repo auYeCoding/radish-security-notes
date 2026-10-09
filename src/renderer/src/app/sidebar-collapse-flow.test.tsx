@@ -34,7 +34,7 @@ const FOLDERS: readonly FolderSummary[] = [
 ];
 
 /**
- * 论坛与银行在公司文件夹里, 论坛带重要与工作标签, 银行带工作标签; 维基未分类, 带个人标签.
+ * 论坛与银行在公司文件夹里, 论坛带重要与工作标签, 银行带工作标签; 维基没有所属文件夹, 带个人标签.
  */
 const ENTRIES: readonly EntryDetail[] = [
   { ...FORUM_ENTRY, folderId: "company", tagIds: ["important", "work-tag"] },
@@ -173,23 +173,26 @@ describe("折叠与展开侧栏", () => {
 });
 
 describe("折叠态的侧栏内容", () => {
-  it("每个标签, 全部条目, 未分类与文件夹行都收起文字, 名称仍带条目数", async () => {
+  it("全部条目与文件夹行都收起文字, 名称仍带条目数, 没有标签行与未分类入口", async () => {
     await renderWorkspace({ isCollapsed: true });
 
     const rows = within(getSidebar()).getAllByRole("listitem");
-    expect(rows).toHaveLength(7);
+    expect(rows).toHaveLength(3);
     rows.forEach((row) => {
       const text = row.querySelector("[data-slot='sidebar-nav-item-text']");
       expect(text?.classList.contains("grow-0")).toBe(true);
       expect(text?.classList.contains("sr-only")).toBe(false);
     });
-    ["重要 1", "全部条目 3", "未分类 1", "公司 2", "家庭 0"].forEach((name) =>
+    ["全部条目 3", "公司 2", "家庭 0"].forEach((name) =>
       expect(
         within(getSidebar()).getByRole("button", {
           name: new RegExp(`^${name.replace(" ", "\\s*")}$`),
         }),
       ).toBeDefined(),
     );
+    expect(
+      within(getSidebar()).queryByRole("button", { name: /未分类/ }),
+    ).toBeNull();
   });
 
   it("没有分区标题, 新建按钮和行尾更多菜单, 展开后都回来", async () => {
@@ -197,53 +200,48 @@ describe("折叠态的侧栏内容", () => {
     const sidebar = within(getSidebar());
 
     expect(sidebar.queryByRole("heading")).toBeNull();
-    expect(sidebar.queryByRole("button", { name: "新建标签" })).toBeNull();
     expect(sidebar.queryByRole("button", { name: "新建文件夹" })).toBeNull();
     expect(
       sidebar.queryAllByRole("button", { name: /的更多操作/ }),
     ).toHaveLength(0);
-    expect(sidebar.getAllByRole("separator")).toHaveLength(2);
+    expect(sidebar.getAllByRole("separator")).toHaveLength(1);
     await userEvent
       .setup()
       .click(screen.getByRole("button", { name: "展开侧栏" }));
 
-    expect(sidebar.getAllByRole("heading")).toHaveLength(2);
-    expect(sidebar.getByRole("button", { name: "新建标签" })).toBeDefined();
+    expect(sidebar.getAllByRole("heading")).toHaveLength(1);
     expect(sidebar.getByRole("button", { name: "新建文件夹" })).toBeDefined();
     expect(
       sidebar.queryAllByRole("button", { name: /的更多操作/ }).length,
-    ).toBe(5);
+    ).toBe(2);
   });
 });
 
-describe("折叠态点标签与文件夹筛选", () => {
-  it("点标签与文件夹筛选条目, 选中的行保留高亮和选中标记", async () => {
+describe("折叠态点文件夹筛选", () => {
+  it("点文件夹筛选条目, 选中的行保留高亮和选中标记", async () => {
     await renderWorkspace({ isCollapsed: true });
     const user = userEvent.setup();
 
-    await user.click(navButton("工作", 2));
     await user.click(navButton("公司", 2));
 
     expect(getEntryListItems()).toHaveLength(2);
-    expect(navButton("工作", 2).getAttribute("aria-pressed")).toBe("true");
-    expect(navButton("工作", 2).closest("li")?.classList).toContain("bg-muted");
     expect(navButton("公司", 2).getAttribute("aria-current")).toBe("true");
     expect(navButton("公司", 2).closest("li")?.classList).toContain("bg-muted");
     expect(navButton("全部条目", 3).getAttribute("aria-current")).toBeNull();
   });
 
-  it("再点同一个标签取消筛选, 点未分类只显示未分类的条目", async () => {
+  it("点全部条目回到全部, 再点文件夹只显示其中的条目", async () => {
     await renderWorkspace({ isCollapsed: true });
     const user = userEvent.setup();
 
-    await user.click(navButton("个人", 1));
-    expect(getEntryListItems()).toHaveLength(1);
-    await user.click(navButton("个人", 1));
+    await user.click(navButton("公司", 2));
+    expect(getEntryListItems()).toHaveLength(2);
+    await user.click(navButton("全部条目", 3));
     expect(getEntryListItems()).toHaveLength(3);
-    await user.click(navButton("未分类", 1));
+    await user.click(navButton("公司", 2));
 
-    expect(getEntryListItems()).toHaveLength(1);
-    expect(navButton("未分类", 1).getAttribute("aria-current")).toBe("true");
+    expect(getEntryListItems()).toHaveLength(2);
+    expect(navButton("公司", 2).getAttribute("aria-current")).toBe("true");
   });
 });
 
@@ -268,21 +266,15 @@ describe("折叠态把条目拖到文件夹图标上", () => {
     expect(navButton("公司", 1)).toBeDefined();
   });
 
-  it("放在未分类图标上后条目回到未分类", async () => {
+  it("放在全部条目图标上不是放入文件夹, 不调用接口, 条目仍在原文件夹里", async () => {
     const environment = await renderWorkspace({ isCollapsed: true });
-    placeLayout("未分类", "论坛");
+    placeLayout("全部条目", "论坛");
 
     await dragWithKeyboard("论坛");
 
-    await waitFor(() =>
-      expect(environment.folderBridge.assignEntry).toHaveBeenCalledWith(
-        "forum",
-        undefined,
-      ),
-    );
-    expect(
-      await screen.findByRole("button", { name: /^未分类\s*2$/ }),
-    ).toBeDefined();
+    expect(environment.folderBridge.assignEntry).not.toHaveBeenCalled();
+    expect(navButton("公司", 2)).toBeDefined();
+    expect(navButton("全部条目", 3)).toBeDefined();
   });
 });
 

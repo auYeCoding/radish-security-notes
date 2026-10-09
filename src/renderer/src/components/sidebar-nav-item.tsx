@@ -14,18 +14,13 @@ import { cn } from "@renderer/lib/class-names";
 import { useDropTarget } from "@renderer/lib/drag-drop/use-drop-target";
 
 import { SidebarNavItemActions } from "./sidebar-nav-item-actions";
+import { SidebarNavItemIcon } from "./sidebar-nav-item-icon";
 import { SidebarNavItemText } from "./sidebar-nav-item-text";
 
 /**
  * 不接收放置的行用的占位编号, 它的放置目标处于禁用状态, 不会被命中.
  */
 const NO_DROP_TARGET_ID = "no-drop-target";
-
-/**
- * 侧栏一行表达选中状态的方式: `current` 是单选列表里的当前项 (`aria-current`), 例如文件夹入口;
- * `toggle` 是可以多选的开关 (`aria-pressed`), 例如标签.
- */
-export type SidebarSelectionKind = "current" | "toggle";
 
 /**
  * 侧栏一行的属性.
@@ -52,10 +47,6 @@ interface SidebarNavItemProps {
    */
   readonly onSelect: () => void;
   /**
-   * 选中状态的表达方式, 默认是 `current`.
-   */
-  readonly selectionKind?: SidebarSelectionKind;
-  /**
    * 作为放置目标时的编号, 省略表示不接收拖放.
    */
   readonly dropTargetId?: string;
@@ -74,10 +65,11 @@ const ROW_END_PADDING: Readonly<Record<CollapseState, string>> = {
 };
 
 /**
- * 按钮内容的排布: 图标与文字这一组始终在行内水平居中, 图标与文字的间距由文字容器自己的外边距
- * 过渡, 所以按钮本身不留间距. 展开时文字容器占满剩余宽度, 看上去靠起始侧排列; 折叠时只剩居中的图标.
+ * 按钮内容的排布: 内容靠起始侧排列, 起始侧不留内边距, 图标与文字的间距由文字容器自己的外边距过渡,
+ * 图标离起始侧的距离由图标格的外边距过渡, 所以按钮本身只在结束侧留内边距. 展开时文字容器占满剩余
+ * 宽度, 折叠时只剩图标, 图标格的外边距让它恰好居中.
  */
-const BUTTON_LAYOUT_CLASSES = "justify-center gap-0 px-3";
+const BUTTON_LAYOUT_CLASSES = "justify-start gap-0 ps-0 pe-3";
 
 /**
  * 拼出一行容器的类名: 快档状态过渡, 起始侧选中竖条的占位, 行尾内边距, 选中与放置高亮.
@@ -102,7 +94,7 @@ function buildRowClassName(
 
 /**
  * 侧栏的一行入口: 图标, 名称与条目数, 行尾可放操作. 选中项除底色外, 起始侧还有强调色竖条, 并
- * 按 `selectionKind` 标记为当前项或已按下; 可接收拖放的行在拖拽源悬停时加底色与描边. 侧栏折叠时
+ * 用 `aria-current` 标记为当前项; 可接收拖放的行在拖拽源悬停时加底色与描边. 侧栏折叠时
  * 同一结构只显示居中的图标: 图标与文字在同一个按钮里, 文字容器收窄并淡出但仍是按钮的无障碍名称,
  * 行尾操作淡出并不可聚焦与点击, 悬停或聚焦时在右侧提示 "名称 (条目数)"; 选中状态与放置目标不变.
  * @param props 组件属性.
@@ -115,7 +107,6 @@ export function SidebarNavItem(props: SidebarNavItemProps): React.JSX.Element {
     props.dropTargetId ?? NO_DROP_TARGET_ID,
     props.dropTargetId === undefined,
   );
-  const isToggle = props.selectionKind === "toggle";
   const state: CollapseState = isCollapsed ? "collapsed" : "expanded";
   return (
     <li
@@ -127,8 +118,7 @@ export function SidebarNavItem(props: SidebarNavItemProps): React.JSX.Element {
           render={
             <Button
               variant="ghost"
-              aria-current={!isToggle && props.isSelected ? "true" : undefined}
-              aria-pressed={isToggle ? props.isSelected : undefined}
+              aria-current={props.isSelected ? "true" : undefined}
               onClick={props.onSelect}
               className={cn(
                 "h-(--control-height) min-w-0 flex-1 rounded-none text-start",
@@ -137,7 +127,7 @@ export function SidebarNavItem(props: SidebarNavItemProps): React.JSX.Element {
             />
           }
         >
-          {props.icon}
+          <SidebarNavItemIcon icon={props.icon} isCollapsed={isCollapsed} />
           <SidebarNavItemText
             label={props.label}
             count={props.count}

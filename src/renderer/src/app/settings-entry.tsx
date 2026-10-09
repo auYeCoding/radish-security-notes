@@ -10,8 +10,10 @@ import { ThemeSwitcher } from "@renderer/features/preferences-switchers/theme-sw
 import { RestoreTrigger } from "@renderer/features/restore-backup/restore-trigger";
 import { SettingsDialog } from "@renderer/features/settings-dialog/settings-dialog";
 import { SettingsTrigger } from "@renderer/features/settings-trigger/settings-trigger";
+import { NewTagTrigger } from "@renderer/features/tag-create/new-tag-trigger";
 
 import { createSecurityEntries } from "./security-entries";
+import { SettingsTagList } from "./settings-tag-list";
 
 /**
  * 设置入口的属性.
@@ -34,7 +36,8 @@ interface SettingsEntryProps {
 
 /**
  * 设置入口的装配: 侧栏底部的设置按钮与它打开的设置对话框. 持有对话框的开合状态, 把主题切换与语言切换
- * 放进对话框的 "外观与语言" 分区, 把导入, 导出, 邮箱备份, 从备份恢复四个入口放进 "数据" 分区, 把主密码开关,
+ * 放进对话框的 "外观与语言" 分区, 把新建标签入口与标签列表放进 "标签" 分区, 把导入, 导出, 邮箱备份,
+ * 从备份恢复四个入口放进 "数据" 分区, 把主密码开关,
  * 查看恢复密钥与空闲, 锁屏, 休眠三个自动锁定控件放进 "安全" 分区; 最近一次自动备份失败时设置按钮上有失败标记.
  * 对话框打开期间不读取失败状态, 标记由对话框里的邮箱备份入口显示, 关闭后立即重新读取.
  * @param props 组件属性.
@@ -59,6 +62,10 @@ export function SettingsEntry(props: SettingsEntryProps): React.JSX.Element {
           appearance={{
             themeAction: <ThemeSwitcher />,
             languageAction: <LanguageSwitcher />,
+          }}
+          tags={{
+            createAction: <NewTagTrigger />,
+            tagList: <SettingsTagList />,
           }}
           data={{
             importAction: <ImportTrigger />,

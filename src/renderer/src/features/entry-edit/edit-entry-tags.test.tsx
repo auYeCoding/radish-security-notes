@@ -97,26 +97,22 @@ describe("编辑条目时移除标签", () => {
     expect(input?.tagIds).toEqual([]);
   });
 
-  it("去掉了当前已选的标签后保存, 侧栏筛选跟随条目", async () => {
+  it("去掉一个标签后保存, 条目保持选中, 带着剩下的标签", async () => {
     const environment = await renderOpenedEditEntryDialog(
       (detail) => <EditEntryTrigger detail={detail} />,
       TAGGED_FORUM,
       { tags: TEST_TAGS },
     );
-    environment.entryStore.getState().toggleTag("important");
-    environment.entryStore.getState().toggleTag("work-tag");
     const user = userEvent.setup();
 
     await user.click(screen.getByRole("button", { name: "移除标签 重要" }));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     await waitFor(() => {
-      expect(environment.entryStore.getState().selectedTagIds).toEqual([
-        "work-tag",
-      ]);
-    });
-    expect(environment.entryStore.getState().selection).toMatchObject({
-      status: "ready",
+      expect(environment.entryStore.getState().selection).toMatchObject({
+        status: "ready",
+        detail: { tagIds: ["work-tag"] },
+      });
     });
   });
 });

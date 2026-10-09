@@ -10,7 +10,7 @@ import {
 } from "@renderer/testing/preferences-test-environment";
 
 import { SidebarCollapseContext } from "./sidebar-collapse-context";
-import { SidebarNavItem, type SidebarSelectionKind } from "./sidebar-nav-item";
+import { SidebarNavItem } from "./sidebar-nav-item";
 import { Button } from "./ui/button";
 import { COLLAPSIBLE_TEXT_STATE_CLASSES } from "./ui/collapse-motion";
 
@@ -46,10 +46,6 @@ interface RenderRowOptions {
    * 这一行是否被选中, 默认未选中.
    */
   readonly isSelected?: boolean;
-  /**
-   * 选中状态的表达方式.
-   */
-  readonly selectionKind?: SidebarSelectionKind;
 }
 
 /**
@@ -68,7 +64,7 @@ interface RenderedRow {
 
 /**
  * 在偏好环境和侧栏折叠上下文里渲染名称为 "工作", 条目数为 3 的一行入口, 行尾带一个更多按钮.
- * @param options 折叠状态, 选中状态与选中方式.
+ * @param options 折叠状态与选中状态.
  * @returns 选中回调的间谍与偏好环境.
  */
 async function renderRow(options: RenderRowOptions): Promise<RenderedRow> {
@@ -82,7 +78,6 @@ async function renderRow(options: RenderRowOptions): Promise<RenderedRow> {
           icon={<FolderIcon aria-hidden="true" />}
           count={3}
           isSelected={options.isSelected ?? false}
-          selectionKind={options.selectionKind}
           onSelect={onSelect}
           actions={<Button>工作的更多操作</Button>}
         />
@@ -164,13 +159,16 @@ describe("侧栏行入口: 折叠态的结构", () => {
     expect(actionsBox?.getAttribute("aria-hidden")).toBe("true");
   });
 
-  it("按钮仍有无障碍名称, 图标在按钮里水平居中", async () => {
+  it("按钮仍有无障碍名称, 图标格的起始侧外边距取折叠态居中所需的偏移", async () => {
     await renderRow({ isCollapsed: true });
 
     const button = screen.getByRole("button", { name: ROW_NAME });
-    expect(button.querySelector("svg")).not.toBeNull();
-    expect(button.classList.contains("justify-center")).toBe(true);
-    expect(button.classList.contains("justify-start")).toBe(false);
+    const iconCell = button.querySelector("svg")?.parentElement;
+    expect(button.classList.contains("justify-start")).toBe(true);
+    expect(iconCell?.classList.contains("ms-(--sidebar-row-icon-inset)")).toBe(
+      true,
+    );
+    expect(iconCell?.classList.contains("ms-3")).toBe(false);
   });
 
   it("点击时仍通知调用方", async () => {
@@ -231,15 +229,11 @@ describe("侧栏行入口: 折叠态的选中状态", () => {
     ).toBe("true");
   });
 
-  it("多选开关行用 aria-pressed 标出选中状态", async () => {
-    await renderRow({
-      isCollapsed: true,
-      isSelected: true,
-      selectionKind: "toggle",
-    });
+  it("选中状态只用 aria-current 表达, 没有 aria-pressed", async () => {
+    await renderRow({ isCollapsed: true, isSelected: true });
 
     const button = screen.getByRole("button", { name: ROW_NAME });
-    expect(button.getAttribute("aria-pressed")).toBe("true");
-    expect(button.getAttribute("aria-current")).toBeNull();
+    expect(button.getAttribute("aria-current")).toBe("true");
+    expect(button.hasAttribute("aria-pressed")).toBe(false);
   });
 });

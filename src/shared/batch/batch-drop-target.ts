@@ -1,5 +1,4 @@
 import type { EntrySummary } from "../entries/entry-types";
-import { folderIdFromDropTarget } from "../folders/folder-drop-target";
 
 /**
  * 一次需要执行的整批放入: 把哪些条目放进哪个文件夹.
@@ -10,9 +9,9 @@ export interface BatchDrop {
    */
   readonly entryIds: readonly string[];
   /**
-   * 目标文件夹编号, 移回未分类时为 undefined.
+   * 目标文件夹编号.
    */
-  readonly folderId: string | undefined;
+  readonly folderId: string;
 }
 
 /**
@@ -35,7 +34,7 @@ export function batchOfDragSource(
  * 移动时什么都不用做.
  * @param entries 全部条目摘要.
  * @param entryIds 被整批拖拽的条目编号.
- * @param targetId 放置目标的编号, 是文件夹编号或 `UNCATEGORIZED_KEY`.
+ * @param targetId 放置目标的编号, 即目标文件夹的编号.
  * @returns 需要执行的整批放入, 什么都不用做时为 undefined.
  */
 export function resolveBatchDrop(
@@ -43,10 +42,11 @@ export function resolveBatchDrop(
   entryIds: readonly string[],
   targetId: string,
 ): BatchDrop | undefined {
-  const folderId = folderIdFromDropTarget(targetId);
   const dragged = new Set(entryIds);
   const movable = entries
-    .filter((entry) => dragged.has(entry.id) && entry.folderId !== folderId)
+    .filter((entry) => dragged.has(entry.id) && entry.folderId !== targetId)
     .map((entry) => entry.id);
-  return movable.length === 0 ? undefined : { entryIds: movable, folderId };
+  return movable.length === 0
+    ? undefined
+    : { entryIds: movable, folderId: targetId };
 }

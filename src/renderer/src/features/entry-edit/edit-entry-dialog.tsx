@@ -10,9 +10,9 @@ import {
 import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 import type { EntryDetail } from "@shared/entries/entry-types";
 
+import { ScrollableDialogContent } from "@renderer/components/scrollable-dialog";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -50,7 +50,7 @@ interface EditEntryDialogContentProps extends EditEntryDialogProps {
 /**
  * 已确定条目类型的编辑对话框, 挂载即打开, 关闭即卸载, 所以每次打开都以条目的最新现值为初始取值.
  * 表单有未保存的修改时, 取消, 按 Esc, 点遮罩或点关闭按钮都先弹出放弃修改的确认, 没有修改则直接
- * 关闭; 保存进行中不响应关闭. 宽度与新建对话框一致.
+ * 关闭; 保存进行中不响应关闭. 宽度与新建对话框一致, 内容超过窗口高度时只有表单的字段区域滚动.
  * @param props 组件属性.
  * @returns 对话框元素.
  */
@@ -79,7 +79,10 @@ function EditEntryDialogContent(
   return (
     <>
       <Dialog open onOpenChange={handleOpenChange}>
-        <DialogContent closeLabel={t("common.close")} className="sm:max-w-lg">
+        <ScrollableDialogContent
+          closeLabel={t("common.close")}
+          className="sm:max-w-lg"
+        >
           <DialogHeader>
             <DialogTitle>{t("entryEdit.title")}</DialogTitle>
             <DialogDescription>{t("entryEdit.description")}</DialogDescription>
@@ -87,7 +90,7 @@ function EditEntryDialogContent(
           <FormProvider {...form}>
             <EditEntryForm detail={detail} type={type} onSaved={onClose} />
           </FormProvider>
-        </DialogContent>
+        </ScrollableDialogContent>
       </Dialog>
       <DiscardChangesDialog
         open={isDiscardOpen}

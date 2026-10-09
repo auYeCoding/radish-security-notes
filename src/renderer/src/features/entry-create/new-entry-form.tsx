@@ -44,8 +44,8 @@ interface NewEntryFormProps {
 
 /**
  * 新建条目的表单: 顶部是类型栏, 之后依次是名称, 所属文件夹 (默认是侧栏当前选中的文件夹, 选中
- * 全部条目或未分类时是未分类), 标签 (默认是侧栏当前选中的标签), 该类型的字段, 自定义字段, 备注与 TOTP,
- * 最后是取消, 保存按钮. 字段区域超过限定高度时在区域内滚动, 保存失败的原因显示在字段区域上方的提示条里,
+ * 全部条目时是无文件夹), 标签 (默认不带标签), 该类型的字段, 自定义字段, 备注与 TOTP,
+ * 最后是取消, 保存按钮. 字段区域超过对话框能给的高度时在区域内滚动 (标题, 类型栏与底部按钮行固定), 保存失败的原因显示在字段区域上方的提示条里,
  * 校验错误显示在对应字段下方.
  * @param props 组件属性.
  * @returns 表单元素.
@@ -58,20 +58,15 @@ export function NewEntryForm(props: NewEntryFormProps): React.JSX.Element {
   const folders = useSortedFolders();
   const tags = useSortedTags();
   const defaultFolderId = useEntryStore((state) => folderIdOfView(state.view));
-  const defaultTagIds = useEntryStore((state) => state.selectedTagIds);
   const form = useForm<NewEntryFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: createDefaultFormValues(
-      type,
-      defaultFolderId,
-      defaultTagIds,
-    ),
+    defaultValues: createDefaultFormValues(type, defaultFolderId),
   });
   return (
     <FormProvider {...form}>
       <form
         noValidate
-        className="flex flex-col gap-5"
+        className="flex min-h-0 flex-col gap-5"
         onSubmit={(event) => void form.handleSubmit(submit)(event)}
       >
         <NewEntryTypeBar

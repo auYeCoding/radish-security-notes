@@ -8,13 +8,11 @@ import type { CollapseState } from "@renderer/components/ui/collapse-motion";
 import { FolderPane } from "@renderer/features/folder-pane/folder-pane";
 import { NewFolderTrigger } from "@renderer/features/folder-create/new-folder-trigger";
 import { SidebarToggle } from "@renderer/features/sidebar-toggle/sidebar-toggle";
-import { NewTagTrigger } from "@renderer/features/tag-create/new-tag-trigger";
 import { cn } from "@renderer/lib/class-names";
 import { usePreferencesStore } from "@renderer/stores/use-preferences-store";
 
 import { FolderRowActions } from "./folder-row-actions";
 import { SidebarFooter } from "./sidebar-footer";
-import { TagRowActions } from "./tag-row-actions";
 
 /**
  * 侧栏展开时的宽度类名, 取自展开宽度 token.
@@ -28,13 +26,15 @@ const COLLAPSED_WIDTH_CLASSES = "w-(--sidebar-collapsed-width)";
 
 /**
  * 顶部入口行的共同类名: 切换按钮由前后两个占位夹在中间, 展开时后占位份额为零, 按钮靠结束侧,
- * 折叠时两个占位份额相等, 按钮居中; 份额过渡让按钮随宽度平滑滑动.
+ * 折叠时两个占位份额相等, 按钮居中; 份额过渡让按钮随宽度平滑滑动. 按钮不在行里垂直居中, 而是从
+ * 行顶部往下偏移一个固定距离 (取自组件 token), 让它与右侧顶栏里的搜索框纵向居中对齐; 行高不变,
+ * 按钮的下半部分伸到下方窗格的范围里, 所以行要抬高层级, 否则下方窗格会盖住按钮的下半部分.
  */
-const TOGGLE_ROW_CLASSES = `flex h-(--control-height) shrink-0 items-center px-3 ${TOGGLE_ROW_SPACER_CLASSES}`;
+const TOGGLE_ROW_CLASSES = `relative z-10 flex h-(--control-height) shrink-0 items-start pt-(--sidebar-toggle-offset) px-3 ${TOGGLE_ROW_SPACER_CLASSES}`;
 
 /**
- * 左侧栏的装配: 顶部一行折叠与展开的切换按钮, 其下是标签与文件夹窗格 (标签分区标题行放新建按钮,
- * 每个标签行与文件夹行尾放更多菜单), 底部是设置按钮与锁定按钮. 从偏好 store 读取折叠状态: 展开时用展开宽度,
+ * 左侧栏的装配: 顶部一行折叠与展开的切换按钮, 其下是文件夹窗格 (文件夹分区标题行放新建按钮,
+ * 每个文件夹行尾放更多菜单), 底部是设置按钮与锁定按钮. 从偏好 store 读取折叠状态: 展开时用展开宽度,
  * 折叠时用折叠宽度, 两个宽度之间按尺寸过渡变化, 过渡期间裁掉溢出的内容; 并经上下文告诉里面的行,
  * 分区标题与设置按钮改成只剩图标的样式. 只负责装配, 不含业务逻辑.
  * @returns 侧栏元素.
@@ -61,8 +61,6 @@ export function Sidebar(): React.JSX.Element {
           <SidebarToggle />
         </div>
         <FolderPane
-          tagHeaderAction={<NewTagTrigger />}
-          renderTagActions={(tag) => <TagRowActions tag={tag} />}
           folderHeaderAction={<NewFolderTrigger />}
           renderFolderActions={(folder) => <FolderRowActions folder={folder} />}
         />

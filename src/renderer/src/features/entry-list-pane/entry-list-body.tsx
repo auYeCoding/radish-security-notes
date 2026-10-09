@@ -38,9 +38,7 @@ export function EntryListBody(
   const selectedId = useEntryStore((state) => selectedIdOf(state.selection));
   const select = useEntryStore((state) => state.select);
   const hasQuery = useEntryStore((state) => !isBlankQuery(state.query));
-  const isFiltered = useEntryStore(
-    (state) => state.view.kind !== "all" || state.selectedTagIds.length > 0,
-  );
+  const isFiltered = useEntryStore((state) => state.view.kind !== "all");
   const checking = useEntryListChecking(entries);
   const handleSelect = useCallback((id: string) => void select(id), [select]);
   if (loadStatus === "failed") {

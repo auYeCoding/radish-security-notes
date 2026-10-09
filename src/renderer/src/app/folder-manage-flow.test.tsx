@@ -28,7 +28,7 @@ const FOLDERS: readonly FolderSummary[] = [
 ];
 
 /**
- * 论坛与银行在工作文件夹里, 维基未分类.
+ * 论坛与银行在工作文件夹里, 维基没有所属文件夹.
  */
 const FILED_ENTRIES: readonly EntryDetail[] = [
   { ...FORUM_ENTRY, folderId: "work" },
@@ -209,14 +209,14 @@ describe("重命名文件夹", () => {
 });
 
 describe("删除文件夹", () => {
-  it("确认框写明其中的条目数与移到未分类, 确认后文件夹消失, 条目回到未分类", async () => {
+  it("确认框写明其中的条目数与变为无文件夹, 确认后文件夹消失, 条目仍在全部条目里", async () => {
     await renderWorkspace();
     const user = userEvent.setup();
 
     await chooseFolderAction("工作", "删除");
     const dialog = await screen.findByRole("alertdialog");
     expect(dialog.textContent).toContain(
-      '"工作" 将被删除, 其中的 2 个条目会移到未分类, 条目本身不会删除.',
+      '"工作" 将被删除, 其中的 2 个条目会变为无文件夹, 条目本身不会删除.',
     );
     await user.click(within(dialog).getByRole("button", { name: "删除" }));
 
@@ -224,8 +224,9 @@ describe("删除文件夹", () => {
       expect(screen.queryByRole("alertdialog")).toBeNull();
     });
     expect(screen.queryByRole("button", { name: /^工作/ })).toBeNull();
-    expect(navButton("未分类", 3)).toBeDefined();
+    expect(screen.queryByRole("button", { name: /未分类/ })).toBeNull();
     expect(navButton("全部条目", 3)).toBeDefined();
+    expect(getEntryListItems()).toHaveLength(3);
   });
 
   it("空文件夹的确认框不提条目, 取消后文件夹保留", async () => {

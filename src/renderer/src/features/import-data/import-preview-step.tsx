@@ -5,6 +5,7 @@ import type {
   ImportPreview,
 } from "@shared/import/import-types";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import {
   SummaryList,
   type SummaryRow,
@@ -106,7 +107,7 @@ export function ImportPreviewStep(
   const { preview } = props;
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <DialogScrollBody className="gap-4">
         <p className="text-sm font-medium">{t("import.preview.heading")}</p>
         <p className="text-sm text-muted-foreground">
           {t("import.preview.description")}
@@ -124,7 +125,7 @@ export function ImportPreviewStep(
             onChange={props.onPolicyChange}
           />
         )}
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button variant="outline" onClick={props.onBack}>
           {t("import.preview.back")}

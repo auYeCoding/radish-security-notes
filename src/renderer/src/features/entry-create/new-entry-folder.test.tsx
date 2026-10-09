@@ -40,17 +40,17 @@ async function openNewLoginForm(
 }
 
 describe("新建条目表单里的所属文件夹", () => {
-  it("默认是未分类, 下拉里是未分类加全部文件夹", async () => {
+  it("默认是无文件夹, 下拉里是无文件夹加全部文件夹", async () => {
     await openNewLoginForm();
     const user = userEvent.setup();
 
     const trigger = screen.getByRole("combobox", { name: "所属文件夹" });
-    expect(trigger.textContent).toContain("未分类");
+    expect(trigger.textContent).toContain("无文件夹");
     await user.click(trigger);
 
     const options = await screen.findAllByRole("option");
     expect(options.map((option) => option.textContent)).toEqual([
-      "未分类",
+      "无文件夹",
       "工作",
       "家庭",
     ]);
@@ -106,8 +106,8 @@ describe("新建条目时保存所属文件夹", () => {
   });
 });
 
-describe("新建条目时改回未分类与失败", () => {
-  it("选回未分类后保存, 新建输入不带所属", async () => {
+describe("新建条目时改回无文件夹与失败", () => {
+  it("选回无文件夹后保存, 新建输入不带所属", async () => {
     const environment = await openNewLoginForm((prepared) =>
       prepared.entryStore.getState().selectView(folderViewOf("work")),
     );
@@ -115,7 +115,7 @@ describe("新建条目时改回未分类与失败", () => {
 
     await user.type(screen.getByLabelText("名称"), "散件");
     await user.click(screen.getByRole("combobox", { name: "所属文件夹" }));
-    await user.click(await screen.findByRole("option", { name: "未分类" }));
+    await user.click(await screen.findByRole("option", { name: "无文件夹" }));
     await user.click(
       within(screen.getByRole("dialog")).getByRole("button", { name: "保存" }),
     );

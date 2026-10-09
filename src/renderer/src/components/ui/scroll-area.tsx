@@ -1,6 +1,7 @@
 import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area";
 import { cn } from "cn";
 
+import { INSET_FOCUS_OUTLINE } from "@renderer/components/ui/focus-outline";
 import { FAST_STATE_TRANSITION } from "@renderer/components/ui/state-motion";
 
 /**
@@ -23,7 +24,8 @@ function ScrollArea({
         data-slot="scroll-area-viewport"
         className={cn(
           FAST_STATE_TRANSITION,
-          "size-full rounded-[inherit] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1",
+          INSET_FOCUS_OUTLINE,
+          "size-full rounded-[inherit] outline-none",
         )}
       >
         {children}

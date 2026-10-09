@@ -190,6 +190,22 @@ describe("自动锁定控件: 联动与不可用", () => {
   });
 });
 
+describe("自动锁定控件: 空闲行的版式", () => {
+  it("空闲开关与 空闲时长 标签在同一行, 排在标签之后并靠右对齐, 下拉在下一行", async () => {
+    await renderControls();
+
+    const label = screen.getByText("空闲时长");
+    const toggle = screen.getByRole("group", { name: "空闲自动锁定" });
+    const row = label.parentElement;
+    expect(row).toBe(toggle.parentElement);
+    expect(row?.classList.contains("justify-between")).toBe(true);
+    expect(label.nextElementSibling).toBe(toggle);
+    expect(row?.nextElementSibling).toBe(
+      screen.getByRole("combobox", { name: "空闲时长" }),
+    );
+  });
+});
+
 describe("自动锁定控件: 英文界面", () => {
   it("开关分组与时长下拉随界面语言变化, 时长按复数显示", async () => {
     const environment = await renderControls();

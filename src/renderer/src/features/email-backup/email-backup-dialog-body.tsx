@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 
 import { EmailBackupActions } from "./email-backup-actions";
@@ -18,7 +19,8 @@ interface EmailBackupDialogBodyProps {
 }
 
 /**
- * 对话框正文: 读取设置期间显示 "正在读取", 读取失败时显示失败提示, 读到后是表单, 状态区与操作区.
+ * 对话框正文: 读取设置期间显示 "正在读取", 读取失败时显示失败提示, 读到后是可滚动的表单与状态区, 其下是
+ * 固定的操作区.
  * @param props 组件属性.
  * @returns 正文元素.
  */
@@ -45,8 +47,10 @@ export function EmailBackupDialogBody(
     default:
       return (
         <>
-          <EmailBackupForm flow={flow} />
-          <EmailBackupStatus flow={flow} />
+          <DialogScrollBody className="gap-4">
+            <EmailBackupForm flow={flow} />
+            <EmailBackupStatus flow={flow} />
+          </DialogScrollBody>
           <EmailBackupActions flow={flow} />
         </>
       );

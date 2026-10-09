@@ -7,7 +7,7 @@ import { useFolderStore } from "./use-folder-store";
 
 /**
  * 取得删除文件夹的方法: 先经文件夹接口在主进程删除, 成功后从列表移除文件夹, 并让其中条目在内存里
- * 回到未分类.
+ * 变为无文件夹.
  * @returns 删除方法.
  */
 export function useRemoveFolder(): (

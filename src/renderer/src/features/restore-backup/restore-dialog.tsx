@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 
+import { ScrollableDialogContent } from "@renderer/components/scrollable-dialog";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -24,7 +24,7 @@ interface RestoreDialogProps {
 /**
  * 恢复对话框, 挂载即打开, 关闭即卸载: 承载 "选择文件, 输入口令, 预览, 确认, 结果" 的流程.
  * 主进程处理期间不能关闭; 其余时候关闭对话框会让主进程释放所选文件与读出的备份, 流程状态 (含口令
- * 与主密码) 随组件卸载丢弃. 内容较多时面板可以滚动.
+ * 与主密码) 随组件卸载丢弃. 标题与底部按钮行固定, 内容较多时只有中间的正文滚动.
  * @param props 组件属性.
  * @returns 对话框元素.
  */
@@ -43,10 +43,10 @@ export function RestoreDialog(props: RestoreDialogProps): React.JSX.Element {
   };
   return (
     <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent
+      <ScrollableDialogContent
         closeLabel={t("common.close")}
         showCloseButton={!isWorking}
-        className="max-h-11/12 overflow-y-auto sm:max-w-xl"
+        className="sm:max-w-xl"
       >
         <DialogHeader>
           <DialogTitle>{t("restore.dialog.title")}</DialogTitle>
@@ -55,7 +55,7 @@ export function RestoreDialog(props: RestoreDialogProps): React.JSX.Element {
           </DialogDescription>
         </DialogHeader>
         <RestoreStepView flow={flow} onDone={close} />
-      </DialogContent>
+      </ScrollableDialogContent>
     </Dialog>
   );
 }

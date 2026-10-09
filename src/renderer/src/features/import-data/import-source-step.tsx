@@ -8,6 +8,7 @@ import {
 } from "@shared/import/import-source-keys";
 
 import { ChoiceOption } from "@renderer/components/choice-option";
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Alert, AlertDescription } from "@renderer/components/ui/alert";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
@@ -55,7 +56,7 @@ export function ImportSourceStep(
   };
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <DialogScrollBody className="gap-3">
         <p className="text-sm font-medium">{t("import.source.heading")}</p>
         <RadioGroup
           aria-label={t("import.source.heading")}
@@ -83,7 +84,7 @@ export function ImportSourceStep(
             </AlertDescription>
           </Alert>
         )}
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button onClick={props.onChooseFile}>
           {t("import.source.choose")}

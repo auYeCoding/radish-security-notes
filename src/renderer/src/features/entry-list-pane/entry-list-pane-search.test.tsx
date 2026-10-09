@@ -153,7 +153,7 @@ describe("EntryListPane 高亮", () => {
 });
 
 describe("EntryListPane 无结果时的范围说明", () => {
-  it("没有文件夹与标签筛选时只有无匹配的说明", async () => {
+  it("没有文件夹筛选时只有无匹配的说明", async () => {
     const environment = await renderPane({ entries: [BANK_ENTRY] });
 
     await searchFor(environment, "zzz");
@@ -174,18 +174,6 @@ describe("EntryListPane 无结果时的范围说明", () => {
     await searchFor(environment, "forum");
 
     expect(screen.getByText("没有匹配的条目")).toBeDefined();
-    expect(screen.getByText("搜索只在当前筛选结果里进行")).toBeDefined();
-  });
-
-  it("选了标签后同样补一句", async () => {
-    const environment = await renderPane({
-      entries: [{ ...BANK_ENTRY, tagIds: ["tag-work"] }, FORUM_ENTRY],
-      tags: [{ id: "tag-work", name: "Project", color: "slate" }],
-    });
-    act(() => environment.entryStore.getState().toggleTag("tag-work"));
-
-    await searchFor(environment, "forum");
-
     expect(screen.getByText("搜索只在当前筛选结果里进行")).toBeDefined();
   });
 

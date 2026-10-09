@@ -21,9 +21,13 @@ interface CollapsibleBoxProps {
    */
   readonly isExpanded: boolean;
   /**
-   * 收放的方向: 沿宽度或沿高度.
+   * 收放的方向: 沿宽度, 或尺寸不变只淡入淡出.
    */
   readonly axis: CollapseAxis;
+  /**
+   * 追加给外层的类名, 例如叠放定位.
+   */
+  readonly className?: string;
   /**
    * 折叠后是否对读屏软件隐藏并禁止聚焦与点击, 默认隐藏. 折叠后文字仍要读出来的内容传 `false`.
    */
@@ -44,9 +48,9 @@ interface CollapsibleBoxProps {
 const DEFAULT_HIDDEN_WHEN_COLLAPSED = true;
 
 /**
- * 随开合状态收放尺寸并淡入淡出的盒子: 外层沿宽度或高度在自动尺寸与零之间过渡并裁掉溢出,
- * 内层只过渡透明度, 两层时长不同. 折叠后默认再加 `inert` 与 `aria-hidden`, 过渡一开始就不可
- * 聚焦与点击, 读屏软件也读不到. 行尾操作, 分区标题块, 分隔线块和空状态共用.
+ * 随开合状态收放尺寸并淡入淡出的盒子: 外层沿宽度在自动尺寸与零之间过渡并裁掉溢出 (方向为
+ * `none` 时尺寸不变), 内层只过渡透明度, 两层时长不同. 折叠后默认再加 `inert` 与 `aria-hidden`,
+ * 过渡一开始就不可聚焦与点击, 读屏软件也读不到. 行尾操作, 分区标题块, 分隔线块和空状态共用.
  * @param props 组件属性.
  * @returns 盒子元素.
  */
@@ -64,6 +68,7 @@ export function CollapsibleBox(props: CollapsibleBoxProps): React.JSX.Element {
       className={cn(
         COLLAPSE_BOX_BASE_CLASSES,
         COLLAPSE_BOX_AXIS_CLASSES[props.axis][state],
+        props.className,
       )}
     >
       <div

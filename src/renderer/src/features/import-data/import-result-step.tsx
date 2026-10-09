@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import type { ImportOutcome } from "@shared/import/import-types";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import {
   SummaryList,
   type SummaryRow,
@@ -137,7 +138,7 @@ export function ImportResultStep(
   const { t } = useTranslation();
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <DialogScrollBody className="gap-4">
         <p className="text-sm font-medium">{t("import.result.heading")}</p>
         <SummaryList rows={toSummaryRows(props.outcome, t)} />
         <WarningAlert
@@ -152,7 +153,7 @@ export function ImportResultStep(
         </div>
         <NotImportedList items={props.outcome.notImported} />
         <ResultNoticeView notice={props.notice} />
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         {props.outcome.notImported.length > 0 && (
           <Button variant="outline" onClick={props.onSaveReport}>

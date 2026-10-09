@@ -25,15 +25,15 @@ export interface FolderBridge {
    */
   rename: (id: string, name: string) => Promise<FolderResult<FolderSummary>>;
   /**
-   * 删除一个文件夹, 其中的条目全部移到未分类, 条目本身不删除.
+   * 删除一个文件夹, 其中的条目全部变为无文件夹, 条目本身不删除.
    * @param id 文件夹编号.
    * @returns 删除结果.
    */
   remove: (id: string) => Promise<FolderResult<undefined>>;
   /**
-   * 把一个条目放进文件夹, 或移出文件夹回到未分类.
+   * 把一个条目放进文件夹, 或移出文件夹.
    * @param entryId 条目编号.
-   * @param folderId 目标文件夹编号, 未分类时为 undefined.
+   * @param folderId 目标文件夹编号, 移出文件夹时为 undefined.
    * @returns 放入结果.
    */
   assignEntry: (

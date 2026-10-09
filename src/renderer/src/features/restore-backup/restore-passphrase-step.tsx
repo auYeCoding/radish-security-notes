@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { formatByteSize } from "@renderer/components/format-byte-size";
 import { PasswordField } from "@renderer/components/password-field";
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
 
@@ -44,31 +45,33 @@ export function RestorePassphraseStep(
   return (
     <form
       noValidate
-      className="flex flex-col gap-4"
+      className="flex min-h-0 flex-col gap-4"
       onSubmit={(event) => {
         event.preventDefault();
         props.onSubmit();
       }}
     >
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium">
-          {t("restore.passphrase.heading")}
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          {t("restore.passphrase.description", {
-            size: formatByteSize(state.fileSizeBytes, t, i18n.language),
-          })}
-        </p>
-      </div>
-      <PasswordField
-        label={t("restore.passphrase.label")}
-        autoComplete="off"
-        value={state.passphrase}
-        onChange={(event) => props.onPassphraseChange(event.target.value)}
-        error={
-          state.isPassphraseWrong ? t("restore.passphrase.wrong") : undefined
-        }
-      />
+      <DialogScrollBody className="gap-4">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-sm font-medium">
+            {t("restore.passphrase.heading")}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {t("restore.passphrase.description", {
+              size: formatByteSize(state.fileSizeBytes, t, i18n.language),
+            })}
+          </p>
+        </div>
+        <PasswordField
+          label={t("restore.passphrase.label")}
+          autoComplete="off"
+          value={state.passphrase}
+          onChange={(event) => props.onPassphraseChange(event.target.value)}
+          error={
+            state.isPassphraseWrong ? t("restore.passphrase.wrong") : undefined
+          }
+        />
+      </DialogScrollBody>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={props.onBack}>
           {t("restore.passphrase.back")}

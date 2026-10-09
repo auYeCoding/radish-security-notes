@@ -6,7 +6,7 @@ import type { TagSummary } from "@shared/tags/tag-types";
 export type TagLoadStatus = "loading" | "ready" | "failed";
 
 /**
- * 标签 store 的状态. 侧栏当前选中的标签属于条目列表的筛选条件, 放在条目 store 里.
+ * 标签 store 的状态.
  */
 export interface TagState {
   /**

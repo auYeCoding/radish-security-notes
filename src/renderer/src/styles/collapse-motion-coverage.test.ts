@@ -40,6 +40,7 @@ const COLLAPSE_CONSTANT_COVERAGE: readonly (readonly [
     ],
   ],
   ["components/sidebar-nav-item-text.tsx", ["COLLAPSIBLE_TEXT_STATE_CLASSES"]],
+  ["components/sidebar-nav-item-icon.tsx", ["COLLAPSE_SPACE_TRANSITION"]],
   [
     "components/sidebar-button-icon.tsx",
     [

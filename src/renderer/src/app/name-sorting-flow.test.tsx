@@ -15,6 +15,10 @@ import {
   createEntryTestEnvironment,
   type EntryTestEnvironment,
 } from "@renderer/testing/entry-test-environment";
+import {
+  listedTagNames,
+  openTagSection,
+} from "@renderer/testing/open-tag-section";
 
 import { UnlockedWorkspace } from "./unlocked-workspace";
 
@@ -100,7 +104,7 @@ async function renderWorkspace(): Promise<EntryTestEnvironment> {
 }
 
 /**
- * 按界面从上到下的顺序取出侧栏里的文件夹名称或标签名称.
+ * 按界面从上到下的顺序取出侧栏里的文件夹名称.
  * @param names 要挑出的名称集合.
  * @returns 这些名称在侧栏里的先后.
  */
@@ -123,7 +127,7 @@ function listedNames(): string[] {
 }
 
 describe("名称排序规则在三处的应用", () => {
-  it("条目列表, 侧栏文件夹与侧栏标签都按名称排序规则排列", async () => {
+  it("条目列表, 侧栏文件夹与设置里的标签都按名称排序规则排列", async () => {
     await renderWorkspace();
 
     expect(listedNames()).toEqual(["Gmail", "1号机", "银行", "邮箱账号"]);
@@ -132,7 +136,7 @@ describe("名称排序规则在三处的应用", () => {
       "银行",
       "邮箱账号",
     ]);
-    expect(sidebarOrder(TAGS.map((tag) => tag.name))).toEqual([
+    expect(listedTagNames(await openTagSection())).toEqual([
       "Work",
       "个人",
       "重要事项",
@@ -180,16 +184,21 @@ describe("名称排序规则在侧栏的即时更新", () => {
     expect(sidebarOrder(names)).toEqual(["Z", "Git", "Gmail", "邮箱账号"]);
   });
 
-  it("新建与编辑标签后侧栏立即换位置", async () => {
+  it("新建与编辑标签后设置里的标签列表立即换位置", async () => {
     const environment = await renderWorkspace();
-    const names = TAGS.map((tag) => tag.name).concat(["A", "Git"]);
+    const section = await openTagSection();
 
     await act(() => environment.tagStore.getState().create("Git", "slate"));
-    expect(sidebarOrder(names)).toEqual(["Git", "Work", "个人", "重要事项"]);
+    expect(listedTagNames(section)).toEqual([
+      "Git",
+      "Work",
+      "个人",
+      "重要事项",
+    ]);
     await act(() =>
       environment.tagStore.getState().update("tag-personal", "A", "green"),
     );
 
-    expect(sidebarOrder(names)).toEqual(["A", "Git", "Work", "重要事项"]);
+    expect(listedTagNames(section)).toEqual(["A", "Git", "Work", "重要事项"]);
   });
 });

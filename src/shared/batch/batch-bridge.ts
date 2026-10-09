@@ -15,9 +15,9 @@ export interface BatchBridge {
     entryIds: readonly string[],
   ) => Promise<BatchResult<undefined>>;
   /**
-   * 一次把多个条目放进文件夹, 或移出文件夹回到未分类.
+   * 一次把多个条目放进文件夹, 或移出文件夹.
    * @param entryIds 要移动的条目编号.
-   * @param folderId 目标文件夹编号, 移回未分类时为 undefined.
+   * @param folderId 目标文件夹编号, 移出文件夹时为 undefined.
    * @returns 移动结果.
    */
   moveEntries: (

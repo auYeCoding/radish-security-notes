@@ -17,7 +17,7 @@ type WorkspaceStoreResets = {
 };
 
 /**
- * 各 store 回到初始状态的重置函数: 条目 (列表, 选中详情含密码, 搜索, 入口, 已选标签), 自定义条目
+ * 各 store 回到初始状态的重置函数: 条目 (列表, 选中详情含密码, 搜索, 入口), 自定义条目
  * 类型, 文件夹, 标签与批量选中, 都整体回写初始状态.
  */
 const WORKSPACE_STORE_RESETS: WorkspaceStoreResets = {

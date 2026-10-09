@@ -96,11 +96,11 @@ async function expectTooltipsOnHover(
 }
 
 describe("设置入口: 外观与语言分区", () => {
-  it("外观与语言分区排在数据与安全之前, 主题三档与语言两档按偏好标出选中项", async () => {
+  it("外观与语言分区排在标签, 数据与安全之前, 主题三档与语言两档按偏好标出选中项", async () => {
     await openSettingsDialogWith(createEntry);
 
     const regions = screen.getAllByRole("region");
-    expect(regions).toHaveLength(3);
+    expect(regions).toHaveLength(4);
     expect(regions[0]).toBe(screen.getByRole("region", { name: "外观与语言" }));
     const section = appearanceSection("外观与语言");
     expect(section.getByRole("group", { name: "主题" })).toBeDefined();

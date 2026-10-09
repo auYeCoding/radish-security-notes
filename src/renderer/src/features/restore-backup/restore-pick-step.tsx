@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
 
@@ -27,7 +28,7 @@ export function RestorePickStep(
   const { t } = useTranslation();
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <DialogScrollBody className="gap-4">
         <p className="text-sm text-muted-foreground">
           {t("restore.pick.intro")}
         </p>
@@ -40,7 +41,7 @@ export function RestorePickStep(
           </p>
         </div>
         <RestoreNotIncludedNotice />
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button onClick={props.onChooseFile}>{t("restore.pick.choose")}</Button>
       </DialogFooter>

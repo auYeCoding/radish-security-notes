@@ -8,13 +8,13 @@ import { useFolderStore } from "@renderer/stores/use-folder-store";
  */
 interface DetailFolderLabelProps {
   /**
-   * 条目所属文件夹的编号, 未分类时为 undefined.
+   * 条目所属文件夹的编号, 没有所属文件夹时为 undefined.
    */
   readonly folderId: string | undefined;
 }
 
 /**
- * 详情标题下标明条目所属位置的一行辅助文字: 文件夹图标加 "文件夹: 名称", 未分类时是 "未分类".
+ * 详情标题下标明条目所属位置的一行辅助文字: 文件夹图标加 "文件夹: 名称", 没有所属文件夹时是 "无文件夹".
  * @param props 组件属性.
  * @returns 所属位置元素.
  */
@@ -30,7 +30,7 @@ export function DetailFolderLabel(
     <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
       <FolderIcon aria-hidden="true" className="size-3.5" />
       {folderName === undefined
-        ? t("entryDetail.uncategorized")
+        ? t("entryDetail.noFolder")
         : t("entryDetail.folder", { name: folderName })}
     </p>
   );

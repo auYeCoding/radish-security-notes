@@ -9,7 +9,6 @@ import {
 } from "@renderer/testing/preferences-test-environment";
 
 import { SettingsDialog } from "./settings-dialog";
-import { SETTINGS_DIALOG_BODY_SLOT } from "./settings-dialog-body-slot";
 import type { SettingsSecurityEntries } from "./settings-security-section";
 
 /**
@@ -44,6 +43,20 @@ const TEST_APPEARANCE = {
 };
 
 /**
+ * 标签分区的新建操作按钮与标签列表.
+ */
+const TEST_TAGS = {
+  createAction: <Button>新建操作</Button>,
+  tagList: <p>标签列表</p>,
+};
+
+/**
+ * 设置对话框的中文说明.
+ */
+const DIALOG_DESCRIPTION =
+  "管理外观与语言, 标签, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥.";
+
+/**
  * 渲染设置对话框后拿到的结果.
  */
 interface RenderedDialog {
@@ -71,6 +84,7 @@ async function renderDialog(
     <SettingsDialog
       onClose={onClose}
       appearance={TEST_APPEARANCE}
+      tags={TEST_TAGS}
       data={TEST_ENTRIES}
       security={security}
     />,
@@ -79,16 +93,26 @@ async function renderDialog(
   return { onClose, environment };
 }
 
+/**
+ * 断言一组文字按给定顺序依次出现在文本里, 每一段都从上一段之后开始找.
+ * @param text 被查找的文本.
+ * @param parts 依次应出现的文字.
+ */
+function expectInOrder(text: string, parts: readonly string[]): void {
+  const positions = parts.reduce<number[]>((found, part) => {
+    const [previous = -1] = found.slice(-1);
+    return [...found, text.indexOf(part, previous + 1)];
+  }, []);
+  expect(positions.every((position) => position >= 0)).toBe(true);
+  expect(positions).toEqual([...positions].sort((a, b) => a - b));
+}
+
 describe("设置对话框: 内容", () => {
   it("对话框有标题与说明, 里面有名为 数据 的分区", async () => {
     await renderDialog();
 
     const dialog = screen.getByRole("dialog", { name: "设置" });
-    expect(
-      within(dialog).getByText(
-        "管理外观与语言, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥.",
-      ),
-    ).toBeDefined();
+    expect(within(dialog).getByText(DIALOG_DESCRIPTION)).toBeDefined();
     expect(within(dialog).getByRole("region", { name: "数据" })).toBeDefined();
   });
 
@@ -96,8 +120,7 @@ describe("设置对话框: 内容", () => {
     await renderDialog();
 
     const section = screen.getByRole("region", { name: "数据" });
-    const text = section.textContent ?? "";
-    const expectedInOrder = [
+    expectInOrder(section.textContent ?? "", [
       "导入数据",
       "导入其他密码管理器导出的文件.",
       "导入操作",
@@ -110,10 +133,7 @@ describe("设置对话框: 内容", () => {
       "从备份恢复",
       "选择备份文件, 预览并确认后恢复数据.",
       "恢复操作",
-    ];
-    const positions = expectedInOrder.map((part) => text.indexOf(part));
-    expect(positions.every((position) => position >= 0)).toBe(true);
-    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    ]);
   });
 });
 
@@ -123,25 +143,24 @@ describe("设置对话框: 安全分区", () => {
 
     const dialog = screen.getByRole("dialog", { name: "设置" });
     const regions = within(dialog).getAllByRole("region");
-    expect(regions).toHaveLength(3);
+    expect(regions).toHaveLength(4);
     expect(regions[1]).toBe(
-      within(dialog).getByRole("region", { name: "数据" }),
+      within(dialog).getByRole("region", { name: "标签" }),
     );
     expect(regions[2]).toBe(
+      within(dialog).getByRole("region", { name: "数据" }),
+    );
+    expect(regions[3]).toBe(
       within(dialog).getByRole("region", { name: "安全" }),
     );
-    const text = regions[2].textContent ?? "";
-    const expectedInOrder = [
+    expectInOrder(regions[3].textContent ?? "", [
       "主密码",
       "开启后每次启动应用都要输入主密码. 关闭后启动时直接进入, 数据文件仍然加密.",
       "主密码操作",
       "恢复密钥",
       "恢复密钥由数据密钥确定, 可随时重新查看, 内容不变.",
       "恢复密钥操作",
-    ];
-    const positions = expectedInOrder.map((part) => text.indexOf(part));
-    expect(positions.every((position) => position >= 0)).toBe(true);
-    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    ]);
   });
 });
 
@@ -150,7 +169,7 @@ describe("设置对话框: 安全分区的自动锁定", () => {
     await renderDialog();
 
     const text = screen.getByRole("region", { name: "安全" }).textContent ?? "";
-    const expectedInOrder = [
+    expectInOrder(text, [
       "恢复密钥操作",
       "空闲自动锁定",
       "整个 Windows 会话的键盘鼠标空闲达到设定时长后自动锁定, 之后要重新输入主密码.",
@@ -161,13 +180,7 @@ describe("设置对话框: 安全分区的自动锁定", () => {
       "休眠时锁定",
       "Windows 进入睡眠或休眠时自动锁定保险库.",
       "休眠锁定操作",
-    ];
-    const positions = expectedInOrder.reduce<number[]>((found, part) => {
-      const [previous = -1] = found.slice(-1);
-      return [...found, text.indexOf(part, previous + 1)];
-    }, []);
-    expect(positions.every((position) => position >= 0)).toBe(true);
-    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    ]);
   });
 });
 
@@ -227,8 +240,7 @@ describe("设置对话框: 外观与语言分区", () => {
     expect(regions[0]).toBe(
       within(dialog).getByRole("region", { name: "外观与语言" }),
     );
-    const text = regions[0].textContent ?? "";
-    const expectedInOrder = [
+    expectInOrder(regions[0].textContent ?? "", [
       "外观与语言",
       "主题",
       "选择浅色, 深色或跟随系统.",
@@ -236,36 +248,47 @@ describe("设置对话框: 外观与语言分区", () => {
       "语言",
       "选择界面语言.",
       "语言操作",
-    ];
-    const positions = expectedInOrder.reduce<number[]>((found, part) => {
-      const [previous = -1] = found.slice(-1);
-      return [...found, text.indexOf(part, previous + 1)];
-    }, []);
-    expect(positions.every((position) => position >= 0)).toBe(true);
-    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+    ]);
   });
 
-  it("三个分区放在对话框内部可纵向滚动的内容区里, 标题与说明在内容区之外", async () => {
+  it("四个分区放在对话框内部可纵向滚动的内容区里, 标题与说明在内容区之外", async () => {
     await renderDialog();
 
     const dialog = screen.getByRole("dialog", { name: "设置" });
-    const body = dialog.querySelector(
-      `[data-slot='${SETTINGS_DIALOG_BODY_SLOT}']`,
-    );
+    const body = dialog.querySelector("[data-slot='dialog-scroll-body']");
     expect(body?.classList.contains("overflow-y-auto")).toBe(true);
     expect(dialog.classList.contains("max-h-11/12")).toBe(true);
-    expect(within(dialog).getAllByRole("region")).toHaveLength(3);
+    expect(within(dialog).getAllByRole("region")).toHaveLength(4);
     within(dialog)
       .getAllByRole("region")
       .forEach((region) => expect(body?.contains(region)).toBe(true));
     expect(body?.contains(within(dialog).getByText("设置"))).toBe(false);
-    expect(
-      body?.contains(
-        within(dialog).getByText(
-          "管理外观与语言, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥.",
-        ),
-      ),
-    ).toBe(false);
+    expect(body?.contains(within(dialog).getByText(DIALOG_DESCRIPTION))).toBe(
+      false,
+    );
+  });
+});
+
+describe("设置对话框: 分区之间的分隔线", () => {
+  it("相邻两个分区之间各有一条分隔线, 共三条, 第一个分区之前与最后一个分区之后没有", async () => {
+    await renderDialog();
+
+    const dialog = screen.getByRole("dialog", { name: "设置" });
+    const regions = within(dialog).getAllByRole("region");
+    const separators = within(dialog)
+      .getAllByRole("separator")
+      .filter((separator) => separator.closest("section") === null);
+    const isBefore = (first: Element, second: Element): boolean =>
+      Boolean(
+        first.compareDocumentPosition(second) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+
+    expect(separators).toHaveLength(3);
+    separators.forEach((separator, index) => {
+      expect(isBefore(regions[index], separator)).toBe(true);
+      expect(isBefore(separator, regions[index + 1])).toBe(true);
+    });
   });
 });
 
@@ -296,7 +319,7 @@ describe("设置对话框: 英文界面", () => {
     const dialog = screen.getByRole("dialog", { name: "Settings" });
     expect(
       within(dialog).getByText(
-        "Manage appearance and language, importing, exporting, backing up and restoring your data, plus your master password and recovery key.",
+        "Manage appearance and language, tags, importing, exporting, backing up and restoring your data, plus your master password and recovery key.",
       ),
     ).toBeDefined();
     expect(within(dialog).getByRole("region", { name: "Data" })).toBeDefined();

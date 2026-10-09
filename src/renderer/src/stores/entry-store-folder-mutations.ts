@@ -13,7 +13,7 @@ import { selectedIdOf, type EntrySelection } from "./entry-state";
 /**
  * 选中的条目详情已读取完成时, 把详情里的所属文件夹换成新值, 其它状态原样返回.
  * @param selection 当前选中状态.
- * @param folderId 新的所属文件夹编号, 未分类时为 undefined.
+ * @param folderId 新的所属文件夹编号, 没有所属文件夹时为 undefined.
  * @returns 更新后的选中状态.
  */
 function withSelectedFolder(
@@ -44,12 +44,12 @@ export function selectView(access: EntryStoreAccess, view: FolderView): void {
 }
 
 /**
- * 在内存里把一个条目放进文件夹或移回未分类, 入口保持不动. 条目因此不再属于当前入口且正被选中时,
- * 按当前可见列表 (入口, 已选标签与搜索关键字) 选中相邻条目并读取它的详情, 没有别的条目时回到没有选中的状态; 入口是全部条目
+ * 在内存里把一个条目放进文件夹或移出文件夹, 入口保持不动. 条目因此不再属于当前入口且正被选中时,
+ * 按当前可见列表 (入口与搜索关键字) 选中相邻条目并读取它的详情, 没有别的条目时回到没有选中的状态; 入口是全部条目
  * 时条目仍留在列表里. 主进程里的归属由文件夹接口另行写入.
  * @param access store 动作能用到的东西.
  * @param entryId 条目编号.
- * @param folderId 目标文件夹编号, 未分类时为 undefined.
+ * @param folderId 目标文件夹编号, 移出文件夹时为 undefined.
  * @returns 相邻条目的详情读取完成后兑现.
  */
 export async function applyEntryFolder(
@@ -57,8 +57,7 @@ export async function applyEntryFolder(
   entryId: string,
   folderId: string | undefined,
 ): Promise<void> {
-  const { entries, searchMatches, selection, selectedTagIds, view } =
-    access.get();
+  const { entries, searchMatches, selection, view } = access.get();
   const moved = entries.map((entry) =>
     entry.id === entryId ? { ...entry, folderId } : entry,
   );
@@ -77,7 +76,6 @@ export async function applyEntryFolder(
   const visible = selectVisibleEntries({
     entries,
     view,
-    tagIds: selectedTagIds,
     matches: searchMatches,
   });
   const neighbour: EntrySummary | undefined = findNeighbour(visible, entryId);
@@ -94,7 +92,7 @@ export async function applyEntryFolder(
 }
 
 /**
- * 在内存里释放一个已被删除的文件夹: 其中条目的所属清空, 回到未分类; 当前入口正是这个文件夹时
+ * 在内存里释放一个已被删除的文件夹: 其中条目的所属清空, 变为无文件夹; 当前入口正是这个文件夹时
  * 回到全部条目. 主进程里的归属已由删除文件夹的接口清空.
  * @param access store 动作能用到的东西.
  * @param folderId 被删除的文件夹编号.

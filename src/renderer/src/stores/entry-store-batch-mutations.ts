@@ -56,7 +56,7 @@ function withSummaryFields(
 
 /**
  * 用批量操作之后的条目列表替换 store 里的列表, 并按单个操作的规则处理详情: 详情里的条目被删除, 或
- * 原本在当前可见列表里而现在不在了, 就按当前入口, 已选标签与搜索关键字下的可见列表选中相邻条目并
+ * 原本在当前可见列表里而现在不在了, 就按当前入口与搜索关键字下的可见列表选中相邻条目并
  * 读取它的详情, 没有就回到没有选中的状态; 否则详情原样保留并同步新的文件夹与标签. 没有选中条目,
  * 或选中的条目没有被这次批量操作改动时, 详情不受影响, 直接换列表, 不去算可见列表 (条目很多时
  * 排序一遍要几百毫秒).
@@ -70,14 +70,13 @@ async function commitEntries(
   nextEntries: readonly EntrySummary[],
   affectedIds: ReadonlySet<string>,
 ): Promise<void> {
-  const { entries, searchMatches, selection, selectedTagIds, view } =
-    access.get();
+  const { entries, searchMatches, selection, view } = access.get();
   const selectedId = selectedIdOf(selection);
   if (selectedId === undefined || !affectedIds.has(selectedId)) {
     access.set({ entries: nextEntries });
     return;
   }
-  const filters = { view, tagIds: selectedTagIds, matches: searchMatches };
+  const filters = { view, matches: searchMatches };
   const visibleBefore = selectVisibleEntries({ entries, ...filters });
   const survivingIds = new Set(
     selectVisibleEntries({ entries: nextEntries, ...filters }).map(
@@ -132,10 +131,10 @@ export async function applyBatchRemoval(
 }
 
 /**
- * 在内存里把一批条目放进文件夹或移回未分类. 主进程里的归属已由批量接口写入.
+ * 在内存里把一批条目放进文件夹或移出文件夹. 主进程里的归属已由批量接口写入.
  * @param access store 动作能用到的东西.
  * @param ids 被移动的条目编号.
- * @param folderId 目标文件夹编号, 未分类时为 undefined.
+ * @param folderId 目标文件夹编号, 移出文件夹时为 undefined.
  * @returns 相邻条目的详情读取完成后兑现.
  */
 export async function applyBatchFolder(

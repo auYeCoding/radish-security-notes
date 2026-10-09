@@ -3,8 +3,11 @@ import { useTranslation } from "react-i18next";
 import type { AttachmentMeta } from "@shared/attachments/attachment-types";
 
 import {
+  DialogScrollBody,
+  ScrollableDialogContent,
+} from "@renderer/components/scrollable-dialog";
+import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -89,7 +92,10 @@ export function AttachmentPreviewDialog(
   };
   return (
     <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent closeLabel={t("common.close")} className="sm:max-w-2xl">
+      <ScrollableDialogContent
+        closeLabel={t("common.close")}
+        className="sm:max-w-2xl"
+      >
         <DialogHeader>
           <DialogTitle className="break-words">
             {t("entryAttachments.preview.title", { name: attachment.name })}
@@ -98,8 +104,10 @@ export function AttachmentPreviewDialog(
             {t("entryAttachments.preview.description")}
           </DialogDescription>
         </DialogHeader>
-        <PreviewBody state={state} name={attachment.name} />
-      </DialogContent>
+        <DialogScrollBody>
+          <PreviewBody state={state} name={attachment.name} />
+        </DialogScrollBody>
+      </ScrollableDialogContent>
     </Dialog>
   );
 }

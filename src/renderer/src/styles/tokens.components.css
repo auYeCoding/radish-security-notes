@@ -10,4 +10,27 @@
   --topbar-height: calc(var(--space-base) * 14);
   --titlebar-height: calc(var(--space-base) * 8);
   --list-row-height: calc(var(--space-base) * 15);
+  /*
+   * 侧栏折叠态里图标在按钮内居中所需的起始侧偏移: 展开与折叠两个终态之间只过渡这个偏移, 图标
+   * 在两个终态间直接滑动, 不随侧栏宽度摆动. 行: 折叠宽度减去侧栏边框 1px, 选中竖条 2px, 行尾内边距
+   * 2px, 按钮边框 2px 与图标 16px, 共 5.75 个间距单位, 再取一半. 底部按钮: 折叠宽度减去侧栏边框 1px,
+   * 两侧外边距 24px, 按钮边框 2px 与图标 16px, 共 10.75 个间距单位, 再取一半.
+   * 分隔线偏移: 折叠态分隔线层 (含上下内边距) 的顶边距标题块顶部的距离, 让分隔线与顶栏下边线对齐:
+   * 顶栏高度减切换按钮行高度, 再减去分隔线层的上内边距 2 个间距单位与分隔线自身厚度 0.25 个间距单位.
+   * 切换按钮偏移: 切换按钮的顶边距切换按钮行顶部的距离, 让按钮在纵向与顶栏里的搜索框居中对齐: 顶栏
+   * 内容区高度 (顶栏高度减下边框 0.25 个间距单位) 的一半, 减去按钮高度 7 个间距单位的一半.
+   */
+  --sidebar-row-icon-inset: calc(
+    (var(--sidebar-collapsed-width) - var(--space-base) * 5.75) / 2
+  );
+  --sidebar-footer-icon-inset: calc(
+    (var(--sidebar-collapsed-width) - var(--space-base) * 10.75) / 2
+  );
+  --sidebar-separator-offset: calc(
+    var(--topbar-height) - var(--control-height) - var(--space-base) * 2.25
+  );
+  --sidebar-toggle-offset: calc(
+    (var(--topbar-height) - var(--space-base) * 0.25) / 2 - var(--space-base) *
+      3.5
+  );
 }

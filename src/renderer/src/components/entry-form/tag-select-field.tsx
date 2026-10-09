@@ -189,7 +189,7 @@ function TagSelectControl(props: TagSelectControlProps): React.JSX.Element {
 }
 
 /**
- * 条目表单里的 "标签" 字段: 标签文字, 多选下拉, 没有任何标签时提示先到左侧栏新建, 以及校验错误.
+ * 条目表单里的 "标签" 字段: 标签文字, 多选下拉, 没有任何标签时提示先到设置里新建, 以及校验错误.
  * 新建与编辑共用, 必须在 `FormProvider` 里使用.
  * @param props 组件属性.
  * @returns 标签字段元素.

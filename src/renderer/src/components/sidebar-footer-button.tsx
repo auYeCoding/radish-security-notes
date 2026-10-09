@@ -45,10 +45,11 @@ interface SidebarFooterButtonProps {
 }
 
 /**
- * 按钮的类名: 占满一行, 图标与文字这一组始终居中. 按钮本身不留内边距与间距, 它们由图标格与文字区
- * 自己的内边距过渡, 所以展开时图标靠起始侧, 折叠时图标居中.
+ * 按钮的类名: 占满一行, 内容靠起始侧排列. 按钮本身不留内边距与间距, 它们由图标格与文字区自己的
+ * 内边距过渡, 所以展开时图标靠起始侧, 折叠时图标的起始侧内边距让它恰好居中, 图标只在这两个终态
+ * 之间滑动.
  */
-const BUTTON_CLASSES = "w-full justify-center text-start";
+const BUTTON_CLASSES = "w-full justify-start text-start";
 
 /**
  * 按钮不可用时追加的类名: 变淡, 悬停不再变色, 指针恢复默认. 用 `aria-disabled` 而不是原生禁用,

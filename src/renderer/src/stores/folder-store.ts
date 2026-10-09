@@ -41,9 +41,9 @@ export interface FolderActions {
    */
   remove: (id: string) => Promise<FolderResult<undefined>>;
   /**
-   * 让主进程把一个条目放进文件夹, 或移出文件夹回到未分类.
+   * 让主进程把一个条目放进文件夹, 或移出文件夹.
    * @param entryId 条目编号.
-   * @param folderId 目标文件夹编号, 未分类时为 undefined.
+   * @param folderId 目标文件夹编号, 移出文件夹时为 undefined.
    * @returns 放入结果.
    */
   assignEntry: (

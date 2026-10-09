@@ -37,12 +37,12 @@ export const MAIN_WINDOW_MIN_WIDTH = 768;
 /**
  * 主窗口的初始宽度, 按内容区计.
  */
-export const MAIN_WINDOW_WIDTH = 1100;
+export const MAIN_WINDOW_WIDTH = 1600;
 
 /**
  * 主窗口的初始高度, 按内容区计.
  */
-export const MAIN_WINDOW_HEIGHT = 720;
+export const MAIN_WINDOW_HEIGHT = 900;
 
 /**
  * 创建无框的主窗口, 渲染完成后再显示, 渲染进程开启沙箱, 并加上导航防护: 页面不能导航或重定向

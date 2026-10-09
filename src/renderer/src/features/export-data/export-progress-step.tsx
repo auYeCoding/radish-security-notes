@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import type { ExportProgressSnapshot } from "@shared/export/export-types";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
 import { Progress, ProgressLabel } from "@renderer/components/ui/progress";
@@ -56,7 +57,7 @@ export function ExportProgressStep(
   const hasCounts = props.progress !== undefined && props.progress.total > 0;
   return (
     <>
-      <div className="flex flex-col gap-2" role="status">
+      <DialogScrollBody className="gap-2" role="status">
         <Progress value={toPercentage(props.progress)}>
           <ProgressLabel>{t(`export.progress.${stage}`)}</ProgressLabel>
         </Progress>
@@ -68,7 +69,7 @@ export function ExportProgressStep(
             })}
           </p>
         )}
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button variant="outline" onClick={props.onCancel}>
           {t("export.progress.cancel")}

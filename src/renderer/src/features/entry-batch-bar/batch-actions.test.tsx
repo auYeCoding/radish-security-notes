@@ -29,7 +29,7 @@ const FOLDERS: readonly FolderSummary[] = [
 ];
 
 /**
- * 论坛带重要与工作标签, 银行带工作标签, 维基没有标签, 都未分类.
+ * 论坛带重要与工作标签, 银行带工作标签, 维基没有标签, 都没有所属文件夹.
  */
 const TAGGED_ENTRIES: readonly EntryDetail[] = [
   { ...FORUM_ENTRY, tagIds: ["important", "work-tag"] },
@@ -92,10 +92,10 @@ describe("批量移入文件夹", () => {
     ]);
   });
 
-  it("点未分类把条目移回未分类", async () => {
+  it("点无文件夹把条目移出文件夹", async () => {
     const environment = await renderWithTwoChecked();
 
-    await chooseBatchMenuItem("移入文件夹", "未分类");
+    await chooseBatchMenuItem("移入文件夹", "无文件夹");
 
     await waitFor(() =>
       expect(environment.batchBridge.moveEntries).toHaveBeenCalledWith(

@@ -7,6 +7,7 @@ import {
 } from "@shared/entries/custom-types/custom-entry-type-key";
 import type { EntryTypeDefinition } from "@shared/entries/entry-field-types";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { useEntryTypeCatalog } from "@renderer/stores/use-entry-type-catalog";
 
 import { CustomTypeTile } from "./custom-type-tile";
@@ -35,7 +36,7 @@ interface EntryTypeGridProps {
 /**
  * 新建条目第一步的类型选择网格: 全部预设类型按预设顺序排在前面, 用户的自定义类型按创建先后接在
  * 后面, 最后是 "新建类型" 格; 窄时两列, 宽时三列. 自定义类型格带 "更多" 菜单, 里面是编辑类型与
- * 删除类型, 删除前先弹出确认框; 预设类型格没有菜单.
+ * 删除类型, 删除前先弹出确认框; 预设类型格没有菜单. 类型多到超出对话框高度时在网格区域内滚动.
  * @param props 组件属性.
  * @returns 类型网格元素.
  */
@@ -47,32 +48,34 @@ export function EntryTypeGrid(props: EntryTypeGridProps): React.JSX.Element {
   >(undefined);
   return (
     <>
-      <div
-        role="group"
-        aria-label={t("entryCreate.typeStep.title")}
-        className="grid grid-cols-2 gap-3 sm:grid-cols-3"
-      >
-        {catalog.types.map((type) =>
-          isCustomTypeKey(type.key) ? (
-            <CustomTypeTile
-              key={type.key}
-              type={type}
-              onSelect={props.onSelect}
-              onEdit={(selected) =>
-                props.onEditType(customTypeIdOf(selected.key) ?? selected.key)
-              }
-              onDelete={setDeletingType}
-            />
-          ) : (
-            <EntryTypeTile
-              key={type.key}
-              type={type}
-              onSelect={props.onSelect}
-            />
-          ),
-        )}
-        <NewTypeTile onSelect={props.onCreateType} />
-      </div>
+      <DialogScrollBody>
+        <div
+          role="group"
+          aria-label={t("entryCreate.typeStep.title")}
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+        >
+          {catalog.types.map((type) =>
+            isCustomTypeKey(type.key) ? (
+              <CustomTypeTile
+                key={type.key}
+                type={type}
+                onSelect={props.onSelect}
+                onEdit={(selected) =>
+                  props.onEditType(customTypeIdOf(selected.key) ?? selected.key)
+                }
+                onDelete={setDeletingType}
+              />
+            ) : (
+              <EntryTypeTile
+                key={type.key}
+                type={type}
+                onSelect={props.onSelect}
+              />
+            ),
+          )}
+          <NewTypeTile onSelect={props.onCreateType} />
+        </div>
+      </DialogScrollBody>
       {deletingType !== undefined && (
         <DeleteCustomTypeDialog
           type={deletingType}

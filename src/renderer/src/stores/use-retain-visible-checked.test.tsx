@@ -23,7 +23,7 @@ function entryOf(id: string, extra: Partial<EntryDetail> = {}): EntryDetail {
 }
 
 /**
- * 渲染 hook 并读取条目: a 与 b 在工作文件夹, c 未分类.
+ * 渲染 hook 并读取条目: a 与 b 在工作文件夹, c 没有所属文件夹.
  * @returns 测试环境.
  */
 async function renderRetaining(): Promise<EntryTestEnvironment> {

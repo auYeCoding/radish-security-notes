@@ -28,7 +28,7 @@ const FOLDERS: readonly FolderSummary[] = [
 ];
 
 /**
- * 论坛与银行在办公文件夹里, 维基未分类.
+ * 论坛与银行在办公文件夹里, 维基没有所属文件夹.
  */
 const ENTRIES: readonly EntryDetail[] = [
   { ...FORUM_ENTRY, folderId: "office" },

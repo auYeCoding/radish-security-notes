@@ -1,10 +1,13 @@
 import { useTranslation } from "react-i18next";
 
 import { RecoveryWordsDisplay } from "@renderer/components/recovery-words-display";
+import {
+  DialogScrollBody,
+  ScrollableDialogContent,
+} from "@renderer/components/scrollable-dialog";
 import { Button } from "@renderer/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -38,6 +41,41 @@ interface RecoveryKeyWordsDialogProps {
 }
 
 /**
+ * 展示步骤底部操作区的属性.
+ */
+interface RecoveryKeyWordsActionsProps {
+  /**
+   * 点 "隐藏" 时的回调.
+   */
+  readonly onHide: () => void;
+  /**
+   * 点 "完成" 时的回调.
+   */
+  readonly onClose: () => void;
+}
+
+/**
+ * 展示步骤的底部操作区: "隐藏" 与 "完成" 两个按钮.
+ * @param props 组件属性.
+ * @returns 操作区元素.
+ */
+function RecoveryKeyWordsActions(
+  props: RecoveryKeyWordsActionsProps,
+): React.JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <DialogFooter>
+      <Button type="button" variant="outline" onClick={props.onHide}>
+        {t("settings.security.recoveryKey.shown.hide")}
+      </Button>
+      <Button type="button" onClick={props.onClose}>
+        {t("settings.security.recoveryKey.shown.done")}
+      </Button>
+    </DialogFooter>
+  );
+}
+
+/**
  * 查看恢复密钥的展示步骤, 挂载即打开, 关闭即卸载: 24 个编号恢复词, 打印恢复套件与保存为文本文件,
  * 没有复制入口. 显示满固定时长后自动隐藏; 打印版式只在这一步存在. 词只在这个组件存在期间留在
  * 渲染端内存里.
@@ -62,7 +100,10 @@ export function RecoveryKeyWordsDialog(
           }
         }}
       >
-        <DialogContent closeLabel={t("common.close")} className="sm:max-w-2xl">
+        <ScrollableDialogContent
+          closeLabel={t("common.close")}
+          className="sm:max-w-2xl"
+        >
           <DialogHeader>
             <DialogTitle>
               {t("settings.security.recoveryKey.shown.title")}
@@ -73,19 +114,17 @@ export function RecoveryKeyWordsDialog(
               })}
             </DialogDescription>
           </DialogHeader>
-          <RecoveryWordsDisplay
-            words={props.words}
-            onSaveTextFile={saveRecoveryTextFile}
+          <DialogScrollBody>
+            <RecoveryWordsDisplay
+              words={props.words}
+              onSaveTextFile={saveRecoveryTextFile}
+            />
+          </DialogScrollBody>
+          <RecoveryKeyWordsActions
+            onHide={props.onHide}
+            onClose={props.onClose}
           />
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={props.onHide}>
-              {t("settings.security.recoveryKey.shown.hide")}
-            </Button>
-            <Button type="button" onClick={props.onClose}>
-              {t("settings.security.recoveryKey.shown.done")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
+        </ScrollableDialogContent>
       </Dialog>
       <RecoveryKeyPrintPortal words={props.words} />
     </>

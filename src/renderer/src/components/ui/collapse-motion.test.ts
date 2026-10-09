@@ -13,6 +13,8 @@ import {
   COLLAPSE_EXTENT_TRANSITION,
   COLLAPSE_FADE_CLASSES,
   COLLAPSE_FADE_TRANSITION,
+  COLLAPSE_LAYER_CELL_CLASSES,
+  COLLAPSE_LAYER_STACK_CLASSES,
   COLLAPSE_SPACE_TRANSITION,
   COLLAPSIBLE_TEXT_BASE_CLASSES,
   COLLAPSIBLE_TEXT_STATE_CLASSES,
@@ -31,10 +33,9 @@ const COLLAPSE_CONSTANTS: readonly (readonly [string, string])[] = [
   ["COLLAPSE_FADE_CLASSES.collapsed", COLLAPSE_FADE_CLASSES.collapsed],
   ["COLLAPSE_BOX_BASE_CLASSES", COLLAPSE_BOX_BASE_CLASSES],
   ["COLLAPSE_BOX_AXIS_CLASSES.width", COLLAPSE_BOX_AXIS_CLASSES.width.expanded],
-  [
-    "COLLAPSE_BOX_AXIS_CLASSES.height",
-    COLLAPSE_BOX_AXIS_CLASSES.height.expanded,
-  ],
+  ["COLLAPSE_BOX_AXIS_CLASSES.none", COLLAPSE_BOX_AXIS_CLASSES.none.expanded],
+  ["COLLAPSE_LAYER_STACK_CLASSES", COLLAPSE_LAYER_STACK_CLASSES],
+  ["COLLAPSE_LAYER_CELL_CLASSES", COLLAPSE_LAYER_CELL_CLASSES],
   ["COLLAPSIBLE_TEXT_BASE_CLASSES", COLLAPSIBLE_TEXT_BASE_CLASSES],
   [
     "COLLAPSIBLE_TEXT_STATE_CLASSES.expanded",
@@ -139,15 +140,23 @@ describe("折叠过渡的节奏", () => {
 });
 
 describe("折叠过渡的状态类名", () => {
-  it("盒子展开取自动尺寸, 折叠取零, 沿宽度收放的盒子不参与挤压", () => {
-    expect(COLLAPSE_BOX_AXIS_CLASSES.height.expanded).toBe("h-auto");
-    expect(COLLAPSE_BOX_AXIS_CLASSES.height.collapsed).toBe("h-0");
+  it("沿宽度收放的盒子展开取自动宽度, 折叠取零, 不参与挤压; 尺寸不变的盒子两种状态都不设尺寸", () => {
+    expect(COLLAPSE_BOX_AXIS_CLASSES.none.expanded).toBe("");
+    expect(COLLAPSE_BOX_AXIS_CLASSES.none.collapsed).toBe("");
     expect(COLLAPSE_BOX_AXIS_CLASSES.width.expanded.split(" ")).toEqual(
       expect.arrayContaining(["w-auto", "shrink-0"]),
     );
     expect(COLLAPSE_BOX_AXIS_CLASSES.width.collapsed.split(" ")).toEqual(
       expect.arrayContaining(["w-0", "shrink-0"]),
     );
+  });
+
+  it("叠放容器是单列网格, 叠放的层都落在第一行第一列", () => {
+    expect(COLLAPSE_LAYER_STACK_CLASSES).toBe("grid");
+    expect(COLLAPSE_LAYER_CELL_CLASSES.split(" ")).toEqual([
+      "col-start-1",
+      "row-start-1",
+    ]);
   });
 
   it("文字区展开占满剩余宽度并留间距, 折叠份额与间距归零", () => {

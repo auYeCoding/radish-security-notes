@@ -18,11 +18,9 @@
   },
   "folderPane": {
     "foldersHeading": "Folders",
-    "tagsHeading": "Tags",
     "emptyFolders": "No folders yet",
     "emptyTags": "No tags yet",
     "allEntries": "All entries",
-    "uncategorized": "Uncategorized",
     "loadFailed": "Unable to load folders. Close the app and try again.",
     "tagsLoadFailed": "Unable to load tags. Close the app and try again.",
     "actions": "More actions for {name}"
@@ -62,7 +60,7 @@
     "open": "Delete",
     "title": "Delete this folder?",
     "descriptionEmpty": "\"{name}\" will be deleted.",
-    "descriptionWithEntries": "\"{name}\" will be deleted. {count, plural, one {Its # entry moves} other {Its # entries move}} to Uncategorized and {count, plural, one {is} other {are}} not deleted.",
+    "descriptionWithEntries": "\"{name}\" will be deleted. {count, plural, one {Its # entry loses its folder} other {Its # entries lose their folder}} and {count, plural, one {is} other {are}} not deleted.",
     "cancel": "Cancel",
     "confirm": "Delete",
     "deleting": "Deleting...",
@@ -167,7 +165,7 @@
     "fieldHidden": "{label} hidden",
     "copied": "Copied",
     "folder": "Folder: {name}",
-    "uncategorized": "Uncategorized",
+    "noFolder": "No folder",
     "tags": "Tags"
   },
   "entryTotp": {
@@ -236,10 +234,10 @@
   "entryForm": {
     "nameLabel": "Name",
     "folderLabel": "Folder",
-    "folderNone": "Uncategorized",
+    "folderNone": "No folder",
     "tagsLabel": "Tags",
     "tagsPlaceholder": "Choose tags",
-    "tagsEmpty": "No tags yet. Create one in the sidebar first.",
+    "tagsEmpty": "No tags yet. Create one in Settings first.",
     "tagsNoMatches": "No matching tags",
     "tagRemove": "Remove tag {name}",
     "notesLabel": "Notes",
@@ -412,6 +410,7 @@
     "rowCheckboxPrompt": "Select entry",
     "invert": "Invert selection",
     "move": "Move to folder",
+    "moveToNoFolder": "No folder",
     "addTag": "Add tag",
     "removeTag": "Remove tag",
     "delete": "Delete selected entries",
@@ -672,7 +671,7 @@
         "heading": "What to export",
         "all": "All entries",
         "current": "Current list",
-        "currentHint": "The entries of the folder and tags selected in the sidebar and filtered by the search.",
+        "currentHint": "The entries of the folder selected in the sidebar and filtered by the search.",
         "checked": "Checked entries",
         "checkedHint": "The entries checked in the entry list.",
         "count": "{count}",
@@ -1146,7 +1145,7 @@
     "open": "Settings",
     "dialog": {
       "title": "Settings",
-      "description": "Manage appearance and language, importing, exporting, backing up and restoring your data, plus your master password and recovery key."
+      "description": "Manage appearance and language, tags, importing, exporting, backing up and restoring your data, plus your master password and recovery key."
     },
     "appearance": {
       "title": "Appearance and language",
@@ -1157,6 +1156,12 @@
       "language": {
         "name": "Language",
         "description": "Choose the interface language."
+      }
+    },
+    "tags": {
+      "title": "Tags",
+      "create": {
+        "description": "Create tags to organize your entries. Type a tag name in the search box to find the entries that carry it."
       }
     },
     "data": {

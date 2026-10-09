@@ -7,7 +7,7 @@ import { useFolderStore } from "./use-folder-store";
 
 /**
  * 取得把条目放进文件夹的方法: 先经文件夹接口写入主进程, 成功后再更新条目在内存里的归属.
- * @returns 放入方法, 目标文件夹编号为 undefined 表示移回未分类.
+ * @returns 放入方法, 目标文件夹编号为 undefined 表示移出文件夹.
  */
 export function useMoveEntryToFolder(): (
   entryId: string,

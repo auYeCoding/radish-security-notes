@@ -25,7 +25,7 @@ const FOLDERS: readonly FolderSummary[] = [
 const WORK_FORUM: EntryDetail = { ...FORUM_ENTRY, folderId: "work" };
 
 describe("编辑条目表单里的所属文件夹", () => {
-  it("预选条目现在所属的文件夹, 未分类的条目预选未分类", async () => {
+  it("预选条目现在所属的文件夹, 没有所属文件夹的条目预选无文件夹", async () => {
     await renderOpenedEditEntryDialog(
       (detail) => <EditEntryTrigger detail={detail} />,
       WORK_FORUM,
@@ -37,7 +37,7 @@ describe("编辑条目表单里的所属文件夹", () => {
     ).toContain("工作");
   });
 
-  it("未分类的条目预选未分类", async () => {
+  it("没有所属文件夹的条目预选无文件夹", async () => {
     await renderOpenedEditEntryDialog(
       (detail) => <EditEntryTrigger detail={detail} />,
       FORUM_ENTRY,
@@ -46,7 +46,7 @@ describe("编辑条目表单里的所属文件夹", () => {
 
     expect(
       screen.getByRole("combobox", { name: "所属文件夹" }).textContent,
-    ).toContain("未分类");
+    ).toContain("无文件夹");
   });
 });
 
@@ -100,8 +100,8 @@ describe("编辑条目时改到另一个文件夹", () => {
   });
 });
 
-describe("编辑条目时改回未分类与失败", () => {
-  it("改回未分类后保存, 更新输入不带所属", async () => {
+describe("编辑条目时改回无文件夹与失败", () => {
+  it("改回无文件夹后保存, 更新输入不带所属", async () => {
     const environment = await renderOpenedEditEntryDialog(
       (detail) => <EditEntryTrigger detail={detail} />,
       WORK_FORUM,
@@ -110,7 +110,7 @@ describe("编辑条目时改回未分类与失败", () => {
     const user = userEvent.setup();
 
     await user.click(screen.getByRole("combobox", { name: "所属文件夹" }));
-    await user.click(await screen.findByRole("option", { name: "未分类" }));
+    await user.click(await screen.findByRole("option", { name: "无文件夹" }));
     await user.click(screen.getByRole("button", { name: "保存" }));
 
     await waitFor(() => {

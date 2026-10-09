@@ -2,7 +2,10 @@ import { render, screen, within } from "@testing-library/react";
 import { FolderIcon } from "lucide-react";
 import { describe, expect, it } from "vitest";
 
-import { expectMotionClasses } from "@renderer/testing/expect-motion-classes";
+import {
+  expectMotionClasses,
+  expectNoClassContaining,
+} from "@renderer/testing/expect-motion-classes";
 import { createPreferencesTestEnvironment } from "@renderer/testing/preferences-test-environment";
 
 import { EmptyState } from "./empty-state";
@@ -15,6 +18,16 @@ import {
   COLLAPSE_FADE_CLASSES,
   COLLAPSIBLE_TEXT_STATE_CLASSES,
 } from "./ui/collapse-motion";
+
+/**
+ * 随折叠收起或放出的尺寸类名片段: 分区标题块, 分隔线块与空状态说明块都不应带, 折叠前后占位才一样.
+ */
+const UNSIZED_BOX_FRAGMENTS: readonly string[] = [
+  "w-0",
+  "w-auto",
+  "h-0",
+  "h-auto",
+];
 
 /**
  * 渲染一行带行尾操作的侧栏入口.
@@ -64,15 +77,15 @@ function renderHeading(isCollapsed: boolean): void {
 
 describe("侧栏行的折叠过渡", () => {
   it.each([false, true])(
-    "折叠为 %s 时按钮居中且不留间距, 间距由文字容器承担",
+    "折叠为 %s 时按钮内容靠起始侧且不留起始侧内边距与间距, 间距由文字容器与图标格承担",
     async (isCollapsed) => {
       const row = await renderRow(isCollapsed);
       const button = within(row).getByRole("button", { name: /^工作\s*3$/ });
 
-      ["justify-center", "gap-0", "px-3"].forEach((className) =>
+      ["justify-start", "gap-0", "ps-0", "pe-3"].forEach((className) =>
         expect(button.classList.contains(className)).toBe(true),
       );
-      expect(button.classList.contains("justify-start")).toBe(false);
+      expect(button.classList.contains("px-3")).toBe(false);
     },
   );
 
@@ -113,7 +126,7 @@ describe("侧栏行的折叠过渡", () => {
 });
 
 describe("分区标题的折叠过渡", () => {
-  it("展开时标题块展开, 分隔线块收起并淡出", () => {
+  it("展开时标题块淡入, 分隔线块淡出, 两块都不改变尺寸", () => {
     renderHeading(false);
 
     const titleBox = closestBox(screen.getByText("标签"));
@@ -122,46 +135,78 @@ describe("分区标题的折叠过渡", () => {
     );
     expect(titleBox?.getAttribute("data-state")).toBe("expanded");
     expect(separatorBox?.getAttribute("data-state")).toBe("collapsed");
-    expectMotionClasses(titleBox, COLLAPSE_BOX_AXIS_CLASSES.height.expanded);
     expectMotionClasses(
-      separatorBox,
-      COLLAPSE_BOX_AXIS_CLASSES.height.collapsed,
+      titleBox?.firstElementChild ?? null,
+      COLLAPSE_FADE_CLASSES.expanded,
     );
+    expectMotionClasses(
+      separatorBox?.firstElementChild ?? null,
+      COLLAPSE_FADE_CLASSES.collapsed,
+    );
+    expectNoClassContaining(titleBox, UNSIZED_BOX_FRAGMENTS);
+    expectNoClassContaining(separatorBox, UNSIZED_BOX_FRAGMENTS);
     expect(separatorBox?.hasAttribute("inert")).toBe(true);
   });
 
-  it("折叠时标题块收起并淡出, 分隔线块展开并淡入, 两者交叉", () => {
+  it("折叠时标题块淡出, 分隔线块淡入, 两者交叉, 两块都不改变尺寸", () => {
     renderHeading(true);
 
     const titleBox = closestBox(screen.getByText("标签"));
     const separatorBox = closestBox(screen.getByRole("separator"));
-    expectMotionClasses(titleBox, COLLAPSE_BOX_AXIS_CLASSES.height.collapsed);
     expectMotionClasses(
       titleBox?.firstElementChild ?? null,
       COLLAPSE_FADE_CLASSES.collapsed,
     );
     expectMotionClasses(
-      separatorBox,
-      COLLAPSE_BOX_AXIS_CLASSES.height.expanded,
-    );
-    expectMotionClasses(
       separatorBox?.firstElementChild ?? null,
       COLLAPSE_FADE_CLASSES.expanded,
     );
+    expectNoClassContaining(titleBox, UNSIZED_BOX_FRAGMENTS);
+    expectNoClassContaining(separatorBox, UNSIZED_BOX_FRAGMENTS);
+    expect(titleBox?.hasAttribute("inert")).toBe(true);
     expect(separatorBox?.hasAttribute("inert")).toBe(false);
   });
 });
 
+describe("分区标题的叠放", () => {
+  it.each([false, true])(
+    "折叠为 %s 时标题块与分隔线块叠放在同一个网格单元里, 分隔线从固定偏移处开始, 与顶栏下边线对齐",
+    (isCollapsed) => {
+      renderHeading(isCollapsed);
+
+      const titleBox = closestBox(screen.getByText("标签"));
+      const separatorBox = closestBox(
+        screen.getByRole("separator", { hidden: true }),
+      );
+      expect(titleBox?.parentElement).toBe(separatorBox?.parentElement);
+      expect(titleBox?.parentElement?.classList.contains("grid")).toBe(true);
+      ["col-start-1", "row-start-1"].forEach((className) => {
+        expect(titleBox?.classList.contains(className)).toBe(true);
+        expect(separatorBox?.classList.contains(className)).toBe(true);
+      });
+      expect(separatorBox?.classList.contains("self-start")).toBe(true);
+      expect(separatorBox?.classList.contains("self-center")).toBe(false);
+      expect(
+        separatorBox?.classList.contains("mt-(--sidebar-separator-offset)"),
+      ).toBe(true);
+      expect(
+        titleBox?.classList.contains("mt-(--sidebar-separator-offset)"),
+      ).toBe(false);
+    },
+  );
+});
+
 describe("空状态的折叠过渡", () => {
-  it("折叠时沿高度收起并淡出, 展开时恢复", () => {
+  it("折叠时只淡出, 展开时恢复, 两种状态占位一样", () => {
     const { rerender } = render(
       <SidebarCollapseContext.Provider value={true}>
         <EmptyState message="还没有标签" />
       </SidebarCollapseContext.Provider>,
     );
     const box = closestBox(screen.getByText("还没有标签"));
+    const collapsedClasses = Array.from(box?.classList ?? []);
 
-    expectMotionClasses(box, COLLAPSE_BOX_AXIS_CLASSES.height.collapsed);
+    expectNoClassContaining(box, UNSIZED_BOX_FRAGMENTS);
     expectMotionClasses(
       box?.firstElementChild ?? null,
       COLLAPSE_FADE_CLASSES.collapsed,
@@ -173,7 +218,7 @@ describe("空状态的折叠过渡", () => {
       </SidebarCollapseContext.Provider>,
     );
 
-    expectMotionClasses(box, COLLAPSE_BOX_AXIS_CLASSES.height.expanded);
+    expect(Array.from(box?.classList ?? [])).toEqual(collapsedClasses);
     expect(box).toBe(closestBox(screen.getByText("还没有标签")));
   });
 });

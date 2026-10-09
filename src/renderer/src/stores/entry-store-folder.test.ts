@@ -5,11 +5,7 @@ import type {
   NewEntryInput,
   UpdateEntryInput,
 } from "@shared/entries/entry-types";
-import {
-  ALL_ENTRIES_VIEW,
-  UNCATEGORIZED_VIEW,
-  folderViewOf,
-} from "@shared/folders/folder-view";
+import { ALL_ENTRIES_VIEW, folderViewOf } from "@shared/folders/folder-view";
 
 import {
   BANK_ENTRY,
@@ -37,7 +33,7 @@ const WORK_BANK: EntryDetail = { ...BANK_ENTRY, folderId: "work" };
 const HOME_WALLET: EntryDetail = { ...WALLET_ENTRY, folderId: "home" };
 
 /**
- * 创建带四个条目的 store, 已读取列表: 论坛与银行在工作, 维基未分类, 钱包在家庭.
+ * 创建带四个条目的 store, 已读取列表: 论坛与银行在工作, 维基没有所属文件夹, 钱包在家庭.
  * @returns 条目 store.
  */
 async function createLoadedStore(): Promise<EntryStore> {
@@ -56,7 +52,7 @@ async function createLoadedStore(): Promise<EntryStore> {
 /**
  * 取 store 里每个条目的编号与所属文件夹.
  * @param store 条目 store.
- * @returns 编号与所属文件夹编号组成的数组, 未分类的所属为 "none".
+ * @returns 编号与所属文件夹编号组成的数组, 没有所属文件夹的所属为 "none".
  */
 function placements(store: EntryStore): string[][] {
   return store
@@ -66,7 +62,7 @@ function placements(store: EntryStore): string[][] {
 
 /**
  * 通用登录的新建输入, 名称为 "新条目", 所属文件夹由调用方给出.
- * @param folderId 所属文件夹编号, 未分类时省略.
+ * @param folderId 所属文件夹编号, 没有所属文件夹时省略.
  * @returns 新建输入.
  */
 function newInputIn(folderId?: string): NewEntryInput {
@@ -113,9 +109,9 @@ describe("条目 store 入口与选中", () => {
     const store = await createLoadedStore();
     store.getState().setQuery("维基");
 
-    store.getState().selectView(UNCATEGORIZED_VIEW);
+    store.getState().selectView(folderViewOf("home"));
 
-    expect(store.getState().view).toEqual(UNCATEGORIZED_VIEW);
+    expect(store.getState().view).toEqual(folderViewOf("home"));
     expect(store.getState().query).toBe("维基");
     expect(store.getState().selection).toEqual({ status: "none" });
   });
@@ -187,7 +183,7 @@ describe("条目 store 把条目放进文件夹", () => {
 });
 
 describe("条目 store 释放已删除的文件夹", () => {
-  it("其中条目回到未分类, 别的文件夹的条目不变", async () => {
+  it("其中条目变为无文件夹, 别的文件夹的条目不变", async () => {
     const store = await createLoadedStore();
 
     store.getState().releaseFolder("work");
@@ -238,7 +234,7 @@ const FORUM_UPDATE_INPUT: UpdateEntryInput = {
 };
 
 describe("条目 store 入口跟随条目", () => {
-  it("新建的条目不属于当前入口时, 入口切到它所属的文件夹, 未分类则切到未分类", async () => {
+  it("新建的条目不属于当前入口时, 入口切到它所属的文件夹, 没有所属文件夹则切到全部条目", async () => {
     const store = await createLoadedStore();
     store.getState().selectView(folderViewOf("work"));
 
@@ -246,7 +242,7 @@ describe("条目 store 入口跟随条目", () => {
     expect(store.getState().view).toEqual(folderViewOf("home"));
     await store.getState().create(newInputIn());
 
-    expect(store.getState().view).toEqual(UNCATEGORIZED_VIEW);
+    expect(store.getState().view).toEqual(ALL_ENTRIES_VIEW);
   });
 
   it("新建的条目属于当前入口, 或入口是全部条目时入口不变", async () => {

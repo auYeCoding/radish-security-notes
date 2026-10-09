@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
 
+import { Separator } from "@renderer/components/ui/separator";
+
 import { SettingsRow } from "./settings-row";
 import { SettingsSection } from "./settings-section";
 
@@ -48,9 +50,9 @@ interface SettingsSecuritySectionProps {
 }
 
 /**
- * 设置对话框的 "安全" 分区: 依次是 "主密码", "恢复密钥", "空闲自动锁定", "锁屏时锁定" 与 "休眠时锁定"
- * 五行, 名称与说明是本分区自己的文案, 右侧是装配层提供的开关与按钮. 没有设主密码时自动锁定不生效,
- * 三个自动锁定行之后有一行说明原因. 最后是 "内容保护" 一行, 不依赖主密码.
+ * 设置对话框的 "安全" 分区, 分三组, 组间有分隔线: 第一组是 "主密码" 与 "恢复密钥", 第二组是 "空闲自动锁定",
+ * "锁屏时锁定" 与 "休眠时锁定", 第三组是 "内容保护", 不依赖主密码. 名称与说明是本分区自己的文案, 右侧是
+ * 装配层提供的开关与按钮. 没有设主密码时自动锁定不生效, 第二组的三行之后有一行说明原因.
  * @param props 组件属性.
  * @returns 安全分区元素.
  */
@@ -70,6 +72,7 @@ export function SettingsSecuritySection(
         description={t("settings.security.recoveryKey.description")}
         action={props.entries.recoveryKeyAction}
       />
+      <Separator />
       <SettingsRow
         name={t("settings.security.autoLock.idle.name")}
         description={t("settings.security.autoLock.idle.description")}
@@ -90,6 +93,7 @@ export function SettingsSecuritySection(
           {t("settings.security.autoLock.unavailable")}
         </p>
       )}
+      <Separator />
       <SettingsRow
         name={t("settings.security.contentProtection.name")}
         description={t("settings.security.contentProtection.description")}

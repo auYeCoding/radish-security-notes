@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 
+import { ScrollableDialogContent } from "@renderer/components/scrollable-dialog";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -24,7 +24,7 @@ interface EmailBackupDialogProps {
 /**
  * 邮箱备份对话框, 挂载即打开, 关闭即卸载: 承载邮箱设置, 发送测试邮件与立即备份. 主进程处理期间
  * (保存, 发送测试邮件, 备份) 不能关闭; 其余时候关闭对话框会让流程状态 (含授权码, 口令与主密码)
- * 随组件卸载丢弃. 内容较多时面板可以滚动.
+ * 随组件卸载丢弃. 标题与底部按钮行固定, 内容较多时只有中间的正文滚动.
  * @param props 组件属性.
  * @returns 对话框元素.
  */
@@ -41,10 +41,10 @@ export function EmailBackupDialog(
   };
   return (
     <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent
+      <ScrollableDialogContent
         closeLabel={t("common.close")}
         showCloseButton={!isWorking}
-        className="max-h-11/12 overflow-y-auto sm:max-w-xl"
+        className="sm:max-w-xl"
       >
         <DialogHeader>
           <DialogTitle>{t("emailBackup.dialog.title")}</DialogTitle>
@@ -53,7 +53,7 @@ export function EmailBackupDialog(
           </DialogDescription>
         </DialogHeader>
         <EmailBackupDialogBody flow={flow} />
-      </DialogContent>
+      </ScrollableDialogContent>
     </Dialog>
   );
 }

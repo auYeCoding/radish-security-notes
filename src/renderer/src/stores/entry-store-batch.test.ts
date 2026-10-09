@@ -26,7 +26,7 @@ function entryNamed(
 
 /**
  * 创建带四个条目的 store, 已读取列表: 名称依次是 Aa, Bb, Cc, Dd, 列表按名称排序后也是这个顺序.
- * @param details 四个条目的详情, 默认都未分类也没有标签.
+ * @param details 四个条目的详情, 默认都没有所属文件夹也没有标签.
  * @returns 条目 store.
  */
 async function createLoadedStore(
@@ -48,13 +48,10 @@ async function createLoadedStore(
  * @returns 编号, 按显示顺序排列.
  */
 function visibleIds(store: EntryStore): string[] {
-  const { entries, searchMatches, selectedTagIds, view } = store.getState();
-  return selectVisibleEntries({
-    entries,
-    view,
-    tagIds: selectedTagIds,
-    matches: searchMatches,
-  }).map((entry) => entry.id);
+  const { entries, searchMatches, view } = store.getState();
+  return selectVisibleEntries({ entries, view, matches: searchMatches }).map(
+    (entry) => entry.id,
+  );
 }
 
 describe("条目 store 批量删除的内存更新", () => {
@@ -197,13 +194,12 @@ describe("条目 store 批量加标签与摘标签的内存更新", () => {
     });
   });
 
-  it("摘掉正在筛选的标签后条目离开可见列表, 详情选中仍可见的相邻条目", async () => {
+  it("摘标签不改变可见列表, 详情里的条目保持选中", async () => {
     const store = await createLoadedStore([
       entryNamed("a", "Aa", { tagIds: ["t1"] }),
       entryNamed("b", "Bb", { tagIds: ["t1"] }),
       entryNamed("c", "Cc", { tagIds: ["t1"] }),
     ]);
-    store.getState().toggleTag("t1");
     await store.getState().select("a");
 
     await store.getState().applyBatchTags([
@@ -211,10 +207,10 @@ describe("条目 store 批量加标签与摘标签的内存更新", () => {
       { entryId: "b", tagIds: [] },
     ]);
 
-    expect(visibleIds(store)).toEqual(["c"]);
+    expect(visibleIds(store)).toEqual(["a", "b", "c"]);
     expect(store.getState().selection).toMatchObject({
       status: "ready",
-      detail: { id: "c" },
+      detail: { id: "a", tagIds: undefined },
     });
   });
 });

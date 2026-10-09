@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import type { RestoreOutcome } from "@shared/restore/restore-types";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import {
   SummaryList,
   type SummaryRow,
@@ -72,7 +73,7 @@ export function RestoreResultStep(
   const { t } = useTranslation();
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <DialogScrollBody className="gap-4">
         <p className="text-sm font-medium">{t("restore.result.heading")}</p>
         <SummaryList rows={toSummaryRows(props.outcome, t)} />
         {props.outcome.replacedExistingData && (
@@ -81,7 +82,7 @@ export function RestoreResultStep(
           </p>
         )}
         <RestoreNotIncludedNotice />
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button onClick={props.onDone}>{t("restore.result.close")}</Button>
       </DialogFooter>

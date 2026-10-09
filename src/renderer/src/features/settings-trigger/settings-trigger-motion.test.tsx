@@ -50,13 +50,12 @@ function getIconCell(button: HTMLElement): Element | null {
 }
 
 describe("设置按钮的折叠过渡: 展开", () => {
-  it("按钮固定为图标尺寸并居中, 内边距与间距交给图标格与文字区", async () => {
+  it("按钮固定为图标尺寸, 内容靠起始侧排列, 内边距与间距交给图标格与文字区", async () => {
     const button = await renderTrigger(false);
 
-    ["w-full", "justify-center", "size-8"].forEach((className) =>
+    ["w-full", "justify-start", "size-8"].forEach((className) =>
       expect(button.classList.contains(className)).toBe(true),
     );
-    expect(button.classList.contains("justify-start")).toBe(false);
   });
 
   it("图标格留起始侧内边距, 文字区占满剩余宽度并留结束侧内边距", async () => {
@@ -81,10 +80,13 @@ describe("设置按钮的折叠过渡: 展开", () => {
 });
 
 describe("设置按钮的折叠过渡: 折叠", () => {
-  it("图标格内边距归零, 文字区份额与内边距归零", async () => {
+  it("图标格起始侧内边距取折叠态居中所需的偏移, 文字区份额与内边距归零", async () => {
     const button = await renderTrigger(true);
 
-    expectMotionClasses(getIconCell(button), "ps-0 pe-0");
+    expectMotionClasses(
+      getIconCell(button),
+      "ps-(--sidebar-footer-icon-inset) pe-0",
+    );
     expectMotionClasses(getText(button), "grow-0 pe-0");
     expect(getText(button)?.classList.contains("sr-only")).toBe(false);
   });

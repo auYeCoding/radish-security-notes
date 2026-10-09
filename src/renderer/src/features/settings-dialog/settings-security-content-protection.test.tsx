@@ -80,3 +80,29 @@ describe("安全分区的内容保护行", () => {
     ).toBeDefined();
   });
 });
+
+describe("安全分区的分组", () => {
+  it("三组之间各有一条分隔线: 主密码与恢复密钥, 三个自动锁定, 内容保护", async () => {
+    await renderSection();
+
+    const section = within(screen.getByRole("region", { name: "安全" }));
+    const [recovery, idle, sleep, contentProtection] = [
+      "恢复密钥操作",
+      "空闲锁定操作",
+      "休眠锁定操作",
+      "内容保护操作",
+    ].map((name) => section.getByRole("button", { name }));
+    const separators = section.getAllByRole("separator");
+    const isBefore = (first: Element, second: Element): boolean =>
+      Boolean(
+        first.compareDocumentPosition(second) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+
+    expect(separators).toHaveLength(2);
+    expect(isBefore(recovery, separators[0])).toBe(true);
+    expect(isBefore(separators[0], idle)).toBe(true);
+    expect(isBefore(sleep, separators[1])).toBe(true);
+    expect(isBefore(separators[1], contentProtection)).toBe(true);
+  });
+});

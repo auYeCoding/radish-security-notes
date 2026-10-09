@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { folderViewOf } from "@shared/folders/folder-view";
+
 import { INITIAL_BATCH_SELECTION_STATE } from "@renderer/stores/batch-selection-state";
 import { INITIAL_ENTRY_STATE } from "@renderer/stores/entry-state";
 import { INITIAL_ENTRY_TYPE_STATE } from "@renderer/stores/entry-type-state";
@@ -31,7 +33,7 @@ const TEST_CUSTOM_TYPE = {
 
 /**
  * 创建一个五个 store 都装满数据的环境: 条目已读取并选中一个 (详情含密码), 填了搜索关键字, 选了
- * 文件夹入口与标签, 勾选了条目, 另外三个 store 也已读取.
+ * 文件夹入口, 勾选了条目, 另外三个 store 也已读取.
  * @returns 装满数据的环境.
  */
 async function createFilledEnvironment(): Promise<EntryTestEnvironment> {
@@ -45,8 +47,7 @@ async function createFilledEnvironment(): Promise<EntryTestEnvironment> {
   await environment.folderStore.getState().load();
   await environment.tagStore.getState().load();
   environment.entryStore.getState().setQuery("论坛");
-  environment.entryStore.getState().selectView({ kind: "uncategorized" });
-  environment.entryStore.getState().toggleTag(TEST_TAGS[0]?.id ?? "");
+  environment.entryStore.getState().selectView(folderViewOf(TEST_FOLDER.id));
   await environment.entryStore.getState().select(FORUM_ENTRY.id);
   environment.batchSelectionStore.getState().toggle(FORUM_ENTRY.id);
   return environment;
@@ -59,7 +60,9 @@ describe("resetWorkspaceStores", () => {
     expect(environment.entryStore.getState().entries.length).toBeGreaterThan(0);
     expect(environment.entryStore.getState().selection.status).toBe("ready");
     expect(environment.entryStore.getState().query).toBe("论坛");
-    expect(environment.entryStore.getState().selectedTagIds).not.toEqual([]);
+    expect(environment.entryStore.getState().view).toEqual(
+      folderViewOf(TEST_FOLDER.id),
+    );
     expect(environment.folderStore.getState().folders).toEqual([TEST_FOLDER]);
     expect(environment.tagStore.getState().tags).toEqual(TEST_TAGS);
     expect(environment.entryTypeStore.getState().customTypes).toEqual([
@@ -68,7 +71,7 @@ describe("resetWorkspaceStores", () => {
     expect(environment.batchSelectionStore.getState().checkedIds.size).toBe(1);
   });
 
-  it("条目 store 回到初始状态: 列表, 选中详情, 搜索, 入口与已选标签都清空", async () => {
+  it("条目 store 回到初始状态: 列表, 选中详情, 搜索与入口都清空", async () => {
     const environment = await createFilledEnvironment();
 
     resetWorkspaceStores(environment);

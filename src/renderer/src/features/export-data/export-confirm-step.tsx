@@ -2,6 +2,7 @@ import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 
 import { PasswordField } from "@renderer/components/password-field";
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import {
   SummaryList,
   type SummaryRow,
@@ -105,7 +106,7 @@ export function ExportConfirmStep(
   const entryCount = isReady ? scopeSummary.summary.entryCount : 0;
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <DialogScrollBody className="gap-4">
         <div className="flex flex-col gap-1">
           <h3 className="text-sm font-medium">{t("export.confirm.heading")}</h3>
           <p className="text-sm text-muted-foreground">
@@ -130,7 +131,7 @@ export function ExportConfirmStep(
           />
         )}
         <ExportFailureAlert failure={state.failure} />
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button variant="outline" onClick={props.onBack}>
           {t("export.confirm.back")}

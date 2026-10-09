@@ -18,11 +18,9 @@
   },
   "folderPane": {
     "foldersHeading": "文件夹",
-    "tagsHeading": "标签",
     "emptyFolders": "还没有文件夹",
     "emptyTags": "还没有标签",
     "allEntries": "全部条目",
-    "uncategorized": "未分类",
     "loadFailed": "无法读取文件夹. 请关闭应用后重试.",
     "tagsLoadFailed": "无法读取标签. 请关闭应用后重试.",
     "actions": "{name} 的更多操作"
@@ -62,7 +60,7 @@
     "open": "删除",
     "title": "删除这个文件夹?",
     "descriptionEmpty": "\"{name}\" 将被删除.",
-    "descriptionWithEntries": "\"{name}\" 将被删除, 其中的 {count} 个条目会移到未分类, 条目本身不会删除.",
+    "descriptionWithEntries": "\"{name}\" 将被删除, 其中的 {count} 个条目会变为无文件夹, 条目本身不会删除.",
     "cancel": "取消",
     "confirm": "删除",
     "deleting": "正在删除...",
@@ -167,7 +165,7 @@
     "fieldHidden": "{label} 已隐藏",
     "copied": "已复制",
     "folder": "文件夹: {name}",
-    "uncategorized": "未分类",
+    "noFolder": "无文件夹",
     "tags": "标签"
   },
   "entryTotp": {
@@ -236,10 +234,10 @@
   "entryForm": {
     "nameLabel": "名称",
     "folderLabel": "所属文件夹",
-    "folderNone": "未分类",
+    "folderNone": "无文件夹",
     "tagsLabel": "标签",
     "tagsPlaceholder": "选择标签",
-    "tagsEmpty": "还没有标签. 可以先在左侧栏新建.",
+    "tagsEmpty": "还没有标签. 可以先在设置里新建.",
     "tagsNoMatches": "没有匹配的标签",
     "tagRemove": "移除标签 {name}",
     "notesLabel": "备注",
@@ -412,6 +410,7 @@
     "rowCheckboxPrompt": "选择条目",
     "invert": "反选",
     "move": "移入文件夹",
+    "moveToNoFolder": "无文件夹",
     "addTag": "加标签",
     "removeTag": "摘标签",
     "delete": "删除选中的条目",
@@ -672,7 +671,7 @@
         "heading": "导出范围",
         "all": "全部条目",
         "current": "当前列表",
-        "currentHint": "左侧栏所选的文件夹与标签, 以及搜索筛出的条目.",
+        "currentHint": "左侧栏所选的文件夹, 以及搜索筛出的条目.",
         "checked": "已勾选的条目",
         "checkedHint": "在条目列表里勾选的条目.",
         "count": "{count} 条",
@@ -1146,7 +1145,7 @@
     "open": "设置",
     "dialog": {
       "title": "设置",
-      "description": "管理外观与语言, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥."
+      "description": "管理外观与语言, 标签, 数据的导入, 导出, 备份与恢复, 以及主密码与恢复密钥."
     },
     "appearance": {
       "title": "外观与语言",
@@ -1157,6 +1156,12 @@
       "language": {
         "name": "语言",
         "description": "选择界面语言."
+      }
+    },
+    "tags": {
+      "title": "标签",
+      "create": {
+        "description": "新建用来给条目分类的标签. 在搜索框里输入标签名, 就能找到带这个标签的条目."
       }
     },
     "data": {

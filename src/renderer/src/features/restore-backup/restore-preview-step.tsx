@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { DialogScrollBody } from "@renderer/components/scrollable-dialog";
 import { Button } from "@renderer/components/ui/button";
 import { DialogFooter } from "@renderer/components/ui/dialog";
 
@@ -51,7 +52,7 @@ export function RestorePreviewStep(
   const isVaultEmpty = preview.vault.isEmpty;
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <DialogScrollBody className="gap-4">
         <RestorePreviewSummary preview={preview} />
         {isVaultEmpty ? (
           <p className="text-sm text-muted-foreground">
@@ -71,7 +72,7 @@ export function RestorePreviewStep(
             onChange={props.onMasterPasswordChange}
           />
         )}
-      </div>
+      </DialogScrollBody>
       <DialogFooter>
         <Button variant="outline" onClick={props.onBack}>
           {t("restore.preview.back")}
