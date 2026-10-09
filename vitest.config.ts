@@ -50,6 +50,22 @@ const SHARED_ALIAS = { "@shared": resolve("src/shared") };
 export const TEST_TIMEOUT_MILLISECONDS = 15000;
 
 /**
+ * 持续集成环境里单个测试的超时, 单位毫秒. GitHub 的 Windows 运行机比开发机慢得多, 首次运行时
+ * 最慢的测试用了 46 秒, 有 4 个测试超过本机的 15 秒上限; 取本机超时的八倍, 留出一倍以上余量.
+ */
+export const CONTINUOUS_INTEGRATION_TEST_TIMEOUT_MILLISECONDS =
+  TEST_TIMEOUT_MILLISECONDS * 8;
+
+/**
+ * 本次运行实际生效的测试超时: 持续集成环境 (GitHub Actions 等会设置环境变量 `CI`) 用放宽的值,
+ * 其余情形用本机的值.
+ */
+export const EFFECTIVE_TEST_TIMEOUT_MILLISECONDS =
+  process.env.CI === undefined || process.env.CI === ""
+    ? TEST_TIMEOUT_MILLISECONDS
+    : CONTINUOUS_INTEGRATION_TEST_TIMEOUT_MILLISECONDS;
+
+/**
  * Vitest 配置, 分 main 与 renderer 两个项目, 两个项目共用同一个测试超时, 覆盖率用 v8.
  */
 export default defineConfig({
@@ -62,7 +78,7 @@ export default defineConfig({
         test: {
           name: "main",
           environment: "node",
-          testTimeout: TEST_TIMEOUT_MILLISECONDS,
+          testTimeout: EFFECTIVE_TEST_TIMEOUT_MILLISECONDS,
           include: MAIN_TEST_FILES,
           css: { include: RAW_CSS_FILES },
         },
@@ -78,7 +94,7 @@ export default defineConfig({
         test: {
           name: "renderer",
           environment: "jsdom",
-          testTimeout: TEST_TIMEOUT_MILLISECONDS,
+          testTimeout: EFFECTIVE_TEST_TIMEOUT_MILLISECONDS,
           include: RENDERER_TEST_FILES,
           setupFiles: RENDERER_SETUP_FILES,
         },

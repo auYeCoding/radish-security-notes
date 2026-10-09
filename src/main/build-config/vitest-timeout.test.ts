@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import config, { TEST_TIMEOUT_MILLISECONDS } from "../../../vitest.config";
+import config, {
+  CONTINUOUS_INTEGRATION_TEST_TIMEOUT_MILLISECONDS,
+  EFFECTIVE_TEST_TIMEOUT_MILLISECONDS,
+  TEST_TIMEOUT_MILLISECONDS,
+} from "../../../vitest.config";
 
 /**
  * 配置里一个测试项目与本测试有关的选项.
@@ -34,12 +38,23 @@ describe("vitest.config.ts 的测试超时", () => {
     expect(TEST_TIMEOUT_MILLISECONDS).toBe(15000);
   });
 
-  it("main 与 renderer 两个项目都设置了这个具名超时", () => {
+  it("持续集成环境的超时是本机超时的八倍", () => {
+    expect(CONTINUOUS_INTEGRATION_TEST_TIMEOUT_MILLISECONDS).toBe(120000);
+  });
+
+  it("生效的超时只取本机与持续集成两个具名值之一", () => {
+    expect([
+      TEST_TIMEOUT_MILLISECONDS,
+      CONTINUOUS_INTEGRATION_TEST_TIMEOUT_MILLISECONDS,
+    ]).toContain(EFFECTIVE_TEST_TIMEOUT_MILLISECONDS);
+  });
+
+  it("main 与 renderer 两个项目都设置了生效的超时", () => {
     expect(
       readProjectOptions().map(({ name, testTimeout }) => [name, testTimeout]),
     ).toEqual([
-      ["main", TEST_TIMEOUT_MILLISECONDS],
-      ["renderer", TEST_TIMEOUT_MILLISECONDS],
+      ["main", EFFECTIVE_TEST_TIMEOUT_MILLISECONDS],
+      ["renderer", EFFECTIVE_TEST_TIMEOUT_MILLISECONDS],
     ]);
   });
 });
