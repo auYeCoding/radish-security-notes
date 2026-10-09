@@ -1,6 +1,6 @@
 {
   "name": "radish-security-notes",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "本地加密的桌面密码与笔记保险库 (Electron, React, TypeScript)",
   "main": "./out/main/index.js",
   "author": "auYe",
