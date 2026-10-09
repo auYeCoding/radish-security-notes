@@ -409,6 +409,9 @@ tmbootpicker.efi
 # nohup 命令默认生成的日志文件
 nohup.out
 
+# project-navigator 的编排记录, 只留在本机
+.navigator/
+
 # Claude Code 的本地个人设置
 .claude/settings.local.json
 
